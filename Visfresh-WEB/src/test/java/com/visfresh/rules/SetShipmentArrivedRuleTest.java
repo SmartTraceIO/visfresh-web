@@ -464,7 +464,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
     protected LocationProfile createLocation(final double lat, final double lon) {
         LocationProfile loc = new LocationProfile();
         loc.setAddress("SPb");
-        loc.setCompany(company);
+        loc.setCompany(company.getCompanyId());
         loc.setName("Finish location");
         loc.getLocation().setLatitude(lat);
         loc.getLocation().setLongitude(lon);
@@ -489,7 +489,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
     private NotificationSchedule createEmailNotificaitonSchedule(final String email) {
         //create user
         final User user = new User();
-        user.setCompany(company);
+        user.setCompany(company.getCompanyId());
         user.setPassword("password");
         user.setEmail(email);
         user.setActive(true);
@@ -510,7 +510,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         final NotificationSchedule s = new NotificationSchedule();
         s.setName("Arrival Notification");
         s.getSchedules().add(schedule);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         return context.getBean(NotificationScheduleDao.class).save(s);
     }
 }

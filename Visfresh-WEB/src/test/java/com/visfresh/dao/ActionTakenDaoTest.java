@@ -53,7 +53,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
     @Before
     public void beforeTest() {
         final Device d = new Device();
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         final String imei = "932487032487";
         d.setImei(imei);
         d.setDescription("JUnit device");
@@ -62,7 +62,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
 
         final AlertProfile ap = new AlertProfile();
         ap.setName("ActionTakenTestProfile");
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
 
         final TemperatureRule rule = new TemperatureRule();
         rule.setCumulativeFlag(true);
@@ -112,8 +112,8 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         final ActionTaken e = createTestEntity();
         dao.save(e);
 
-        assertNotNull(dao.findOne(e.getId(), sharedCompany));
-        assertNull(dao.findOne(e.getId(), createCompany("Other")));
+        assertNotNull(dao.findOne(e.getId(), sharedCompany.getCompanyId()));
+        assertNull(dao.findOne(e.getId(), createCompany("Other").getCompanyId()));
     }
     @Test
     public void testFindByShipment() {
@@ -143,7 +143,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
     private User createUser(final String name) {
         final User u = new User();
         u.setActive(true);
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail(name + "@junit.ru");
         u.setFirstName(name);
         return context.getBean(UserDao.class).save(u);
@@ -156,7 +156,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
      */
     private Shipment createShipment(final Device d, final AlertProfile ap) {
         Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(d);
         s.setAlertProfile(ap);
         s = getContext().getBean(ShipmentDao.class).save(s);
@@ -252,7 +252,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         d.setImei(imei);
         d.setActive(true);
         d.setName("JUnit-" + imei);
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         return context.getBean(DeviceDao.class).save(d);
     }
     /**

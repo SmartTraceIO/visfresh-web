@@ -34,7 +34,6 @@ import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.AuthService;
@@ -88,7 +87,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String title = "Mr";
 
         final User u = new User();
-        u.setCompany(getCompany());
+        u.setCompany(getCompanyId());
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -147,7 +146,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String title = "Mrs";
 
         final User u = new User();
-        u.setCompany(getCompany());
+        u.setCompany(getCompanyId());
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -166,13 +165,13 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final String password = "password";
 
-        final Long id = client.saveUser(u, password, true);
+        final Long id = client.saveUser(u, getCompany(), password, true);
 
         assertNotNull(id);
         User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
         assertEquals(2, u2.getRoles().size());
-        assertNotNull(u2.getCompany());
+        assertNotNull(u2.getCompanyId());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
         assertEquals(email, u2.getEmail());
@@ -197,7 +196,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         u.setPhone(newPhone);
         u.setId(id);
-        client.saveUser(u, newPassword, true);
+        client.saveUser(u, getCompany(), newPassword, true);
 
         u2 = dao.findByEmail(u.getEmail());
         assertEquals(newPhone, u2.getPhone());
@@ -248,13 +247,13 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final String password = "password";
 
-        final Long id = client.saveUser(u, password, true);
+        final Long id = client.saveUser(u, null, password, true);
 
         assertNotNull(id);
         User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
         assertEquals(2, u2.getRoles().size());
-        assertNotNull(u2.getCompany());
+        assertNotNull(u2.getCompanyId());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
         assertEquals(email, u2.getEmail());
@@ -274,8 +273,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         u.setPhone(newPhone);
         u.setId(u2.getId());
-        u.setCompany(getCompany());
-        client.saveUser(u, newPassword, true);
+        u.setCompany(getCompanyId());
+        client.saveUser(u, getCompany(), newPassword, true);
 
         u2 = dao.findByEmail(u.getEmail());
         assertEquals(newPhone, u2.getPhone());
@@ -365,7 +364,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String title = "Mrs";
 
         final User u = new User();
-        u.setCompany(getCompany());
+        u.setCompany(getCompanyId());
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -382,18 +381,18 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.getRoles().add(Role.NormalUser);
 
         final String password = "password";
-        final Long id = client.saveUser(u, password, false);
+        final Long id = client.saveUser(u, getCompany(), password, false);
 
         final User tmp = new User();
         tmp.setId(id);
-        client.saveUser(tmp, null, false);
+        client.saveUser(tmp, getCompany(), null, false);
         //save user by null values for check correct handling
         //null values.
 
         final User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
         assertEquals(1, u2.getRoles().size());
-        assertNotNull(u2.getCompany());
+        assertNotNull(u2.getCompanyId());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
         assertEquals(email, u2.getEmail());
@@ -561,7 +560,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setEmail(email);
         u.setFirstName(firstName);
         u.setLastName(lastName);
-        u.setCompany(company);
+        u.setCompany(company.getCompanyId());
         u.setPosition("Manager");
         u.setExternalCompany("External JUnit company");
         u.setDeviceGroup("AuthorizedDeviceGroup");
@@ -577,7 +576,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
     protected UserRestClient createClient() {
         final UserRestClient c = new UserRestClient(UTC);
         c.setServiceUrl(getServiceUrl());
-        c.setCompanyResolver(context.getBean(CompanyResolver.class));
         c.setShipmentResolver(context.getBean(ShipmentResolver.class));
         return c;
     }

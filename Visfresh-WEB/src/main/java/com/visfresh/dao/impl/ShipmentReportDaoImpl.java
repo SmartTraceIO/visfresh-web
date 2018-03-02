@@ -25,6 +25,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationIssue;
@@ -75,7 +76,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @see com.visfresh.dao.ShipmentReportDao#createReport(com.visfresh.entities.Shipment)
      */
     @Override
-    public ShipmentReportBean createReport(final Shipment s) {
+    public ShipmentReportBean createReport(final Shipment s, final Company company) {
         final ShipmentReportBean bean = new ShipmentReportBean();
         final Arrival arrival = arrivalDao.getArrival(s);
 
@@ -90,7 +91,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             bean.setDateArrived(s.getArrivalDate());
         }
 
-        bean.setCompanyName(s.getCompany().getName());
+        bean.setCompanyName(company.getName());
         bean.setAssetNum(s.getAssetNum());
         bean.setComment(s.getCommentsForReceiver());
         bean.setDateShipped(s.getShipmentDate());

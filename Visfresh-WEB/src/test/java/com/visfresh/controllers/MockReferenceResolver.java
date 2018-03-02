@@ -13,7 +13,6 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
-import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UserResolver;
@@ -22,7 +21,7 @@ import com.visfresh.io.UserResolver;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MockReferenceResolver implements ReferenceResolver, CompanyResolver, ShipmentResolver, UserResolver {
+public class MockReferenceResolver implements ReferenceResolver, ShipmentResolver, UserResolver {
     private final Map<Long, LocationProfile> locationProfiles = new HashMap<Long, LocationProfile>();
     private final Map<Long, AlertProfile> alertProfiles = new HashMap<Long, AlertProfile>();
     private final Map<Long, NotificationSchedule> notificationSchedules = new HashMap<Long, NotificationSchedule>();
@@ -72,13 +71,6 @@ public class MockReferenceResolver implements ReferenceResolver, CompanyResolver
     @Override
     public Shipment getShipment(final Long id) {
         return shipments.get(id);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
-     */
-    @Override
-    public Company getCompany(final Long id) {
-        return companies.get(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.UserResolver#getUser(java.lang.String)

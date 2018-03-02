@@ -89,7 +89,7 @@ public class BatteryRechargedRuleTest extends BatteryRechargedRule {
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei(imei);
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setDescription("Test device");
         return d;
     }
@@ -102,7 +102,7 @@ public class BatteryRechargedRuleTest extends BatteryRechargedRule {
         final Shipment s = new Shipment();
         s.setId(++id);
         s.setDevice(device);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setStatus(status);
         return s;
     }

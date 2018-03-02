@@ -79,7 +79,7 @@ public class SendNotificationTool extends NotificationServiceImpl {
         d.setImei("354430070005732");
         d.setName("Gotzinger 573");
         d.setDescription("Gotzinger trial for 573");
-        d.setCompany(c);
+        d.setCompany(c.getCompanyId());
         d.setActive(true);
 
         //create shipment
@@ -87,7 +87,7 @@ public class SendNotificationTool extends NotificationServiceImpl {
         s.setId(799l);
         s.setTripCount(5);
         s.setDevice(d);
-        s.setCompany(c);
+        s.setCompany(c.getCompanyId());
 
         //create tracker event.
         final TrackerEvent e = new TrackerEvent();

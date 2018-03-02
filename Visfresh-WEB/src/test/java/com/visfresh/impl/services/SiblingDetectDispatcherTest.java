@@ -227,7 +227,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
                     y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
         }
 
-        assertTrue(updateSiblings(master.getId(), master.getCompany().getId()));
+        assertTrue(updateSiblings(master.getId(), master.getCompanyId()));
 
         //check sibling group
         assertTrue(master.getSiblings().contains(sibling.getId()));
@@ -262,7 +262,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
                     t0 + dt * i + 60 * 1000l);
         }
 
-        assertTrue(updateSiblings(master.getId(), master.getCompany().getId()));
+        assertTrue(updateSiblings(master.getId(), master.getCompanyId()));
 
         assertTrue(master.getSiblings().contains(sibling.getId()));
         assertFalse(master.getSiblings().contains(notSibling.getId()));
@@ -296,7 +296,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
                     t0 + dt * i + 60 * 1000l);
         }
 
-        assertFalse(updateSiblings(master.getId(), master.getCompany().getId()));
+        assertFalse(updateSiblings(master.getId(), master.getCompanyId()));
     }
 
     /**
@@ -357,7 +357,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
 
         final SystemMessage sm = messages.get(0);
         assertEquals(GROUP_PREFIX + s.getId().toString(), sm.getGroup());
-        assertEquals(s.getCompany().getId().toString(), sm.getMessageInfo());
+        assertEquals(s.getCompanyId().toString(), sm.getMessageInfo());
 
         //test not repeats the scheduling
         scheduleSiblingDetection(s, new Date(System.currentTimeMillis() + 100000000l));
@@ -460,7 +460,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
     protected Shipment createShipment(final long id) {
         final Shipment s = new Shipment();
         s.setId(id);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setShipmentDescription("Test_" + id);
         s.setDevice(createDevice(id));
         s.setStatus(ShipmentStatus.InProgress);
@@ -475,7 +475,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
     private Device createDevice(final long id) {
         final String imei = Long.toString(1000000000l + id);
         final Device d = new Device();
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setImei(imei);
         d.setName("JUnit-" + id);
         return d;

@@ -80,7 +80,7 @@ public class RestSessionDaoTest extends BaseCrudTest<RestSessionDao, RestSession
     private User createUser(final String email) {
         final User u = new User();
         u.setActive(true);
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setFirstName("FirstName");
         u.setLastName("LastName");
         u.setEmail(email);

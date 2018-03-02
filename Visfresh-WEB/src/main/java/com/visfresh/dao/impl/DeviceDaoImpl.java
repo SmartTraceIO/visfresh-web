@@ -19,7 +19,6 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Color;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.DeviceModel;
@@ -95,7 +94,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         paramMap.put(MODEL_FIELD, device.getModel().name());
         paramMap.put(DESCRIPTION_FIELD, device.getDescription());
         paramMap.put(IMEI_FIELD, device.getImei());
-        paramMap.put(COMPANY_FIELD, device.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, device.getCompanyId());
         paramMap.put(TRIPCOUNT_FIELD, device.getTripCount());
         paramMap.put(ACTIVE_FIELD, device.isActive());
         paramMap.put(AUTOSTART_TEMPLATE_FIELD, device.getAutostartTemplateId());
@@ -147,6 +146,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         d.setModel(DeviceModel.valueOf((String) map.get(MODEL_FIELD)));
         d.setDescription((String) map.get(DESCRIPTION_FIELD));
         d.setImei((String) map.get(IMEI_FIELD));
+        d.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
         d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         d.setActive(Boolean.TRUE.equals(map.get(ACTIVE_FIELD)));
         d.setColor(parseColor((String) map.get(COLOR_FIELD)));
@@ -226,7 +226,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
     @Override
     public List<Device> findByGroup(final DeviceGroup group) {
         final Filter filter = new Filter();
-        filter.addFilter(COMPANY_FIELD, group.getCompany().getId());
+        filter.addFilter(COMPANY_FIELD, group.getCompanyId());
         filter.addFilter(PROPERTY_DEVICE_GROUP, group);
         final Sorting sorting = new Sorting(NAME_FIELD);
 
@@ -236,13 +236,13 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
      * @see com.visfresh.dao.DeviceDao#moveToNewCompany(com.visfresh.entities.Device, com.visfresh.entities.Company)
      */
     @Override
-    public void moveToNewCompany(final Device device, final Company c) {
+    public void moveToNewCompany(final Device device, final Long c) {
         final String sql = "update devices set company=:company, "
                 + TRIPCOUNT_FIELD + "= 0,"
                 + AUTOSTART_TEMPLATE_FIELD + "= NULL where imei=:device";
         final Map<String, Object> params = new HashMap<>();
         params.put("device", device.getImei());
-        params.put("company", c.getId());
+        params.put("company", c);
 
         jdbc.update(sql, params);
     }
@@ -274,7 +274,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
      * @see com.visfresh.dao.DeviceDao#getListDeviceItems(com.visfresh.entities.Company, com.visfresh.dao.Sorting, com.visfresh.dao.Page)
      */
     @Override
-    public List<ListDeviceItem> getDevices(final Company company,
+    public List<ListDeviceItem> getDevices(final Long company,
             final Sorting sorting, final Page page) {
         String sql = "select\n"
                 + "d." + IMEI_FIELD + " as " + DeviceConstants.PROPERTY_IMEI + ",\n"
@@ -341,7 +341,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         }
 
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("company", company.getId());
+        params.put("company", company);
 
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
         final List<ListDeviceItem> items = new LinkedList<>();
@@ -416,5 +416,11 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
             }
         }
         return item;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final Device t, final Map<String, Object> map, final Map<String, Object> cache) {
     }
 }

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
@@ -45,6 +46,8 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
     private EmailService email;
     @Autowired
     private NotificationBundle bundle;
+    @Autowired
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -90,7 +93,7 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
         if (!wasNotificationSent) {
             final TrackerEvent event = context.getEvent();
             final Device device = event.getDevice();
-            final Company c = device.getCompany();
+            final Company c = companyDao.findOne(device.getCompanyId());
 
             final String email = c.getEmail();
             if (email != null) {

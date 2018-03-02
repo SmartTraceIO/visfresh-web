@@ -28,7 +28,7 @@ public class DeviceGroup implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Group company.
      */
-    private Company company;
+    private Long company;
 
     /**
      * Default constructor.
@@ -41,14 +41,14 @@ public class DeviceGroup implements EntityWithId<Long>, EntityWithCompany {
      * @see com.visfresh.entities.EntityWithCompany#getCompany()
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /* (non-Javadoc)
      * @see com.visfresh.entities.EntityWithCompany#setCompany(com.visfresh.entities.Company)
      */
     @Override
-    public void setCompany(final Company c) {
+    public void setCompany(final Long c) {
         this.company = c;
     }
     /* (non-Javadoc)

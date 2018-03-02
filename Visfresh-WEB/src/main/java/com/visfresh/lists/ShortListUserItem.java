@@ -3,6 +3,7 @@
  */
 package com.visfresh.lists;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
 
 /**
@@ -21,20 +22,22 @@ public class ShortListUserItem {
         super();
     }
     /**
-     * @param u
+     * @param u user.
+     * @param company user's company
      */
-    public ShortListUserItem(final User u) {
+    public ShortListUserItem(final User u, final Company company) {
         setId(u.getId());
         if (u.getFirstName() != null || u.getLastName() != null) {
             setFullName(buildFullName(u));
         }
-        setPositionCompany(buildPositionCompany(u));
+        setPositionCompany(buildPositionCompany(u, company));
     }
     /**
      * @param u the user.
+     * @param company TODO
      * @return position company.
      */
-    public static String buildPositionCompany(final User u) {
+    public static String buildPositionCompany(final User u, final Company company) {
         final StringBuilder sb = new StringBuilder();
         if (u.getPosition() != null) {
             sb.append(u.getPosition());
@@ -43,7 +46,7 @@ public class ShortListUserItem {
             if (sb.length() > 0) {
                 sb.append(" - ");
             }
-            sb.append(u.getCompany().getName());
+            sb.append(company.getName());
         } else if (u.getExternalCompany() != null) {
             if (sb.length() > 0) {
                 sb.append(" - ");

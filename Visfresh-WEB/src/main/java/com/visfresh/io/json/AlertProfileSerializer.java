@@ -14,7 +14,6 @@ import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.lists.ListAlertProfileItem;
@@ -25,14 +24,14 @@ import com.visfresh.utils.LocalizationUtils;
  *
  */
 public class AlertProfileSerializer extends AbstractJsonSerializer {
-    private final Company company;
+    private final Long company;
     private final TemperatureUnits tempUnits;
     private final CorrectiveActionListSerializer correctiveActionsSerializer;
 
     /**
      * @param tz time zone.
      */
-    public AlertProfileSerializer(final Company company, final TimeZone tz, final TemperatureUnits tempUnits) {
+    public AlertProfileSerializer(final Long company, final TimeZone tz, final TemperatureUnits tempUnits) {
         super(tz);
         this.tempUnits = tempUnits;
         this.company = company;

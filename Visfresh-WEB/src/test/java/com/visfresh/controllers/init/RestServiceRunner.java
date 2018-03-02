@@ -175,7 +175,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             user.setEmail("a@b.c");
             user.setFirstName("Yury");
             user.setLastName("Gagarin");
-            user.setCompany(c);
+            user.setCompany(c.getCompanyId());
 
             final Set<Role> roles = new HashSet<Role>();
             roles.add(Role.Admin);

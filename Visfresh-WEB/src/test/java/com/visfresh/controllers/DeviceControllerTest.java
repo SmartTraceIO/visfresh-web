@@ -157,12 +157,12 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         //create autostart shipment template
         ShipmentTemplate tpl = new ShipmentTemplate();
-        tpl.setCompany(getCompany());
+        tpl.setCompany(getCompanyId());
         tpl.setName("TPL1");
         tpl = getContext().getBean(ShipmentTemplateDao.class).save(tpl);
 
         AutoStartShipment aut = new AutoStartShipment();
-        aut.setCompany(getCompany());
+        aut.setCompany(getCompanyId());
         aut.setTemplate(tpl);
         aut.setPriority(10);
         aut = getContext().getBean(AutoStartShipmentDao.class).save(aut);
@@ -338,12 +338,12 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         //create device
         final Device d = createDevice("0239870932487", false);
-        d.setCompany(c1);
+        d.setCompany(c1.getCompanyId());
         dao.save(d);
 
         //create device group for device
         final DeviceGroup dg = new DeviceGroup();
-        dg.setCompany(c1);
+        dg.setCompany(c1.getCompanyId());
         dg.setName("DG-1");
 
         final DeviceGroupDao dgd = context.getBean(DeviceGroupDao.class);
@@ -380,7 +380,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final User u = new User();
         u.setRoles(new LinkedList<Role>());
         u.getRoles().add(Role.SmartTraceAdmin);
-        u.setCompany(getCompany());
+        u.setCompany(getCompanyId());
         u.setEmail("admin@smartrace.com.au");
         u.setFirstName("JUnit");
         u.setLastName("Admin");
@@ -394,7 +394,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final String newImei = client.moveDevice(d, c2);
 
         //check device really moved
-        assertEquals(c2.getId(), dao.findByImei(d.getImei()).getCompany().getId());
+        assertEquals(c2.getId(), dao.findByImei(d.getImei()).getCompanyId());
 
         //check device with given IMEI
         final Device newDevice = dao.findByImei(newImei);
@@ -428,7 +428,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final Device d2 = createDevice("2934879823477", true);
         final Device d3 = createDevice("2987943878487", true);
 
-        client.initDeviceColors(d1.getCompany());
+        client.initDeviceColors(d1.getCompanyId());
 
         assertNotNull(dao.findOne(d1.getImei()).getColor());
         assertNotNull(dao.findOne(d2.getImei()).getColor());

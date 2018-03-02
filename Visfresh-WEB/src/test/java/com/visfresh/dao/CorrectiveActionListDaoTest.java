@@ -41,7 +41,7 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
      */
     protected CorrectiveActionList createList(final Company c) {
         final CorrectiveActionList list = new CorrectiveActionList();
-        list.setCompany(c);
+        list.setCompany(c.getCompanyId());
         list.setName("JUnit action list");
         list.getActions().add(createAction("Run JUnit and check result"));
         list.getActions().add(createAction("Run JUnit and check result again"));
@@ -52,7 +52,7 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
      */
     @Override
     protected void assertCreateTestEntityOk(final CorrectiveActionList list) {
-        assertEquals(sharedCompany.getId(), list.getCompany().getId());
+        assertEquals(sharedCompany.getId(), list.getCompanyId());
         assertEquals("JUnit action list", list.getName());
         assertEquals("Run JUnit and check result", list.getActions().get(0).getAction());
         assertTrue(list.getActions().get(0).isRequestVerification());
@@ -63,7 +63,7 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
         createAndSaveAlertProfile(sharedCompany);
         createAndSaveAlertProfile(sharedCompany);
 
-        assertEquals(2, dao.findByCompany(sharedCompany, null, null, null).size());
+        assertEquals(2, dao.findByCompany(sharedCompany.getCompanyId(), null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -71,7 +71,7 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left, null, null, null).size());
+        assertEquals(0, dao.findByCompany(left.getCompanyId(), null, null, null).size());
     }
     /**
      * @param c
@@ -92,7 +92,7 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
     @Test
     public void testUpdate() {
         CorrectiveActionList list = new CorrectiveActionList();
-        list.setCompany(sharedCompany);
+        list.setCompany(sharedCompany.getCompanyId());
         list.setName("JUnit-CorrectiveActionList");
 
         dao.save(list);

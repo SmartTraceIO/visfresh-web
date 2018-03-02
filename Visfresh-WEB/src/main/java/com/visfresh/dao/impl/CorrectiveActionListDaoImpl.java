@@ -70,7 +70,7 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
         paramMap.put(NAME_FIELD, list.getName());
         paramMap.put(DESCRIPTION, list.getDescription());
         paramMap.put(ACTIONS, toJson(list.getActions()));
-        paramMap.put(COMPANY_FIELD, list.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, list.getCompanyId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -130,11 +130,18 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
         final CorrectiveActionList list = new CorrectiveActionList();
 
         list.setId(((Number) map.get(ID_FIELD)).longValue());
+        list.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
         list.setName((String) map.get(NAME_FIELD));
         list.setDescription((String) map.get(DESCRIPTION));
         list.getActions().addAll(parseActions((String) map.get(ACTIONS)));
 
         return list;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final CorrectiveActionList t, final Map<String, Object> map, final Map<String, Object> cache) {
     }
 
     /**

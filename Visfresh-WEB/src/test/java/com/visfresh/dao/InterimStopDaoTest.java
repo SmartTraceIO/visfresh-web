@@ -41,13 +41,13 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei("23984293087034");
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         getContext().getBean(DeviceDao.class).save(d);
 
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         this.shipment = getContext().getBean(ShipmentDao.class).save(s);
     }
@@ -156,7 +156,7 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
      */
     private Shipment createShipment(final Device device) {
         final Shipment s = new Shipment();
-        s.setCompany(device.getCompany());
+        s.setCompany(device.getCompanyId());
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");
@@ -183,7 +183,7 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
     private LocationProfile createLocation(final String name) {
         final LocationProfile l = new LocationProfile();
         l.setName(name);
-        l.setCompany(sharedCompany);
+        l.setCompany(sharedCompany.getCompanyId());
         l.setRadius(300);
         l.setAddress("adderss of " + name);
         return getContext().getBean(LocationProfileDao.class).save(l);

@@ -11,8 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,6 +22,8 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
+
+import junit.framework.AssertionFailedError;
 
 
 /**
@@ -208,7 +208,7 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         final Device device = createDevice("12345569989898", true);
         //create owner shipment
         final Shipment s = new Shipment();
-        s.setCompany(getCompany());
+        s.setCompany(getCompanyId());
         s.setDevice(device);
         s.setShippedFrom(loc);
         this.getContext().getBean(ShipmentDao.class).save(s);
@@ -241,7 +241,7 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         final Device device = createDevice("12345569989898", true);
         //create owner shipment
         final Shipment s = new Shipment();
-        s.setCompany(getCompany());
+        s.setCompany(getCompanyId());
         s.setDevice(device);
         s.setShippedTo(loc);
         this.getContext().getBean(ShipmentDao.class).save(s);

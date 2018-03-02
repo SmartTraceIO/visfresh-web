@@ -81,7 +81,7 @@ public class NoteController extends AbstractController implements DeviceConstant
         if (shipmentId != null) {
             s = shipmentDao.findOne(shipmentId);
         } else {
-            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
+            s = shipmentDao.findBySnTrip(user.getCompanyId(), sn, trip);
         }
 
         checkCompanyAccess(user, s);
@@ -122,7 +122,7 @@ public class NoteController extends AbstractController implements DeviceConstant
         if (shipmentId != null) {
             s = shipmentDao.findOne(shipmentId);
         } else {
-            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
+            s = shipmentDao.findBySnTrip(user.getCompanyId(), sn, trip);
         }
 
         checkCompanyAccess(user, s);
@@ -183,7 +183,7 @@ public class NoteController extends AbstractController implements DeviceConstant
         if (dto.getShipmentId() != null) {
             s = shipmentDao.findOne(dto.getShipmentId());
         } else {
-            s = shipmentDao.findBySnTrip(user.getCompany(), dto.getSn(), dto.getTrip());
+            s = shipmentDao.findBySnTrip(user.getCompanyId(), dto.getSn(), dto.getTrip());
         }
 
         checkCompanyAccess(user, s);

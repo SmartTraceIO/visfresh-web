@@ -19,7 +19,7 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     /**
      * Company name.
      */
-    private Company company;
+    private Long company;
     /**
      * Shipment description.
      */
@@ -251,14 +251,14 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
     @Override
-    public void setCompany(final Company company) {
+    public void setCompany(final Long company) {
         this.company = company;
     }
     /**

@@ -18,7 +18,7 @@ public class NotificationSchedule implements EntityWithId<Long>, EntityWithCompa
     /**
      * Company
      */
-    private Company company;
+    private Long company;
     /**
      * Notification schedule name.
      */
@@ -87,13 +87,14 @@ public class NotificationSchedule implements EntityWithId<Long>, EntityWithCompa
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
-    public void setCompany(final Company company) {
+    @Override
+    public void setCompany(final Long company) {
         this.company = company;
     }
 }

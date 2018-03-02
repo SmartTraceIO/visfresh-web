@@ -100,7 +100,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
 
         final AlertProfile profile = new AlertProfile();
 
-        profile.setCompany(company);
+        profile.setCompany(company.getCompanyId());
         profile.setName(name);
 
         //hot
@@ -295,7 +295,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         }
 
         final NotificationSchedule s = new NotificationSchedule();
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setDescription("Test Notification schedule");
         s.setName(name);
 
@@ -326,8 +326,8 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         user.setEmail(email);
         user.setPhone(phone);
         user.setPosition(position);
-        user.setCompany(company);
-        userService.saveUser(user, "", false);
+        user.setCompany(company.getCompanyId());
+        userService.saveUser(user, company, "", false);
 
         final PersonSchedule s = new PersonSchedule();
         s.setFromTime(1);
@@ -350,7 +350,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         for (final DeviceDto d : devices) {
             if (id.equals(d.getImei())) {
                 final Device device = new Device();
-                device.setCompany(company);
+                device.setCompany(company.getCompanyId());
                 device.setDescription(d.getDescription());
                 device.setImei(d.getImei());
                 device.setModel(d.getModel());
@@ -360,7 +360,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         }
 
         final Device d = new Device();
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setDescription("Develment Tools virtual device");
         d.setImei("111111111111111");
         d.setName("DevTool Device");

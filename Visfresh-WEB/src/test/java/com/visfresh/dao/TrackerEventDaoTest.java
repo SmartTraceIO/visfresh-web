@@ -73,7 +73,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
      */
     protected Device createDevice(final Company company, final String imei) {
         final Device d = new Device();
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setImei(imei);
         d.setName("Test Device");
         d.setDescription("JUnit device");
@@ -94,7 +94,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
     private Shipment createShipment(final Device d, final ShipmentStatus status) {
         Shipment s = new Shipment();
         s.setStatus(status);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(d);
         s = shipmentDao.save(s);
         return s;
@@ -146,12 +146,10 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(device.getName(), d.getName());
         assertEquals(device.getSn(), d.getSn());
 
-        final Company c = d.getCompany();
+        final Long c = d.getCompanyId();
         assertNotNull(c);
 
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        assertEquals(sharedCompany.getId(), c);
 
         assertNotNull(e.getShipment());
     }
@@ -179,12 +177,10 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(device.getName(), d.getName());
         assertEquals(device.getSn(), d.getSn());
 
-        final Company c = d.getCompany();
+        final Long c = d.getCompanyId();
         assertNotNull(c);
 
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        assertEquals(sharedCompany.getId(), c);
 
         assertNotNull(e.getShipment());
     }

@@ -329,7 +329,7 @@ public class AutoStartShipmentDaoTest extends
      */
     private ShipmentTemplate createTemplate(final String name, final String description) {
         final ShipmentTemplate tpl = new ShipmentTemplate();
-        tpl.setCompany(sharedCompany);
+        tpl.setCompany(sharedCompany.getCompanyId());
         tpl.setName(name);
         tpl.setShipmentDescription(description);
         return getContext().getBean(ShipmentTemplateDao.class).save(tpl);
@@ -341,7 +341,7 @@ public class AutoStartShipmentDaoTest extends
     private LocationProfile createLocation(final String name) {
         final LocationProfile l = new LocationProfile();
         l.setName(name);
-        l.setCompany(sharedCompany);
+        l.setCompany(sharedCompany.getCompanyId());
         l.setRadius(300);
         l.setAddress("adderss of " + name);
         return getContext().getBean(LocationProfileDao.class).save(l);
@@ -352,7 +352,7 @@ public class AutoStartShipmentDaoTest extends
      */
     private AlertProfile createAlertProfile(final String name) {
         final AlertProfile a = new AlertProfile();
-        a.setCompany(sharedCompany);
+        a.setCompany(sharedCompany.getCompanyId());
         a.setName(name);
         return getContext().getBean(AlertProfileDao.class).save(a);
     }
@@ -362,7 +362,7 @@ public class AutoStartShipmentDaoTest extends
      */
     @Override
     protected void assertCreateTestEntityOk(final AutoStartShipment cfg) {
-        assertEquals(sharedCompany.getId(), cfg.getCompany().getId());
+        assertEquals(sharedCompany.getId(), cfg.getCompanyId());
         assertNotNull(cfg.getTemplate());
         assertEquals(10, cfg.getPriority());
         assertEquals(1, cfg.getShippedFrom().size());
@@ -388,7 +388,7 @@ public class AutoStartShipmentDaoTest extends
      */
     private AutoStartShipment createAutoStart(final ShipmentTemplate template) {
         final AutoStartShipment cfg = new AutoStartShipment();
-        cfg.setCompany(sharedCompany);
+        cfg.setCompany(sharedCompany.getCompanyId());
         cfg.setStartOnLeaveLocation(true);
         cfg.setPriority(10);
         cfg.setTemplate(template);

@@ -24,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.UserConstants;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
@@ -35,7 +36,6 @@ import com.visfresh.entities.ReferenceInfo;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
-import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
@@ -66,7 +66,7 @@ public class UserController extends AbstractController implements UserConstants 
     @Autowired
     private ShipmentResolver shipmentResolver;
     @Autowired
-    private CompanyResolver companyResolver;
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -93,7 +93,8 @@ public class UserController extends AbstractController implements UserConstants 
         final User u = dao.findOne(userId == null ? user.getId() : userId);
         checkCompanyAccess(user, u);
 
-        return createSuccessResponse(u == null ? null : getUserSerializer(user).toJson(u));
+        final Company company = companyDao.findOne(u.getCompanyId());
+        return createSuccessResponse(u == null ? null : getUserSerializer(user).toJson(u, company));
     }
     /**
      * @param authToken authentication token.
@@ -115,18 +116,19 @@ public class UserController extends AbstractController implements UserConstants 
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         final User user = getLoggedInUser();
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
         final UserSerializer ser = getUserSerializer(user);
         final JsonArray array = new JsonArray();
 
         final List<User> users = dao.findByCompany(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSorting(sc, so, getDefaultListShipmentsSortingOrder(), 2),
                 page,
                 null);
 
+        final Company company = companyDao.findOne(user.getCompanyId());
         for (final User u : users) {
-            array.add(ser.toJson(new ExpandedListUserItem(u)));
+            array.add(ser.toJson(new ExpandedListUserItem(u, company)));
         }
         return createListSuccessResponse(array, total);
     }
@@ -153,11 +155,11 @@ public class UserController extends AbstractController implements UserConstants 
         final UserSerializer ser = getUserSerializer(user);
 
         final List<ShortListUserItem> users = getUserListItems(
-                user.getCompany(),
+                companyDao.findOne(user.getCompanyId()),
                 createSorting(sc, so, getDefaultListShipmentsSortingOrder(), 2),
                 null,
                 page);
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
 
         final JsonArray array = new JsonArray();
         for (final ShortListUserItem s : users) {
@@ -175,8 +177,8 @@ public class UserController extends AbstractController implements UserConstants 
     private List<ShortListUserItem> getUserListItems(final Company company,
             final Sorting sorting, final Filter filter, final Page page) {
         final List<ShortListUserItem> result = new LinkedList<ShortListUserItem>();
-        for (final User u : dao.findByCompany(company, sorting, page, filter)) {
-            result.add(new ShortListUserItem(u));
+        for (final User u : dao.findByCompany(company.getCompanyId(), sorting, page, filter)) {
+            result.add(new ShortListUserItem(u, company));
         }
         return result;
     }
@@ -219,10 +221,10 @@ public class UserController extends AbstractController implements UserConstants 
             newUser.setRoles(new HashSet<Role>());
         }
 
-        if (newUser.getCompany() == null) {
-            newUser.setCompany(user.getCompany());
+        if (newUser.getCompanyId() == null) {
+            newUser.setCompany(user.getCompanyId());
         } else {
-            checkCompanyAccess(user, newUser.getCompany());
+            checkCompanyAccess(user, newUser.getCompanyId());
         }
 
         checkCanAssignRoles(user, newUser.getRoles());
@@ -250,8 +252,8 @@ public class UserController extends AbstractController implements UserConstants 
      * @return
      */
     private User mergeUsers(final User oldUser, final User newUser) {
-        if (newUser.getCompany() != null) {
-            oldUser.setCompany(newUser.getCompany());
+        if (newUser.getCompanyId() != null) {
+            oldUser.setCompany(newUser.getCompanyId());
         }
         if (newUser.getDeviceGroup() != null) {
             oldUser.setDeviceGroup(newUser.getDeviceGroup());
@@ -298,8 +300,8 @@ public class UserController extends AbstractController implements UserConstants 
         if (newUser.getExternal() != null) {
             oldUser.setExternal(newUser.getExternal());
         }
-        if (newUser.getCompany() != null) {
-            oldUser.setCompany(newUser.getCompany());
+        if (newUser.getCompanyId() != null) {
+            oldUser.setCompany(newUser.getCompanyId());
         }
         return oldUser;
     }
@@ -420,7 +422,6 @@ public class UserController extends AbstractController implements UserConstants 
     protected UserSerializer getUserSerializer(final User user) {
         final UserSerializer ser = new UserSerializer(
                 user == null ? SerializerUtils.UTС : user.getTimeZone());
-        ser.setCompanyResolver(companyResolver);
         ser.setShipmentResolver(shipmentResolver);
         return ser;
     }

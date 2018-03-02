@@ -6,6 +6,7 @@ package com.visfresh.lists;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 
@@ -59,8 +60,9 @@ public class ExpandedListUserItem {
     }
     /**
      * @param user user.
+     * @param company TODO
      */
-    public ExpandedListUserItem(final User user) {
+    public ExpandedListUserItem(final User user, final Company company) {
         super();
         setId(user.getId());
         setFirstName(user.getFirstName());
@@ -69,7 +71,7 @@ public class ExpandedListUserItem {
         if (user.isExternal()) {
             setCompanyName(user.getExternalCompany());
         } else {
-            setCompanyName(user.getCompany().getName());
+            setCompanyName(company.getName());
         }
         setPosition(user.getPosition());
         setActive(user.getActive());

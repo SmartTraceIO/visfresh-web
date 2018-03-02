@@ -209,7 +209,7 @@ public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> exten
         map.put(NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD, s.getNoAlertsAfterArrivalMinutes());
         map.put(NOALERT_AFTER_START_TIMOUT_FIELD, s.getNoAlertsAfterStartMinutes());
         map.put(SHUTDOWN_AFTER_START_TIMOUT_FIELD, s.getShutDownAfterStartMinutes());
-        map.put(COMPANY_FIELD, s.getCompany().getId());
+        map.put(COMPANY_FIELD, s.getCompanyId());
         map.put(SHIPPEDFROM_FIELD, s.getShippedFrom() == null ? null : s.getShippedFrom().getId());
         map.put(SHIPPEDTO_FIELD, s.getShippedTo() == null ? null : s.getShippedTo().getId());
         map.put(COMMENTS_FIELD, s.getCommentsForReceiver());
@@ -330,6 +330,7 @@ public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> exten
         final V s = createEntity();
 
         s.setId(((Number) map.get(ID_FIELD)).longValue());
+        s.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
         Number id = (Number) map.get(ALERT_PROFILE_FIELD);
         if (id != null) {
             s.setAlertProfile(alertProfileDao.findOne(id.longValue()));

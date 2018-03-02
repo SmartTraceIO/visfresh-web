@@ -20,7 +20,6 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentAuditDao;
 import com.visfresh.dao.Sorting;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.utils.SerializerUtils;
 
@@ -151,18 +150,18 @@ public class ShipmentAuditDaoImpl extends DaoImplBase<ShipmentAuditItem, Shipmen
      * @see com.visfresh.dao.ShipmentAuditDao#findAll(com.visfresh.entities.Company, com.visfresh.dao.Filter, com.visfresh.dao.Sorting, com.visfresh.dao.Page)
      */
     @Override
-    public List<ShipmentAuditItem> findAll(final Company company, final Filter filter, final Sorting sorting, final Page page) {
+    public List<ShipmentAuditItem> findAll(final Long company, final Filter filter, final Sorting sorting, final Page page) {
         final Filter f = new Filter(filter);
-        f.addFilter(SHIPMENTS_COMPANY, company.getId());
+        f.addFilter(SHIPMENTS_COMPANY, company);
         return findAll(f, sorting, page);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentAuditDao#getEntityCount(com.visfresh.entities.Company, com.visfresh.dao.Filter)
      */
     @Override
-    public int getEntityCount(final Company company, final Filter filter) {
+    public int getEntityCount(final Long company, final Filter filter) {
         final Filter f = new Filter(filter);
-        f.addFilter(SHIPMENTS_COMPANY, company.getId());
+        f.addFilter(SHIPMENTS_COMPANY, company);
         return super.getEntityCount(f);
     }
 

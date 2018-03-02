@@ -527,7 +527,7 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
         final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         final SingleShipmentDto dto = new SingleShipmentDto();
-        dto.setCompanyId(shipment.getCompany().getId());
+        dto.setCompanyId(shipment.getCompanyId());
 
         if (shipment.getAlertProfile() != null) {
             dto.setAlertProfileId(shipment.getAlertProfile().getId());
@@ -762,12 +762,12 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
             return true;
         }
 
-        final Company usersCompany = user.getCompany();
-        if (s == null || s.getCompany() == null) {
+        final Long usersCompany = user.getCompanyId();
+        if (s == null || s.getCompanyId() == null) {
             return false;
         }
 
-        if (s.getCompany().getId().equals(usersCompany.getId())) {
+        if (s.getCompanyId().equals(usersCompany)) {
             return true;
         }
 
@@ -780,7 +780,7 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
 
         //check company access
         for (final Company c : s.getCompanyAccess()) {
-            if (c.getId().equals(usersCompany.getId())) {
+            if (c.getId().equals(usersCompany)) {
                 return true;
             }
         }

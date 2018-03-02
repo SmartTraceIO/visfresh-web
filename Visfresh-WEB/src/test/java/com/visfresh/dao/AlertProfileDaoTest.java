@@ -55,7 +55,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
      */
     @Override
     protected void assertCreateTestEntityOk(final AlertProfile p) {
-        assertEquals(sharedCompany.getId(), p.getCompany().getId());
+        assertEquals(sharedCompany.getId(), p.getCompanyId());
         assertEquals("JUnit test alert pforile", p.getDescription());
         assertEquals("JUnit-Alert", p.getName());
         assertTrue(p.isWatchBatteryLow());
@@ -72,7 +72,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         createAndSaveAlertProfile(sharedCompany);
         createAndSaveAlertProfile(sharedCompany);
 
-        assertEquals(2, dao.findByCompany(sharedCompany, null, null, null).size());
+        assertEquals(2, dao.findByCompany(sharedCompany.getCompanyId(), null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -80,7 +80,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left, null, null, null).size());
+        assertEquals(0, dao.findByCompany(left.getCompanyId(), null, null, null).size());
     }
     /**
      * @param c
@@ -98,7 +98,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
 
         final AlertProfile p = all.get(0);
 
-        assertEquals(sharedCompany.getId(), p.getCompany().getId());
+        assertEquals(sharedCompany.getId(), p.getCompanyId());
         assertEquals("JUnit test alert pforile", p.getDescription());
         assertEquals("JUnit-Alert", p.getName());
         assertTrue(p.isWatchBatteryLow());
@@ -123,12 +123,12 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
     @Test
     public void testSaveTemperatureIssue() {
         AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
 
         final CorrectiveActionList actions = new CorrectiveActionList();
-        actions.setCompany(sharedCompany);
+        actions.setCompany(sharedCompany.getCompanyId());
         actions.setName("Rule action");
         actions.setName("Rule action description");
         actions.getActions().add(new CorrectiveAction("test", true));
@@ -155,7 +155,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         //test corrective actions.
         final CorrectiveActionList actualActions = actual.getCorrectiveActions();
         assertEquals(actions.getId(), actualActions.getId());
-        assertNotNull(actions.getCompany());
+        assertNotNull(actions.getCompanyId());
         assertEquals(actions.getName(), actualActions.getName());
         assertEquals(actions.getDescription(), actualActions.getDescription());
         assertEquals(actions.getActions().size(), actualActions.getActions().size());
@@ -163,7 +163,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
     @Test
     public void testUpdateTemperatureIssueCorrectiveActions() {
         AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
 
@@ -223,7 +223,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
     @Test
     public void testUpdate() {
         AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
 
@@ -253,7 +253,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
     }
     private CorrectiveActionList createCorrectiveActions() {
         final CorrectiveActionList list = new CorrectiveActionList();
-        list.setCompany(sharedCompany);
+        list.setCompany(sharedCompany.getCompanyId());
         list.setName("List 1");
 
         final CorrectiveAction a = new CorrectiveAction();
@@ -270,7 +270,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
      */
     protected AlertProfile createAlertProfile(final Company c) {
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(c);
+        ap.setCompany(c.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
         ap.setLowerTemperatureLimit(-2.5);

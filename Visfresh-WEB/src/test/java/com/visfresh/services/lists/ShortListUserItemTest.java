@@ -32,16 +32,16 @@ public class ShortListUserItemTest {
         c.setName(companyName);
 
         final User u = new User();
-        u.setCompany(c);
+        u.setCompany(c.getCompanyId());
         u.setExternal(false);
         u.setPosition(position);
 
         //position is not null
-        assertEquals(position + " - " + companyName, new ShortListUserItem(u).getPositionCompany());
+        assertEquals(position + " - " + companyName, new ShortListUserItem(u, c).getPositionCompany());
 
         //position is null
         u.setPosition(null);
-        assertEquals(companyName, new ShortListUserItem(u).getPositionCompany());
+        assertEquals(companyName, new ShortListUserItem(u, c).getPositionCompany());
     }
     @Test
     public void testPositionCompanyExternalUser() {
@@ -54,20 +54,20 @@ public class ShortListUserItemTest {
         u.setExternalCompany(companyName);
 
         //position is not null
-        assertEquals(position + " - " + companyName, new ShortListUserItem(u).getPositionCompany());
+        assertEquals(position + " - " + companyName, new ShortListUserItem(u, null).getPositionCompany());
 
         //position is null
         u.setPosition(null);
-        assertEquals(companyName, new ShortListUserItem(u).getPositionCompany());
+        assertEquals(companyName, new ShortListUserItem(u, null).getPositionCompany());
 
         //company is null
         u.setPosition(position);
         u.setExternalCompany(null);
-        assertEquals(position, new ShortListUserItem(u).getPositionCompany());
+        assertEquals(position, new ShortListUserItem(u, null).getPositionCompany());
 
         //both are null
         u.setPosition(null);
         u.setExternalCompany(null);
-        assertEquals("", new ShortListUserItem(u).getPositionCompany());
+        assertEquals("", new ShortListUserItem(u, null).getPositionCompany());
     }
 }

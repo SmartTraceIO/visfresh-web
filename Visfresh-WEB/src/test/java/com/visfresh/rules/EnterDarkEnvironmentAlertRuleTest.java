@@ -125,7 +125,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
         //enable battery low alerts
         final AlertProfile p = new AlertProfile();
         p.setName("Enter dark environment alert rule");
-        p.setCompany(s.getCompany());
+        p.setCompany(s.getCompanyId());
         p.setWatchEnterDarkEnvironment(true);
         context.getBean(AlertProfileDao.class).save(p);
 

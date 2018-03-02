@@ -73,7 +73,7 @@ public abstract class AbstractRestServiceTest {
 
     public User createUser1() {
         final User u = new User();
-        u.setCompany(getCompany());
+        u.setCompany(getCompanyId());
         u.setEmail("asuvorov-" + (++lastLong) + "@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
@@ -85,7 +85,7 @@ public abstract class AbstractRestServiceTest {
     }
     public User createUser2() {
         final User u = new User();
-        u.setCompany(getCompany());
+        u.setCompany(getCompanyId());
         u.setEmail("mkutuzov-" + (++lastLong) + "@mail.ru");
         u.setFirstName("Mikhael");
         u.setLastName("Kutuzov");
@@ -97,7 +97,7 @@ public abstract class AbstractRestServiceTest {
     }
     public User createUser(final String userName, final Company c) {
         final User u = new User();
-        u.setCompany(c);
+        u.setCompany(c.getCompanyId());
         u.setEmail(userName + "@mail.ru");
         u.setFirstName(userName);
         u.setLastName("JUnit");
@@ -201,7 +201,7 @@ public abstract class AbstractRestServiceTest {
         final LocationProfile p = new LocationProfile();
 
         p.setCompanyName("Sun Microsystems");
-        p.setCompany(getCompany());
+        p.setCompany(getCompanyId());
         p.setInterim(true);
         p.setName("Loc-" + (++lastLong));
         p.setNotes("Any notes");
@@ -236,13 +236,13 @@ public abstract class AbstractRestServiceTest {
      */
     protected Long saveNotificationScheduleDirectly(final NotificationSchedule s) {
         final NotificationScheduleDao dao = context.getBean(NotificationScheduleDao.class);
-        s.setCompany(getCompany());
+        s.setCompany(getCompanyId());
         dao.save(s);
         return s.getId();
     }
     protected Long saveAlertProfileDirectly(final AlertProfile p) {
         final AlertProfileDao dao = context.getBean(AlertProfileDao.class);
-        p.setCompany(getCompany());
+        p.setCompany(getCompanyId());
         dao.save(p);
         return p.getId();
     }
@@ -252,7 +252,7 @@ public abstract class AbstractRestServiceTest {
      */
     protected Long saveLocationDirectly(final LocationProfile p) {
         final LocationProfileDao dao = context.getBean(LocationProfileDao.class);
-        p.setCompany(getCompany());
+        p.setCompany(getCompanyId());
         dao.save(p);
         return p.getId();
     }
@@ -261,7 +261,7 @@ public abstract class AbstractRestServiceTest {
      */
     protected Long saveShipmentDirectly(final Shipment s) {
         final ShipmentDao dao = context.getBean(ShipmentDao.class);
-        s.setCompany(getCompany());
+        s.setCompany(getCompanyId());
         dao.save(s);
         return s.getId();
     }
@@ -281,7 +281,7 @@ public abstract class AbstractRestServiceTest {
             }
         }
 
-        t.setCompany(getCompany());
+        t.setCompany(getCompanyId());
         final ShipmentTemplateDao dao = context.getBean(ShipmentTemplateDao.class);
         dao.save(t);
         return t.getId();
@@ -331,7 +331,7 @@ public abstract class AbstractRestServiceTest {
         s.setAssetType("SeaContainer");
         s.setPoNum(893793487);
         s.setTripCount(88);
-        s.setCompany(getCompany());
+        s.setCompany(getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         s.setCommentsForReceiver("Comments for receiver");
         if (save) {
@@ -373,10 +373,17 @@ public abstract class AbstractRestServiceTest {
         t.setColor(Color.DarkCyan);
         t.setModel(DeviceModel.TT18);
         if (save) {
-            t.setCompany(getCompany());
+            t.setCompany(getCompanyId());
             context.getBean(DeviceDao.class).save(t);
         }
         return t;
+    }
+
+    /**
+     * @return
+     */
+    protected Long getCompanyId() {
+        return getCompany().getCompanyId();
     }
 
     /**

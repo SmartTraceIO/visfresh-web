@@ -32,14 +32,14 @@ public class ShipmentSessionDaoTest extends BaseDaoTest<ShipmentSessionDao> {
         Device d = new Device();
         d.setImei("9238470983274987");
         d.setName("Test Device");
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         d.setTripCount(5);
         d = context.getBean(DeviceDao.class).save(d);
 
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(ShipmentStatus.Arrived);
         this.shipment = getContext().getBean(ShipmentDao.class).save(s);
     }

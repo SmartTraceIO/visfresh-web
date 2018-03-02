@@ -14,7 +14,7 @@ public class AutoStartShipment implements EntityWithCompany,
         EntityWithId<Long>, Comparable<AutoStartShipment> {
     private Long id;
     private int priority = 0;
-    private Company company;
+    private Long company;
     private ShipmentTemplate template;
     private final List<LocationProfile> shippedFrom = new LinkedList<>();
     private final List<LocationProfile> shippedTo = new LinkedList<>();
@@ -45,14 +45,14 @@ public class AutoStartShipment implements EntityWithCompany,
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
     @Override
-    public void setCompany(final Company company) {
+    public void setCompany(final Long company) {
         this.company = company;
     }
     /**

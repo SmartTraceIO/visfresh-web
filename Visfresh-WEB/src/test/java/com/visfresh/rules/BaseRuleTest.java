@@ -60,7 +60,7 @@ public abstract class BaseRuleTest {
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei(imei);
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setDescription("Test device");
         return context.getBean(DeviceDao.class).save(d);
     }
@@ -72,7 +72,7 @@ public abstract class BaseRuleTest {
     protected Shipment createDefaultShipment(final ShipmentStatus status, final Device device) {
         final Shipment s = new Shipment();
         s.setDevice(device);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setStatus(status);
         return context.getBean(ShipmentDao.class).save(s);
     }

@@ -92,7 +92,7 @@ public class SiblingDetectionRuleTest extends SiblingDetectionRule {
     protected Shipment createShipment(final long id) {
         final Shipment s = new Shipment();
         s.setId(id);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setShipmentDescription("Test_" + id);
         s.setDevice(createDevice(id));
         s.setStatus(ShipmentStatus.InProgress);
@@ -107,7 +107,7 @@ public class SiblingDetectionRuleTest extends SiblingDetectionRule {
     private Device createDevice(final long id) {
         final String imei = Long.toString(1000000000l + id);
         final Device d = new Device();
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setImei(imei);
         d.setName("JUnit-" + id);
         return d;

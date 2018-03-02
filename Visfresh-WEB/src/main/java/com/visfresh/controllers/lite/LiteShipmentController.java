@@ -78,7 +78,7 @@ public class LiteShipmentController extends AbstractController {
 
         final Filter filter = ShipmentController.createFilter(req);
         final LiteShipmentResult result = dao.getShipments(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSortingShipments(
                         req.getSortColumn(),
                         req.getSortOrder(),
@@ -123,7 +123,7 @@ public class LiteShipmentController extends AbstractController {
 
         //request shipments from DB
         final List<LiteShipment> shipments = dao.getShipmentsNearby(
-                user.getCompany(), lat, lon, radius, startDate);
+                user.getCompanyId(), lat, lon, radius, startDate);
 
         final LiteShipmentSerializer ser = getSerializer(user);
         final JsonArray array = new JsonArray();

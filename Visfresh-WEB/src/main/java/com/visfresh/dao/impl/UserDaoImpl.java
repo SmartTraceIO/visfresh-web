@@ -131,7 +131,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, User, Long> 
         paramMap.put(EMAIL_FIELD, user.getEmail());
         paramMap.put(PHONE_FIELD, user.getPhone());
         paramMap.put(ROLES_FIELD, convertToDatabaseColumn(user.getRoles()));
-        paramMap.put(COMPANY_FIELD, user.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, user.getCompanyId());
         paramMap.put(TIME_ZONE_FIELD, user.getTimeZone().getID());
         paramMap.put(TEMPERATURE_UNITS, user.getTemperatureUnits().toString());
         paramMap.put(DEVICEGROUP_FIELD, user.getDeviceGroup());
@@ -212,6 +212,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, User, Long> 
     protected User createEntity(final Map<String, Object> row) {
         final User u = new User();
         u.setId(((Number) row.get(ID_FIELD)).longValue());
+        u.setCompany(((Number) row.get(COMPANY_FIELD)).longValue());
         u.setFirstName((String) row.get(FIRSTNAME_FIELD));
         u.setLastName((String) row.get(LASTNAME_FIELD));
         u.setExternalCompany((String) row.get(EXTERNALCOMPANY_FIELD));
@@ -282,5 +283,11 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, User, Long> 
             refs.add(ref);
         }
         return refs;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final User t, final Map<String, Object> map, final Map<String, Object> cache) {
     }
 }

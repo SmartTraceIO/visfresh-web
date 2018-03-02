@@ -72,7 +72,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         d.setImei(imei);
         d.setName("Test Device");
         d.setModel(DeviceModel.TT18);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         d.setTripCount(5);
         d.setColor(choiseColor(imei));
@@ -95,10 +95,8 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         assertEquals(DeviceModel.TT18, d.getModel());
 
         //test company
-        final Company c = d.getCompany();
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        final Long c = d.getCompanyId();
+        assertEquals(sharedCompany.getId(), c);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
@@ -117,10 +115,8 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         assertEquals(5, d.getTripCount());
 
         //test company
-        final Company c = d.getCompany();
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        final Long c = d.getCompanyId();
+        assertEquals(sharedCompany.getId(), c);
         assertEquals(autoStart.getId(), d.getAutostartTemplateId());
     }
     @Test
@@ -128,7 +124,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         createAndSaveDevice(sharedCompany, "293487032784");
         createAndSaveDevice(sharedCompany, "834270983474");
 
-        assertEquals(2, dao.findByCompany(sharedCompany, null, null, null).size());
+        assertEquals(2, dao.findByCompany(sharedCompany.getCompanyId(), null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -136,7 +132,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left, null, null, null).size());
+        assertEquals(0, dao.findByCompany(left.getCompanyId(), null, null, null).size());
     }
     @Test
     public void testEnabledField() {
@@ -182,65 +178,65 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
 
         List<ListDeviceItem> devices;
         //test sort by imei
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_IMEI), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_IMEI), null);
         assertEquals(imei1, devices.get(0).getImei());
         assertEquals(imei2, devices.get(1).getImei());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_IMEI), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_IMEI), null);
         assertEquals(imei2, devices.get(0).getImei());
         assertEquals(imei1, devices.get(1).getImei());
 
         //test sort by name
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_NAME), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_NAME), null);
         assertEquals(name1, devices.get(0).getName());
         assertEquals(name2, devices.get(1).getName());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_NAME), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_NAME), null);
         assertEquals(name2, devices.get(0).getName());
         assertEquals(name1, devices.get(1).getName());
 
         //sorting by description
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_DESCRIPTION), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_DESCRIPTION), null);
         assertEquals(desc1, devices.get(0).getDescription());
         assertEquals(desc2, devices.get(1).getDescription());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_DESCRIPTION), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_DESCRIPTION), null);
         assertEquals(desc2, devices.get(0).getDescription());
         assertEquals(desc1, devices.get(1).getDescription());
 
         //test by active status
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_ACTIVE), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_ACTIVE), null);
         assertEquals(active1, devices.get(0).isActive());
         assertEquals(active2, devices.get(1).isActive());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_ACTIVE), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_ACTIVE), null);
         assertEquals(active2, devices.get(0).isActive());
         assertEquals(active1, devices.get(1).isActive());
 
         //test by serial number property
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_SN), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_SN), null);
         assertEquals(imei2, devices.get(0).getImei());
         assertEquals(imei1, devices.get(1).getImei());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_SN), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_SN), null);
         assertEquals(imei1, devices.get(0).getImei());
         assertEquals(imei2, devices.get(1).getImei());
 
         //sort by autostart template ID
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID), null);
         assertEquals(d2.getImei(), devices.get(0).getImei());
         assertEquals(d1.getId(), devices.get(1).getImei());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID), null);
         assertEquals(d1.getImei(), devices.get(0).getImei());
         assertEquals(d2.getId(), devices.get(1).getImei());
 
         //sort by autostart template name
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME), null);
         assertEquals(d1.getImei(), devices.get(0).getImei());
         assertEquals(d2.getId(), devices.get(1).getImei());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME), null);
         assertEquals(d2.getImei(), devices.get(0).getImei());
         assertEquals(d1.getId(), devices.get(1).getImei());
     }
@@ -276,66 +272,66 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
 
         List<ListDeviceItem> devices;
         //test by shipment
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_SHIPMENT), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_LAST_SHIPMENT), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_LAST_SHIPMENT), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_LAST_SHIPMENT), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
         //test sort by latitude
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_READING_LAT), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_LAST_READING_LAT), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_LAT), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_LAT), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 
         //sort by last reading longitude
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_READING_LONG), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_LAST_READING_LONG), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_LONG), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_LONG), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
         //sort by battery
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_READING_BATTERY), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_LAST_READING_BATTERY), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_BATTERY), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_BATTERY), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 
         //sort by temperature
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany,
+        devices = dao.getDevices(sharedCompany.getCompanyId(),
                 new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
         //sort by last reading time
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_TIME_ISO), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_TIME_ISO), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 
         //sort by shipment status
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_SHIPMENT_STATUS), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(DeviceConstants.PROPERTY_SHIPMENT_STATUS), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_SHIPMENT_STATUS), null);
+        devices = dao.getDevices(sharedCompany.getCompanyId(), new Sorting(false, DeviceConstants.PROPERTY_SHIPMENT_STATUS), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
     }
@@ -344,7 +340,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         createAndSaveDevice(sharedCompany, "293487032784");
         createAndSaveDevice(sharedCompany, "834270983474");
 
-        assertEquals(2, dao.getDevices(sharedCompany, null, null).size());
+        assertEquals(2, dao.getDevices(sharedCompany.getCompanyId(), null, null).size());
 
         //test left company
         Company left = new Company();
@@ -352,7 +348,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.getDevices(left, null, null).size());
+        assertEquals(0, dao.getDevices(left.getCompanyId(), null, null).size());
     }
     @Test
     public void testGetDevicesPagination() {
@@ -361,11 +357,11 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         createAndSaveDevice(sharedCompany, "333333333333");
         createAndSaveDevice(sharedCompany, "444444444444");
 
-        assertEquals(4, dao.getDevices(sharedCompany,
+        assertEquals(4, dao.getDevices(sharedCompany.getCompanyId(),
                 new Sorting(DeviceConstants.PROPERTY_IMEI), null).size());
-        assertEquals(3, dao.getDevices(sharedCompany,
+        assertEquals(3, dao.getDevices(sharedCompany.getCompanyId(),
                 new Sorting(DeviceConstants.PROPERTY_IMEI), new Page(1, 3)).size());
-        assertEquals(1, dao.getDevices(sharedCompany,
+        assertEquals(1, dao.getDevices(sharedCompany.getCompanyId(),
                 new Sorting(DeviceConstants.PROPERTY_IMEI), new Page(2, 3)).size());
     }
     @Test
@@ -390,7 +386,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         createTrackerEvent(s, lat1, lon1, bat1, t1, time1);
         createTrackerEvent(s, lat2, lon2, bat2, t2, time2);
 
-        final ListDeviceItem item = dao.getDevices(sharedCompany, null, null).get(0);
+        final ListDeviceItem item = dao.getDevices(sharedCompany.getCompanyId(), null, null).get(0);
         assertEquals(bat2, item.getBattery().doubleValue(), 0.0001);
         assertEquals(d.getDescription(), item.getDescription());
         assertEquals(d.getImei(), item.getImei());
@@ -416,7 +412,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         createTrackerEvent(s2, 1.1, 2.2, 3, 4, new Date());
         createTrackerEvent(d1, 1.1, 2.2, 3, 5, new Date());
 
-        final ListDeviceItem item = dao.getDevices(sharedCompany, null, null).get(0);
+        final ListDeviceItem item = dao.getDevices(sharedCompany.getCompanyId(), null, null).get(0);
         assertEquals(s1.getId(), item.getShipmentId());
         assertNull(item.getTemperature());
     }
@@ -437,10 +433,8 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         assertEquals("Test device", d.getDescription());
 
         //test company
-        final Company c = d.getCompany();
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        final Long c = d.getCompanyId();
+        assertEquals(sharedCompany.getId(), c);
     }
     @Test
     public void testDeviceState() {
@@ -466,9 +460,9 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         final Company c2 = createCompany("C2");
 
         final Device d = createAndSaveDevice(c1, "239488932490874");
-        dao.moveToNewCompany(d, c2);
+        dao.moveToNewCompany(d, c2.getCompanyId());
 
-        assertEquals(c2.getId(), dao.findByImei(d.getImei()).getCompany().getId());
+        assertEquals(c2.getId(), dao.findByImei(d.getImei()).getCompanyId());
     }
     /**
      * @param d device.
@@ -477,7 +471,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
     private Shipment createShipment(final Device d, final ShipmentStatus status) {
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(status);
         return getContext().getBean(ShipmentDao.class).save(s);
     }
@@ -487,7 +481,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
      */
     private Device createAndSaveDevice(final Company c, final String imei) {
         final Device d = createDevice(imei);
-        d.setCompany(c);
+        d.setCompany(c.getCompanyId());
         return dao.save(d);
     }
     /**
@@ -537,7 +531,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
      */
     private ShipmentTemplate createShipmentTemplate(final String name) {
         final ShipmentTemplate s = new ShipmentTemplate();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setName(name);
         return getContext().getBean(ShipmentTemplateDao.class).save(s);
     }
@@ -547,7 +541,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
      */
     private AutoStartShipment createAutoStartTemplate(final ShipmentTemplate tpl) {
         final AutoStartShipment aut = new AutoStartShipment();
-        aut.setCompany(sharedCompany);
+        aut.setCompany(sharedCompany.getCompanyId());
         aut.setTemplate(tpl);
         aut.setPriority(10);
         return getContext().getBean(AutoStartShipmentDao.class).save(aut);

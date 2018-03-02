@@ -134,4 +134,10 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate, S
     protected Map<String, String> getPropertyToDbMap() {
         return propertyToDbFields;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final ShipmentTemplate t, final Map<String, Object> map, final Map<String, Object> cache) {
+    }
 }

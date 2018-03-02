@@ -72,7 +72,7 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         assertNotNull(saved);
         assertEquals(group.getDescription(), saved.getDescription());
         assertEquals(group.getName(), saved.getName());
-        assertNotNull(saved.getCompany());
+        assertNotNull(saved.getCompanyId());
     }
     /**
      * Tests saving of device group.
@@ -102,7 +102,7 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         assertNotNull(saved);
         assertEquals(updatedDescription, saved.getDescription());
         assertEquals(updatedName, saved.getName());
-        assertNotNull(saved.getCompany());
+        assertNotNull(saved.getCompanyId());
     }
     /**
      * Tests get of device groups
@@ -306,7 +306,7 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         final DeviceGroup group = new DeviceGroup();
         group.setName(name);
         group.setDescription(description);
-        group.setCompany(getCompany());
+        group.setCompany(getCompanyId());
         dao.save(group);
         return group;
     }

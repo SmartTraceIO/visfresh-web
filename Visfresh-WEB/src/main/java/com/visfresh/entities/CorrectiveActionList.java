@@ -21,7 +21,7 @@ public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompa
     /**
      * ID in data base.
      */
-    private Company company;
+    private Long company;
     /**
      * Action list name.
      */
@@ -71,14 +71,14 @@ public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompa
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
     @Override
-    public void setCompany(final Company company) {
+    public void setCompany(final Long company) {
         this.company = company;
     }
     /**
@@ -110,7 +110,7 @@ public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompa
 
         final CorrectiveActionList other = (CorrectiveActionList) obj;
         return Objects.equals(getId(), other.getId())
-                && getCompany().getId().equals(other.getCompany().getId())
+                && getCompanyId().equals(other.getCompanyId())
                 && Objects.equals(getName(), other.getName())
                 && Objects.equals(getDescription(), other.getDescription())
                 && CollectionUtils.equals(getActions(), other.getActions());
@@ -124,7 +124,7 @@ public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompa
         hash.add(getId());
         hash.add(getName());
         hash.add(getDescription());
-        hash.add(getCompany().getId());
+        hash.add(getCompanyId());
 
         for (final CorrectiveAction a : getActions()) {
             hash.add(a);

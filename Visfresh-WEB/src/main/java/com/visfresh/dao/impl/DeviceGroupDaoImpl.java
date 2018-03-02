@@ -90,7 +90,7 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
 
         paramMap.put(NAME_FIELD, group.getName());
         paramMap.put(DESCRIPTION_FIELD, group.getDescription());
-        paramMap.put(COMPANY_FIELD, group.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, group.getCompanyId());
 
         if (group.getId() == null) {
             final GeneratedKeyHolder kh = new GeneratedKeyHolder();
@@ -131,6 +131,7 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
     protected DeviceGroup createEntity(final Map<String, Object> map) {
         final DeviceGroup g = new DeviceGroup();
         g.setId(((Number) map.get(ID_FIELD)).longValue());
+        g.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
         g.setName((String) map.get(NAME_FIELD));
         g.setDescription((String) map.get(DESCRIPTION_FIELD));
         return g;
@@ -188,7 +189,7 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
     @Override
     public List<DeviceGroup> findByDevice(final Device device) {
         final Filter filter = new Filter();
-        filter.addFilter(COMPANY_FIELD, device.getCompany().getId());
+        filter.addFilter(COMPANY_FIELD, device.getCompanyId());
         filter.addFilter(PROPERTY_DEVICE, device);
         final Sorting sorting = new Sorting(NAME_FIELD);
 
@@ -257,5 +258,11 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
 
         final List<DeviceGroup> groups = findAll(f, new Sorting(ID_FIELD), new Page(1, 1));
         return groups.isEmpty() ? null : groups.get(0);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final DeviceGroup t, final Map<String, Object> map, final Map<String, Object> cache) {
     }
 }

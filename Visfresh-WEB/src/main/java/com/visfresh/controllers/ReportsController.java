@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.dao.ShipmentDao;
@@ -86,6 +87,8 @@ public class ReportsController extends AbstractController {
     private UserDao userDao;
     @Autowired
     private LocationProfileDao locationProfileDao;
+    @Autowired
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -140,7 +143,8 @@ public class ReportsController extends AbstractController {
 
         //create report bean.
         final PerformanceReportBean bean = performanceReportDao.createReport(
-                user.getCompany(), new Date(ranges.getStartTime()),
+                companyDao.findOne(user.getCompanyId()),
+                new Date(ranges.getStartTime()),
                 new Date(ranges.getEndTime()),
                 atom,
                 location);
@@ -225,7 +229,7 @@ public class ReportsController extends AbstractController {
         if (shipmentId != null) {
             s = shipmentDao.findOne(shipmentId);
         } else {
-            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
+            s = shipmentDao.findBySnTrip(user.getCompanyId(), sn, trip);
         }
 
         checkCompanyAccess(user, s);
@@ -250,7 +254,8 @@ public class ReportsController extends AbstractController {
      * @return PDF shipment report.
      */
     private File createShipmentReport(final Shipment s, final User user)throws IOException {
-        final ShipmentReportBean bean = shipmentReportDao.createReport(s);
+        final ShipmentReportBean bean = shipmentReportDao.createReport(
+                s, companyDao.findOne(user.getCompanyId()));
 
         //correct report recipient list if report really sent
         if (s.getArrivalDate() != null) {
@@ -345,7 +350,7 @@ public class ReportsController extends AbstractController {
                     "Should be specified sn and trip request parameters");
         }
 
-        final Shipment s = shipmentDao.findBySnTrip(user.getCompany(), req.getSn(), req.getTrip());
+        final Shipment s = shipmentDao.findBySnTrip(user.getCompanyId(), req.getSn(), req.getTrip());
         if (s == null) {
             throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Unable to found shipment for " + req.getSn() + " (" + req.getTrip()

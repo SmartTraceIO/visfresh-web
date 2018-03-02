@@ -58,7 +58,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //create alert profile.
         final AlertProfile p = new AlertProfile();
-        p.setCompany(shipment.getCompany());
+        p.setCompany(shipment.getCompanyId());
         p.setName("JUnit");
         p.setDescription("JUnit alerts");
 

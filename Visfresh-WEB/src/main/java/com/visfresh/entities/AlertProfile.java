@@ -21,7 +21,7 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * ID in data base.
      */
-    private Company company;
+    private Long company;
     /**
      * Alert profile name.
      */
@@ -139,14 +139,14 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
     @Override
-    public void setCompany(final Company company) {
+    public void setCompany(final Long company) {
         this.company = company;
     }
     /**

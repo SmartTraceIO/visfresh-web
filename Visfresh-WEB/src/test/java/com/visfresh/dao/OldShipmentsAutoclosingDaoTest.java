@@ -49,7 +49,7 @@ public class OldShipmentsAutoclosingDaoTest extends BaseDaoTest<OldShipmentsAuto
         final Device d = new Device();
         d.setName("Test Device: " + imei);
         d.setImei(imei);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test Device: " + imei);
         return getContext().getBean(DeviceDao.class).save(d);
     }
@@ -69,7 +69,7 @@ public class OldShipmentsAutoclosingDaoTest extends BaseDaoTest<OldShipmentsAuto
     protected Shipment createShipment(final Device d, final ShipmentStatus status) {
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(status);
         return getContext().getBean(ShipmentDao.class).save(s);
     }

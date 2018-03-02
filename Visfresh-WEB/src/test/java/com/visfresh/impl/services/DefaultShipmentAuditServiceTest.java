@@ -65,14 +65,14 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
         final Device d = new Device();
         d.setImei(Long.toString(92384709111111111l + id));
         d.setName("Test Device");
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setDescription("Test device");
         d.setTripCount(5);
 
         final Shipment s = new Shipment();
         s.setId(id);
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(ShipmentStatus.Arrived);
 
         return s;

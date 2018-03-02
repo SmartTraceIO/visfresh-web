@@ -170,7 +170,7 @@ public class CorrectiveActionControllerTest extends AbstractRestServiceTest {
      */
     private CorrectiveActionList createCorrectiveActionList(final boolean save) {
         final CorrectiveActionList list = new CorrectiveActionList();
-        list.setCompany(getCompany());
+        list.setCompany(getCompanyId());
         list.setName("JUnit action list");
 
         if (save) {

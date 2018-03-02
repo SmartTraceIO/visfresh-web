@@ -32,13 +32,13 @@ public class AlternativeLocationsDaoTest extends BaseDaoTest<AlternativeLocation
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei("23984293087034");
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         getContext().getBean(DeviceDao.class).save(d);
 
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         this.shipment = getContext().getBean(ShipmentDao.class).save(s);
     }
@@ -67,7 +67,7 @@ public class AlternativeLocationsDaoTest extends BaseDaoTest<AlternativeLocation
     private LocationProfile createLocation(final String name) {
         final LocationProfile l = new LocationProfile();
         l.setName(name);
-        l.setCompany(sharedCompany);
+        l.setCompany(sharedCompany.getCompanyId());
         l.setRadius(300);
         l.setAddress("adderss of " + name);
         return getContext().getBean(LocationProfileDao.class).save(l);

@@ -68,9 +68,9 @@ public class SingleShipmentUtils {
     }
     public static Shipment createShipment(final SingleShipmentBean bean) {
         final Shipment s = new Shipment();
-        s.setCompany(createCompany(bean.getCompanyId()));
+        final Company company = createCompany(bean.getCompanyId());
+        s.setCompany(company.getCompanyId());
 
-        final Company company = s.getCompany();
         s.setAlertProfile(createAlertProfile(bean.getAlertProfile(), bean, company));
 
         s.setAlertSuppressionMinutes(bean.getAlertSuppressionMinutes());
@@ -167,7 +167,7 @@ public class SingleShipmentUtils {
     private static NotificationSchedule createNotificationSchedulee(final ListNotificationScheduleItem bean,
             final Company company) {
         final NotificationSchedule s = new NotificationSchedule();
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setDescription(bean.getNotificationScheduleDescription());
         s.setId(bean.getId());
         s.setName(bean.getNotificationScheduleName());
@@ -185,7 +185,7 @@ public class SingleShipmentUtils {
 
         final LocationProfile p = new LocationProfile();
         p.setAddress(bean.getAddress());
-        p.setCompany(company);
+        p.setCompany(company.getCompanyId());
         p.setId(bean.getId());
         p.setInterim(bean.isInterim());
         p.setName(bean.getName());
@@ -209,7 +209,7 @@ public class SingleShipmentUtils {
         if (color != null) {
             d.setColor(Color.valueOf(color));
         }
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setImei(imei);
         d.setName(name);
         return d;
@@ -230,7 +230,7 @@ public class SingleShipmentUtils {
     private static AlertProfile createAlertProfile(final AlertProfileBean bean, final SingleShipmentBean shipment, final Company company) {
         final AlertProfile ap = new AlertProfile();
         ap.setBatteryLowCorrectiveActions(createCorrectiveActionList(bean.getBatteryLowCorrectiveActions(), company));
-        ap.setCompany(company);
+        ap.setCompany(company.getCompanyId());
         ap.setDescription(bean.getDescription());
         ap.setId(bean.getId());
         ap.setLightOnCorrectiveActions(createCorrectiveActionList(bean.getLightOnCorrectiveActions(), company));
@@ -287,7 +287,7 @@ public class SingleShipmentUtils {
         }
 
         final CorrectiveActionList al = new CorrectiveActionList();
-        al.setCompany(company);
+        al.setCompany(company.getCompanyId());
         al.setDescription(bean.getDescription());
         al.setId(bean.getId());
         al.setName(bean.getName());

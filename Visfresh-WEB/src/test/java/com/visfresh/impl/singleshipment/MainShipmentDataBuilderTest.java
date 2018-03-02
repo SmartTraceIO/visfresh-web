@@ -191,7 +191,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertEquals(assetNum, bean.getAssetNum());
         assertEquals(assetType, bean.getAssetType());
         assertEquals(commentsForReceiver, bean.getCommentsForReceiver());
-        assertEquals(device.getCompany().getId(), bean.getCompanyId());
+        assertEquals(device.getCompanyId(), bean.getCompanyId());
         assertEquals(device.getImei(), bean.getDevice());
         assertEquals(device.getColor().name(), bean.getDeviceColor());
         assertEquals(device.getName(), bean.getDeviceName());
@@ -283,7 +283,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         final LocationProfile loc = new LocationProfile();
         loc.setAddress(address);
-        loc.setCompany(s.getCompany());
+        loc.setCompany(s.getCompanyId());
         loc.setCompanyName(companyName);
         loc.setInterim(interim);
         loc.setStart(start);
@@ -327,7 +327,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         final LocationProfile loc = new LocationProfile();
         loc.setAddress("Odessa. Deribasovskaya 1, 1");
-        loc.setCompany(s.getCompany());
+        loc.setCompany(s.getCompanyId());
         loc.setCompanyName("Company name");
         loc.setInterim(true);
         loc.setStart(true);
@@ -376,7 +376,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         final LocationProfile loc = new LocationProfile();
         loc.setAddress(address);
-        loc.setCompany(s.getCompany());
+        loc.setCompany(s.getCompanyId());
         loc.setCompanyName(companyName);
         loc.setInterim(interim);
         loc.setStart(start);
@@ -483,7 +483,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         final LocationProfile loc = new LocationProfile();
         loc.setAddress(address);
-        loc.setCompany(s.getCompany());
+        loc.setCompany(s.getCompanyId());
         loc.setCompanyName(companyName);
         loc.setInterim(interim);
         loc.setStart(start);
@@ -522,7 +522,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         final LocationProfile loc = new LocationProfile();
         loc.setAddress(address);
-        loc.setCompany(s.getCompany());
+        loc.setCompany(s.getCompanyId());
         loc.setCompanyName(companyName);
         loc.setInterim(interim);
         loc.setStart(start);
@@ -561,7 +561,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         final LocationProfile loc = new LocationProfile();
         loc.setAddress(address);
-        loc.setCompany(s.getCompany());
+        loc.setCompany(s.getCompanyId());
         loc.setCompanyName(companyName);
         loc.setInterim(interim);
         loc.setStart(start);
@@ -805,7 +805,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         final Shipment s = createShipment();
 
         final NotificationSchedule sched = new NotificationSchedule();
-        sched.setCompany(sharedCompany);
+        sched.setCompany(sharedCompany.getCompanyId());
         final String description = "Schedule description";
         sched.setDescription(description);
         final String name = "Schedule name";
@@ -891,7 +891,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         final Shipment s = createShipment();
 
         final NotificationSchedule sched = new NotificationSchedule();
-        sched.setCompany(sharedCompany);
+        sched.setCompany(sharedCompany.getCompanyId());
         final String description = "Schedule description";
         sched.setDescription(description);
         final String name = "Schedule name";
@@ -970,7 +970,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         final Shipment s = createShipment();
 
         final DeviceGroup group = new DeviceGroup();
-        group.setCompany(sharedCompany);
+        group.setCompany(sharedCompany.getCompanyId());
         group.setDescription("Device group description");
         group.setName("Device group name");
 
@@ -1275,7 +1275,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         context.getBean(ShipmentSessionDao.class).saveSession(session);
 
         final CorrectiveActionList correctiveActions = new CorrectiveActionList();
-        correctiveActions.setCompany(sharedCompany);
+        correctiveActions.setCompany(sharedCompany.getCompanyId());
         correctiveActions.setName("CorAct");
         correctiveActions.setDescription("Corrective action list");
         correctiveActions.getActions().add(new CorrectiveAction("a1", true));
@@ -1361,7 +1361,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         //battery low corrective action
         final CorrectiveActionList bloa = new CorrectiveActionList();
-        bloa.setCompany(sharedCompany);
+        bloa.setCompany(sharedCompany.getCompanyId());
         bloa.setDescription("Battery low corrective action list");
         bloa.setName("BloaActions");
         bloa.getActions().add(new CorrectiveAction("a1", true));
@@ -1370,7 +1370,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         //battery low corrective action
         final CorrectiveActionList lona = new CorrectiveActionList();
-        lona.setCompany(sharedCompany);
+        lona.setCompany(sharedCompany.getCompanyId());
         lona.setDescription("Ligth on corrective action list");
         lona.setName("LonaActions");
         lona.getActions().add(new CorrectiveAction("a3", true));
@@ -1378,7 +1378,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         final AlertProfile ap = new AlertProfile();
         ap.setBatteryLowCorrectiveActions(bloa);
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setDescription("Alert profile description");
         ap.setLightOnCorrectiveActions(lona);
         ap.setLowerTemperatureLimit(-22.33);
@@ -1429,7 +1429,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
      */
     private DeviceGroup createDeviceGroup(final Device... devices) {
         final DeviceGroup grp = new DeviceGroup();
-        grp.setCompany(sharedCompany);
+        grp.setCompany(sharedCompany.getCompanyId());
         grp.setDescription("JUnit device group");
         grp.setName("JUnit");
 
@@ -1461,7 +1461,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         //create notification schedule.
         final NotificationSchedule sched = new NotificationSchedule();
-        sched.setCompany(sharedCompany);
+        sched.setCompany(sharedCompany.getCompanyId());
         sched.setDescription(name);
         sched.setName(name);
         sched.getSchedules().add(ps);
@@ -1487,7 +1487,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
      */
     private User createUser(final String symbolycId) {
         final User u = new User();
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setActive(true);
         u.setEmail(symbolycId + "@smarttrace.com.au");
         u.setFirstName(symbolycId);
@@ -1542,7 +1542,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
     private LocationProfile createLocation(final String name) {
         final LocationProfile p = new LocationProfile();
         p.setAddress("Odessa city, Deribasovskaya st. 1, apt. 1");
-        p.setCompany(sharedCompany);
+        p.setCompany(sharedCompany.getCompanyId());
         p.setInterim(true);
         p.setName("Test location");
         p.setNotes("Any notes");

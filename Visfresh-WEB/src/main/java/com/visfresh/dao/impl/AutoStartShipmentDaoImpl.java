@@ -72,7 +72,7 @@ public class AutoStartShipmentDaoImpl
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         paramMap.put(ID_FIELD, aut.getId());
-        paramMap.put(COMPANY_FIELD, aut.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, aut.getCompanyId());
         paramMap.put(PRIORITY_FIELD, aut.getPriority());
         paramMap.put(START_ON_MOVING_FIELD, aut.isStartOnLeaveLocation());
         if (aut.getId() == null) {
@@ -257,6 +257,7 @@ public class AutoStartShipmentDaoImpl
     protected AutoStartShipment createEntity(final Map<String, Object> map) {
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setId(((Number) map.get(ID_FIELD)).longValue());
+        cfg.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
         cfg.setPriority(((Number) map.get(PRIORITY_FIELD)).intValue());
         cfg.setStartOnLeaveLocation((Boolean) map.get(START_ON_MOVING_FIELD));
         return cfg;
@@ -267,7 +268,6 @@ public class AutoStartShipmentDaoImpl
     @Override
     protected void resolveReferences(final AutoStartShipment t,
             final Map<String, Object> row, final Map<String, Object> cache) {
-        super.resolveReferences(t, row, cache);
         resolveTemplate(t, row, cache);
         resolveLocations(t, row, cache);
     }

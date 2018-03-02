@@ -88,7 +88,7 @@ public class SimulatorControllerTest extends AbstractRestServiceTest {
 
         AutoStartShipment auto = new AutoStartShipment();
         auto.setTemplate(createShipmentTemplate(true));
-        auto.setCompany(auto.getTemplate().getCompany());
+        auto.setCompany(auto.getTemplate().getCompanyId());
         auto = context.getBean(AutoStartShipmentDao.class).save(auto);
 
         final SimulatorDto dto = new SimulatorDto();
@@ -115,7 +115,7 @@ public class SimulatorControllerTest extends AbstractRestServiceTest {
 
         AutoStartShipment auto = new AutoStartShipment();
         auto.setTemplate(createShipmentTemplate(true));
-        auto.setCompany(auto.getTemplate().getCompany());
+        auto.setCompany(auto.getTemplate().getCompanyId());
         auto = context.getBean(AutoStartShipmentDao.class).save(auto);
 
         //do update

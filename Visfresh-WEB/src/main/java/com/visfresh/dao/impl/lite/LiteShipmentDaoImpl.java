@@ -27,7 +27,6 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.dao.impl.ShipmentDaoImpl;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.StringUtils;
@@ -59,7 +58,7 @@ public class LiteShipmentDaoImpl implements LiteShipmentDao {
      * @see com.visfresh.dao.LiteShipmentDao#getShipmentsNear(com.visfresh.entities.Company, double, double, int, java.util.Date)
      */
     @Override
-    public List<LiteShipment> getShipmentsNearby(final Company company, final double lat, final double lon, final int radius, final Date startDate) {
+    public List<LiteShipment> getShipmentsNearby(final Long company, final double lat, final double lon, final int radius, final Date startDate) {
         final String sql = "select shipments.* ,"
                 + " substring(shipments.device, -7, 6) as deviceSN,"
                 + " sfrom.name as shippedFromLocationName,"
@@ -89,7 +88,7 @@ public class LiteShipmentDaoImpl implements LiteShipmentDao {
 
         //create parameter map
         final Map<String, Object> params = new HashMap<>();
-        params.put("company", company.getId());
+        params.put("company", company);
         if (startDate != null) {
             params.put("time", startDate);
         }
@@ -125,7 +124,7 @@ public class LiteShipmentDaoImpl implements LiteShipmentDao {
      * @return
      */
     @Override
-    public LiteShipmentResult getShipments(final Company company, final Sorting sorting,
+    public LiteShipmentResult getShipments(final Long company, final Sorting sorting,
             final Filter filter, final Page page) {
         final List<Map<String, Object>> list = getShipmentsDbData(company, sorting, filter, page);
 
@@ -151,13 +150,13 @@ public class LiteShipmentDaoImpl implements LiteShipmentDao {
      * @param filter
      * @return
      */
-    protected int getTotalCount(final Company company, final Filter filter) {
+    protected int getTotalCount(final Long company, final Filter filter) {
         //select shipments using standard query builder
         final SelectAllSupport support = shipmentDao.getSelectAllSupport();
         //add company to filter
         final Filter f = new Filter(filter);
         if (company != null) {
-            f.addFilter("company", company.getId());
+            f.addFilter("company", company);
         }
         support.buildGetCount(f);
 
@@ -172,13 +171,13 @@ public class LiteShipmentDaoImpl implements LiteShipmentDao {
      * @param page
      * @return
      */
-    protected List<Map<String, Object>> getShipmentsDbData(final Company company, final Sorting sorting, final Filter filter, final Page page) {
+    protected List<Map<String, Object>> getShipmentsDbData(final Long company, final Sorting sorting, final Filter filter, final Page page) {
         //select shipments using standard query builder
         final SelectAllSupport support = shipmentDao.getSelectAllSupport();
         //add company to filter
         final Filter f = new Filter(filter);
         if (company != null) {
-            f.addFilter("company", company.getId());
+            f.addFilter("company", company);
         }
 
         //build query

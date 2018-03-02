@@ -32,6 +32,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.controllers.audit.ShipmentAuditAction;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.InterimStopDao;
@@ -43,7 +44,6 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
@@ -125,6 +125,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private ShipmentAuditService auditService;
     @Autowired
     private SingleShipmentService singleShipmentService;
+    @Autowired
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -176,7 +178,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         final Shipment newShipment = createShipment(req.getShipment(), oldShipment);
         resolveReferences(user, req.getShipment(), newShipment);
 
-        newShipment.setCompany(user.getCompany());
+        newShipment.setCompany(user.getCompanyId());
         newShipment.setCreatedBy(user.getEmail());
 
         if (id != null) {
@@ -206,7 +208,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         if (req.isSaveAsNewTemplate()) {
             final Long tplId = createShipmentTemplate(
-                    user.getCompany(), newShipment, req.getTemplateName());
+                    user.getCompanyId(), newShipment, req.getTemplateName());
             resp.setTemplateId(tplId);
         }
 
@@ -385,7 +387,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         //add date shipped
         final String dateShipped = DateTimeUtils.formatShipmentDate(
-                newShipment.getCompany(), newShipment.getShipmentDate());
+                companyDao.findOne(newShipment.getCompanyId()),
+                newShipment.getShipmentDate());
         String desc = newShipment.getShipmentDescription();
         if (desc == null) {
             desc = dateShipped;
@@ -408,7 +411,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         return resultId;
     }
 
-    private Long createShipmentTemplate(final Company company, final Shipment shipment, final String templateName) {
+    private Long createShipmentTemplate(final Long company, final Shipment shipment, final String templateName) {
         final ShipmentTemplate tpl = new ShipmentTemplate(shipment);
         tpl.setCompany(company);
         tpl.setAddDateShipped(true);
@@ -439,7 +442,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         final Filter filter = createFilter(req);
         final ListResult<ListShipmentItem> shipments = getShipments(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSortingShipments(
                         req.getSortColumn(),
                         req.getSortOrder(),
@@ -498,7 +501,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         final List<ListShipmentItem> shipments = new LinkedList<>();
         ListResult<ListShipmentItem> part;
         do {
-            part = getShipments(user.getCompany(), sorting, null, new Page(page, limit), user);
+            part = getShipments(user.getCompanyId(), sorting, null, new Page(page, limit), user);
             for (final ListShipmentItem item : part.getItems()) {
                 //Check date and location nearby
                 final Double itemLat = item.getLastReadingLat();
@@ -883,12 +886,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param user the user.
      * @return
      */
-    private ListResult<ListShipmentItem> getShipments(final Company company,
+    private ListResult<ListShipmentItem> getShipments(final Long company,
             final Sorting sorting,
             final Filter filter,
             final Page page, final User user) {
         final ListResult<ListShipmentItem> shipments = shipmentDao.getCompanyShipments(
-                company.getId(), sorting, page, filter);
+                company, sorting, page, filter);
 
         final Date currentTime = new Date();
 
@@ -1174,8 +1177,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return false;
         }
 
-        final Company usersCompany = user.getCompany();
-        if (s.getCompanyId().equals(usersCompany.getId())) {
+        final Long usersCompany = user.getCompanyId();
+        if (s.getCompanyId().equals(usersCompany)) {
             return true;
         }
 
@@ -1188,7 +1191,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         //check company access
         for (final ShipmentCompanyDto c : s.getCompanyAccess()) {
-            if (c.getId().equals(usersCompany.getId())) {
+            if (c.getId().equals(usersCompany)) {
                 return true;
             }
         }

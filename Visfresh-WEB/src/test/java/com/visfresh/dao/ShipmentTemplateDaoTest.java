@@ -53,7 +53,7 @@ public class ShipmentTemplateDaoTest
         alertProfileDao = getContext().getBean(AlertProfileDao.class);
 
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
         ap.setWatchBatteryLow(true);
@@ -67,7 +67,7 @@ public class ShipmentTemplateDaoTest
         LocationProfile p = new LocationProfile();
 
         p.setAddress("Odessa city, Deribasovskaya st. 1, apt. 1");
-        p.setCompany(sharedCompany);
+        p.setCompany(sharedCompany.getCompanyId());
         p.setInterim(true);
         p.setName("Test location 1");
         p.setNotes("Any notes");
@@ -82,7 +82,7 @@ public class ShipmentTemplateDaoTest
         p = new LocationProfile();
 
         p.setAddress("Odessa city, Deribasovskaya st. 1, apt. 2");
-        p.setCompany(sharedCompany);
+        p.setCompany(sharedCompany.getCompanyId());
         p.setInterim(true);
         p.setName("Test location 2");
         p.setNotes("Any notes");
@@ -97,7 +97,7 @@ public class ShipmentTemplateDaoTest
         notificationScheduleDao = getContext().getBean(NotificationScheduleDao.class);
 
         NotificationSchedule s = new NotificationSchedule();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
@@ -114,7 +114,7 @@ public class ShipmentTemplateDaoTest
         alertNotifSched = notificationScheduleDao.save(s);
 
         s = new NotificationSchedule();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
@@ -131,7 +131,7 @@ public class ShipmentTemplateDaoTest
 
     private User createUser() {
         final User u = new User();
-        u.setCompany(this.sharedCompany);
+        u.setCompany(this.sharedCompany.getCompanyId());
         u.setEmail("asuvorov@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
@@ -154,7 +154,7 @@ public class ShipmentTemplateDaoTest
         s.setArrivalNotificationWithinKm(17);
         s.setSendArrivalReport(false);
         s.setSendArrivalReportOnlyIfAlerts(true);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setExcludeNotificationsIfNoAlerts(true);
         s.setName("Shipment-1");
         s.setShipmentDescription("Test Shipment");
@@ -179,7 +179,7 @@ public class ShipmentTemplateDaoTest
         assertEquals(17, tpl.getArrivalNotificationWithinKm().intValue());
         assertFalse(tpl.isSendArrivalReport());
         assertTrue(tpl.isSendArrivalReportOnlyIfAlerts());
-        assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
+        assertEquals(sharedCompany.getId(), tpl.getCompanyId());
         assertEquals(true, tpl.isExcludeNotificationsIfNoAlerts());
         assertEquals("Shipment-1", tpl.getName());
         assertEquals("Test Shipment", tpl.getShipmentDescription());
@@ -198,7 +198,7 @@ public class ShipmentTemplateDaoTest
     public void testFindByCompany() {
         dao.save(createTestEntity());
 
-        assertEquals(1, dao.findByCompany(sharedCompany, null, null, null).size());
+        assertEquals(1, dao.findByCompany(sharedCompany.getCompanyId(), null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -206,7 +206,7 @@ public class ShipmentTemplateDaoTest
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left, null, null, null).size());
+        assertEquals(0, dao.findByCompany(left.getCompanyId(), null, null, null).size());
     }
 
     /* (non-Javadoc)
@@ -223,7 +223,7 @@ public class ShipmentTemplateDaoTest
         assertEquals(17, tpl.getArrivalNotificationWithinKm().intValue());
         assertFalse(tpl.isSendArrivalReport());
         assertTrue(tpl.isSendArrivalReportOnlyIfAlerts());
-        assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
+        assertEquals(sharedCompany.getId(), tpl.getCompanyId());
         assertEquals(true, tpl.isExcludeNotificationsIfNoAlerts());
         assertEquals("Shipment-1", tpl.getName());
         assertEquals("Test Shipment", tpl.getShipmentDescription());

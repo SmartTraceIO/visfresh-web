@@ -42,7 +42,7 @@ public class ShipmentStatisticsServiceInitializeTest extends BaseDaoTest<Shipmen
         //create shared device
         final Device d = new Device();
         d.setActive(true);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setImei("3487098374353452");
         d.setName("JUnit");
 
@@ -83,7 +83,7 @@ public class ShipmentStatisticsServiceInitializeTest extends BaseDaoTest<Shipmen
     private Shipment createShipment() {
         final Shipment s = new Shipment();
         s.setStatus(ShipmentStatus.Default);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(device);
         return context.getBean(ShipmentDao.class).save(s);
     }

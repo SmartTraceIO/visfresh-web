@@ -92,14 +92,14 @@ public class Company implements EntityWithId<Long>, EntityWithCompany {
      * @see com.visfresh.entities.EntityWithCompany#getCompany()
      */
     @Override
-    public Company getCompany() {
-        return this;
+    public Long getCompanyId() {
+        return getId();
     }
     /* (non-Javadoc)
      * @see com.visfresh.entities.EntityWithCompany#setCompany(com.visfresh.entities.Company)
      */
     @Override
-    public void setCompany(final Company c) {
+    public void setCompany(final Long c) {
     }
     /**
      * @return the address

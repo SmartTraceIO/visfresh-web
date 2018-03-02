@@ -11,7 +11,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.CorrectiveActionsConstants;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 
@@ -28,12 +27,12 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
      *
      */
     private static final String ACTION = "action";
-    private final Company company;
+    private final Long company;
 
     /**
      * Default constructor.
      */
-    public CorrectiveActionListSerializer(final Company c) {
+    public CorrectiveActionListSerializer(final Long c) {
         super(TimeZone.getDefault());
         this.company = c;
     }

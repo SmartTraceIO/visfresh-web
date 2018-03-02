@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
 
 /**
@@ -36,7 +35,7 @@ public interface ActionTakenDao extends DaoBase<ActionTakenView, ActionTaken, Lo
      * @param company company ID.
      * @return action taken view.
      */
-    ActionTakenView findOne(Long id, Company company);
+    ActionTakenView findOne(Long id, Long company);
     /**
      * @param shipment shipment.
      * @return list of action taken view.

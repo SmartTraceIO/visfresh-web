@@ -95,7 +95,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         paramMap.put(ONMOVEMENTSTART_FIELD, ap.isWatchMovementStart());
         paramMap.put(ONMOVEMENTSTOP_FIELD, ap.isWatchMovementStop());
         paramMap.put(ONBATTERYLOW_FIELD, ap.isWatchBatteryLow());
-        paramMap.put(COMPANY_FIELD, ap.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, ap.getCompanyId());
         paramMap.put(LOWERTEMPLIMIT_FIELD, ap.getLowerTemperatureLimit());
         paramMap.put(UPPERTEMPLIMIT_FIELD, ap.getUpperTemperatureLimit());
 
@@ -181,20 +181,19 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      */
     @Override
     protected void resolveReferences(final AlertProfile t, final Map<String, Object> row, final Map<String, Object> cache) {
-        super.resolveReferences(t, row, cache);
         t.getAlertRules().addAll(loadTemperatureIssues(t.getId()));
 
         //update company for corrective actions
         for (final TemperatureRule r: t.getAlertRules()) {
             if (r.getCorrectiveActions() != null) {
-                r.getCorrectiveActions().setCompany(t.getCompany());
+                r.getCorrectiveActions().setCompany(t.getCompanyId());
             }
         }
         if (t.getBatteryLowCorrectiveActions() != null) {
-            t.getBatteryLowCorrectiveActions().setCompany(t.getCompany());
+            t.getBatteryLowCorrectiveActions().setCompany(t.getCompanyId());
         }
         if (t.getLightOnCorrectiveActions() != null) {
-            t.getLightOnCorrectiveActions().setCompany(t.getCompany());
+            t.getLightOnCorrectiveActions().setCompany(t.getCompanyId());
         }
     }
 
@@ -340,6 +339,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         final AlertProfile ap = new AlertProfile();
 
         ap.setId(((Number) row.get(ID_FIELD)).longValue());
+        ap.setCompany(((Number) row.get(COMPANY_FIELD)).longValue());
 
         ap.setName((String) row.get(NAME_FIELD));
         ap.setDescription((String) row.get(DESCRIPTION_FIELD));

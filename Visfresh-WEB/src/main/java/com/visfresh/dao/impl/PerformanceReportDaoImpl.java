@@ -75,7 +75,8 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
             bean.setLocationName(location.getName());
         }
 
-        final Map<Long, AlertProfileStats> statsMap = createInitialStatsMap(c, startDate, endDate, timeRanges);
+        final Map<Long, AlertProfileStats> statsMap = createInitialStatsMap(
+                c.getCompanyId(), startDate, endDate, timeRanges);
         final Map<Long, List<TemperatureAlert>> shipmentAlerts = new HashMap<>();
 
         addShipmentStats(c, startDate, endDate, statsMap, shipmentAlerts, timeAtom, location);
@@ -273,7 +274,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
      * @return
      */
     protected Map<Long, AlertProfileStats> createInitialStatsMap(
-            final Company c, final Date startDate, final Date endDate, final List<TimeRanges> timeRanges) {
+            final Long c, final Date startDate, final Date endDate, final List<TimeRanges> timeRanges) {
         //Warning!!! the number of shipments per alert profile and time ranges
         //should be added after
         final Map<Long, AlertProfileStats> statsMap = new HashMap<>();

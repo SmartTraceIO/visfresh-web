@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.AutoStartShipmentDao;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.entities.AlternativeLocations;
@@ -54,6 +55,8 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     private AbstractRuleEngine ruleEngine;
     @Autowired
     private ShipmentSessionDao shipmentSessionDao;
+    @Autowired
+    private CompanyDao companyDao;
 
     private static class ShipmentInit {
         private AutoStartShipment autoStart;
@@ -116,7 +119,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         ShipmentInit init = null;
         //first of all attempt to select autostart shipment template
         final List<AutoStartShipment> autoStarts = autoStartShipmentDao.findByCompany(
-                device.getCompany(), null, null, null);
+                device.getCompanyId(), null, null, null);
         Collections.sort(autoStarts);
 
         if (!autoStarts.isEmpty()) {
@@ -286,7 +289,8 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
 
         if (tpl.isAddDateShipped()) {
             s.setShipmentDescription(s.getShipmentDescription()
-                    + " " + DateTimeUtils.formatShipmentDate(tpl.getCompany(), new Date()));
+                    + " " + DateTimeUtils.formatShipmentDate(
+                            companyDao.findOne(tpl.getCompanyId()), new Date()));
         }
 
         return s;
@@ -367,7 +371,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
      */
     private Shipment createNewDefaultShipment(final Device device) {
         final Shipment s = new Shipment();
-        s.setCompany(device.getCompany());
+        s.setCompany(device.getCompanyId());
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");

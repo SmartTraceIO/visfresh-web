@@ -174,7 +174,7 @@ public class SimulatorDaoTest extends BaseDaoTest<SimulatorDao> {
      */
     private Shipment createShipment(final Device target) {
         final Shipment s = new Shipment();
-        s.setCompany(target.getCompany());
+        s.setCompany(target.getCompanyId());
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(target);
         s.setShipmentDescription("JUnit shipment");
@@ -188,7 +188,7 @@ public class SimulatorDaoTest extends BaseDaoTest<SimulatorDao> {
         final Device d = new Device();
         d.setImei(imei);
         d.setActive(true);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("JUnit Device");
         d.setName("JUnit");
         return context.getBean(DeviceDao.class).save(d);
@@ -200,7 +200,7 @@ public class SimulatorDaoTest extends BaseDaoTest<SimulatorDao> {
     private User createUser(final String email) {
         final User u = new User();
         u.setActive(true);
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail(email);
         u.setFirstName("JUnit");
         u.setLastName("User");

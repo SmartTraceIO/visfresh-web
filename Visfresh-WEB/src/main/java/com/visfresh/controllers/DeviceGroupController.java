@@ -59,7 +59,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final @RequestBody JsonObject group) throws RestServiceException {
             final User user = getLoggedInUser();
             DeviceGroup g = createSerializer(user).parseDeviceGroup(group);
-            g.setCompany(user.getCompany());
+            g.setCompany(user.getCompanyId());
 
             final DeviceGroup old = dao.findOne(g.getId());
             checkCompanyAccess(user, old);
@@ -87,12 +87,12 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         final User user = getLoggedInUser();
         final DeviceGroupSerializer ser = createSerializer(user);
 
-        final List<DeviceGroup> groups = dao.findByCompany(user.getCompany(),
+        final List<DeviceGroup> groups = dao.findByCompany(user.getCompanyId(),
                 createSorting(sc, so, getDefaultSortOrder(), 1),
                 page,
                 null);
 
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
         final JsonArray array = new JsonArray();
         for (final DeviceGroup t : groups) {
             array.add(ser.toJson(t));

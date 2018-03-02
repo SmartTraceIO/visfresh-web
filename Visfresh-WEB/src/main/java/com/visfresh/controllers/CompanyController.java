@@ -53,14 +53,16 @@ public class CompanyController extends AbstractController implements CompanyCons
             @RequestParam(required = false) final Long companyId) throws RestServiceException {
         //check logged in.
         final User user = getLoggedInUser();
-        final Company company;
-        if (companyId == null || user.getCompany().getId().equals(companyId)) {
-            company = user.getCompany();
+        final Long id;
+        if (companyId == null || user.getCompanyId().equals(companyId)) {
+            id = user.getCompanyId();
         } else {
-            company = dao.findOne(companyId);
+            id = companyId;
         }
 
-        checkCompanyAccess(user, company);
+        checkCompanyAccess(user, id);
+
+        final Company company = dao.findOne(id);
         return createSuccessResponse(getCompanySerializer(user).toJson(company));
     }
     /**

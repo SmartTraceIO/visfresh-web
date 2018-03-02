@@ -13,7 +13,7 @@ public class LocationProfile extends LocationProfileBean implements EntityWithId
     /**
      * Company
      */
-    private Company company;
+    private Long company;
 
     /**
      * Default constructor.
@@ -26,14 +26,14 @@ public class LocationProfile extends LocationProfileBean implements EntityWithId
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
     @Override
-    public void setCompany(final Company company) {
+    public void setCompany(final Long company) {
         this.company = company;
     }
 }

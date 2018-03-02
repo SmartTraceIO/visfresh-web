@@ -29,7 +29,6 @@ import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -433,8 +432,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
     @Override
     protected void resolveReferences(final Shipment s, final Map<String, Object> row,
             final Map<String, Object> cache) {
-        super.resolveReferences(s, row, cache);
-
         final String imei = (String) row.get(DEVICE_FIELD);
         final String key = "device_" + imei;
         Device device = (Device) cache.get(key);
@@ -456,7 +453,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      * @see com.visfresh.dao.ShipmentDao#getBySnTrip(java.lang.String, java.lang.Integer)
      */
     @Override
-    public Shipment findBySnTrip(final Company company, final String sn, final Integer trip) {
+    public Shipment findBySnTrip(final Long company, final String sn, final Integer trip) {
         //create serial number filter
         final String key = "snKey";
 
@@ -464,7 +461,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
         final Filter f = new Filter();
         if (company != null) {
-            f.addFilter(COMPANY_FIELD, company.getId());
+            f.addFilter(COMPANY_FIELD, company);
         }
 
         final DefaultCustomFilter customFilter = new DefaultCustomFilter();

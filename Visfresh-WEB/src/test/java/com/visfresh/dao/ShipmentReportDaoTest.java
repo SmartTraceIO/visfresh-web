@@ -23,6 +23,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Color;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -69,14 +70,14 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         Device d = new Device();
         d.setImei("9238470983274987");
         d.setName("Test Device");
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         d.setTripCount(5);
         d = context.getBean(DeviceDao.class).save(d);
 
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(ShipmentStatus.Arrived);
         this.shipment = getContext().getBean(ShipmentDao.class).save(s);
 
@@ -90,7 +91,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
     private User createUser(final String firstName, final String lastName) {
         final User user = new User();
         user.setActive(true);
-        user.setCompany(sharedCompany);
+        user.setCompany(sharedCompany.getCompanyId());
         user.setEmail(firstName + "." + lastName + "@mail.ru");
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -114,7 +115,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
 
         assertEquals(shipment.getDevice().getImei(), report.getDevice());
         assertEquals(tripCount, report.getTripCount());
@@ -132,7 +133,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final LocationProfile locTo = new LocationProfile();
         locTo.setAddress("Odessa city, Myasoedovskaya 1, apt.1");
         locTo.setName(locationToName);
-        locTo.setCompany(sharedCompany);
+        locTo.setCompany(sharedCompany.getCompanyId());
         locTo.setRadius(500);
         locTo.getLocation().setLatitude(10.);
         locTo.getLocation().setLongitude(11.);
@@ -140,7 +141,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final LocationProfile locFrom = new LocationProfile();
         locFrom.setAddress("Odessa city, Deribasovskaya 1, apt.1");
         locFrom.setName(locationFromName);
-        locFrom.setCompany(sharedCompany);
+        locFrom.setCompany(sharedCompany.getCompanyId());
         locFrom.setRadius(500);
         locFrom.getLocation().setLatitude(10.);
         locFrom.getLocation().setLongitude(11.);
@@ -153,7 +154,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
 
         final DateFormat fmt = DateTimeUtils.createPrettyFormat(
                 user.getLanguage(), user.getTimeZone());
@@ -184,7 +185,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createTrackerEvent(startTime + 8 * dt, -20.3);
         createTrackerEvent(startTime + 9 * dt, 0);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
 
         final List<TrackerEvent> events = context.getBean(TrackerEventDao.class).findAll(
                 null, null, null);
@@ -224,7 +225,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createTrackerEvent(startTime + 8 * dt, -20.3);
         createTrackerEvent(startTime + 9 * dt, 0);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
 
         final List<TrackerEvent> events = context.getBean(TrackerEventDao.class).findAll(
                 null, null, null).subList(5, 9);
@@ -251,7 +252,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         ap.setName("JUnit Alerts");
         ap.setUpperTemperatureLimit(15.3);
         ap.setLowerTemperatureLimit(-11.2);
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
 
         context.getBean(AlertProfileDao.class).save(ap);
         return ap;
@@ -261,7 +262,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
      */
     @Test
     public void testNoReadings() {
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         final TemperatureStats stats = report.getTemperatureStats();
         assertEquals(0., stats.getLowerTemperatureLimit(), 0.001);
         assertEquals(5., stats.getUpperTemperatureLimit(), 0.001);
@@ -294,7 +295,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
         context.getBean(ShipmentSessionDao.class).saveSession(session);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(1, report.getFiredAlertRules().size());
         assertEquals(a1.getType(), report.getFiredAlertRules().get(0).getType());
     }
@@ -306,7 +307,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createAlert(e);
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(2, report.getAlerts().size());
         assertEquals(a1.getType(), report.getAlerts().get(0).getType());
     }
@@ -315,7 +316,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipment.getDevice().setColor(Color.DarkGoldenrod);
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         assertNotNull(report.getDeviceColor());
     }
     @Test
@@ -334,7 +335,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final PersonSchedule s2 = createSchedule(u2);
 
         final NotificationSchedule ns = new NotificationSchedule();
-        ns.setCompany(sharedCompany);
+        ns.setCompany(sharedCompany.getCompanyId());
         ns.setName("JUnit NS");
         ns.getSchedules().add(s1);
         ns.getSchedules().add(s2);
@@ -348,7 +349,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         //duplicate user
         notificator.sendNotification(Arrays.asList(s1, s2, s2), a1, e);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(2, report.getWhoWasNotifiedByAlert().size());
     }
     @Test
@@ -362,7 +363,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         context.getBean(AlternativeLocationsDao.class).save(shipment, alts);
 
-        final ShipmentReportBean bean = dao.createReport(shipment);
+        final ShipmentReportBean bean = dao.createReport(shipment, getCompany(shipment));
         assertEquals(2, bean.getPossibleShippedTo().size());
         assertEquals(loc1.getName(), bean.getPossibleShippedTo().get(0));
         assertEquals(loc2.getName(), bean.getPossibleShippedTo().get(1));
@@ -382,7 +383,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         //create personal schedule for user.
         final NotificationSchedule ns = new NotificationSchedule();
-        ns.setCompany(sharedCompany);
+        ns.setCompany(sharedCompany.getCompanyId());
         ns.setName("JUnit NS");
         ns.getSchedules().add(s1);
         ns.getSchedules().add(s2);
@@ -393,7 +394,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipmentDao.save(shipment);
 
         //test without notification sent
-        ShipmentReportBean report = dao.createReport(shipment);
+        ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(0, report.getWhoReceivedReport().size());
 
         //test with notification sent
@@ -401,7 +402,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         notificator.sendNotification(Arrays.asList(s1, s2), arrival, e);
 
-        report = dao.createReport(shipment);
+        report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(2, report.getWhoReceivedReport().size());
     }
     @Test
@@ -415,7 +416,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         //create personal schedule for user.
         final NotificationSchedule ns = new NotificationSchedule();
-        ns.setCompany(sharedCompany);
+        ns.setCompany(sharedCompany.getCompanyId());
         ns.setName("JUnit NS");
         ns.getSchedules().add(s1);
         ns.getSchedules().add(s2);
@@ -425,7 +426,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipment.setStatus(ShipmentStatus.Default);
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment);
+        final ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(2, report.getWhoReceivedReport().size());
     }
 
@@ -444,7 +445,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         //create personal schedule for user.
         final NotificationSchedule ns = new NotificationSchedule();
-        ns.setCompany(sharedCompany);
+        ns.setCompany(sharedCompany.getCompanyId());
         ns.setName("JUnit NS");
         ns.getSchedules().add(s1);
         ns.getSchedules().add(s2);
@@ -455,7 +456,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipmentDao.save(shipment);
 
         //test without notification sent
-        ShipmentReportBean report = dao.createReport(shipment);
+        ShipmentReportBean report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(0, report.getWhoReceivedReport().size());
 
         //test with notification sent
@@ -463,8 +464,16 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         notificator.sendNotification(Arrays.asList(s1, s2), arrival, e);
 
-        report = dao.createReport(shipment);
+        report = dao.createReport(shipment, getCompany(shipment));
         assertEquals(0, report.getWhoReceivedReport().size());
+    }
+
+    /**
+     * @param s shipment.
+     * @return shipment's company
+     */
+    private Company getCompany(final Shipment s) {
+        return context.getBean(CompanyDao.class).findOne(s.getCompanyId());
     }
 
     /**
@@ -473,7 +482,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
      */
     private LocationProfile craeteLocation(final String name) {
         final LocationProfile loc = new LocationProfile();
-        loc.setCompany(sharedCompany);
+        loc.setCompany(sharedCompany.getCompanyId());
         loc.setName(name);
         loc.setAddress(name + " address");
         loc.setRadius(500);

@@ -74,7 +74,7 @@ public class NotificationScheduleController extends AbstractController implement
     public JsonObject saveNotificationSchedule(final @RequestBody JsonObject schedule) throws RestServiceException {
         final User user = getLoggedInUser();
         final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(schedule);
-        s.setCompany(user.getCompany());
+        s.setCompany(user.getCompanyId());
 
         final NotificationSchedule old = dao.findOne(s.getId());
         checkCompanyAccess(user, old);
@@ -102,12 +102,12 @@ public class NotificationScheduleController extends AbstractController implement
         //check logged in.
         final User user = getLoggedInUser();
         final List<NotificationSchedule> schedules = dao.findByCompany(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSorting(sc, so, getDefaultSortOrder(), 2),
                 page,
                 null);
 
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
 
         final NotificationScheduleSerializer ser = createSerializer(user);
         final JsonArray array = new JsonArray();
@@ -156,7 +156,7 @@ public class NotificationScheduleController extends AbstractController implement
         final NotificationSchedule s = dao.findOne(notificationScheduleId);
         checkCompanyAccess(user, s);
 
-        if (s != null && s.getCompany().getId().equals(user.getCompany().getId())) {
+        if (s != null && s.getCompanyId().equals(user.getCompanyId())) {
             for (final PersonSchedule ps : s.getSchedules()) {
                 if (ps.getId().equals(personScheduleId)) {
                     s.getSchedules().remove(ps);

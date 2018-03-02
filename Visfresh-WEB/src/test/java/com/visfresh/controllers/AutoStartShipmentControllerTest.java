@@ -323,7 +323,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
     private AutoStartShipment createAutoStartShipment(final ShipmentTemplate template,
             final LocationProfile locFrom, final LocationProfile locTo) {
         final AutoStartShipment cfg = new AutoStartShipment();
-        cfg.setCompany(getCompany());
+        cfg.setCompany(getCompanyId());
         cfg.setPriority(77);
         cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);
@@ -335,7 +335,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
      */
     private ShipmentTemplate createTemplate() {
         final ShipmentTemplate tpl = new ShipmentTemplate();
-        tpl.setCompany(getCompany());
+        tpl.setCompany(getCompanyId());
         tpl.setName("JUnit template");
         return context.getBean(ShipmentTemplateDao.class).save(tpl);
     }
@@ -346,7 +346,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
     private LocationProfile createLocation(final String name) {
         final LocationProfile l = new LocationProfile();
         l.setName(name);
-        l.setCompany(getCompany());
+        l.setCompany(getCompanyId());
         l.setRadius(300);
         l.setAddress("adderss of " + name);
         return context.getBean(LocationProfileDao.class).save(l);

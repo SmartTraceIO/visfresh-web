@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.Arrival;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 
@@ -41,7 +40,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Arrival, L
         shipmentDao = getContext().getBean(ShipmentDao.class);
 
         final Device d = new Device();
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         final String imei = "932487032487";
         d.setImei(imei);
         d.setName("Test Device");
@@ -56,7 +55,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Arrival, L
      */
     private Shipment createShipment(final Device d) {
         Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(d);
         s = shipmentDao.save(s);
         return s;
@@ -144,12 +143,10 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Arrival, L
         assertEquals(device.getName(), d.getName());
         assertEquals(device.getSn(), d.getSn());
 
-        final Company c = d.getCompany();
+        final Long c = d.getCompanyId();
         assertNotNull(c);
 
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        assertEquals(sharedCompany.getId(), c);
 
         assertNotNull(a.getShipment());
     }
@@ -176,12 +173,10 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Arrival, L
         assertEquals(device.getName(), d.getName());
         assertEquals(device.getSn(), d.getSn());
 
-        final Company c = d.getCompany();
+        final Long c = d.getCompanyId();
         assertNotNull(c);
 
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        assertEquals(sharedCompany.getId(), c);
 
         assertNotNull(a.getShipment());
     }
@@ -206,7 +201,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Arrival, L
         d.setImei(imei);
         d.setActive(true);
         d.setName("JUnit-" + imei);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         return context.getBean(DeviceDao.class).save(d);
     }
 }

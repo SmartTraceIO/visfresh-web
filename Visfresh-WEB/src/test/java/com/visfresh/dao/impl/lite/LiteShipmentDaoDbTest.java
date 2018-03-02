@@ -50,7 +50,7 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
      */
     protected Device createDevice(final String imei) {
         final Device d = new Device();
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setImei(imei);
         d.setName("Test Device");
         d.setDescription("JUnit device");
@@ -71,7 +71,7 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
     private Shipment createShipment(final Device d, final ShipmentStatus status) {
         Shipment s = new Shipment();
         s.setStatus(status);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(d);
         s = context.getBean(ShipmentDao.class).save(s);
         return s;
@@ -116,13 +116,13 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
         createShipment(device);
         final Shipment s3 = createShipment(device);
 
-        List<LiteShipment> shipments = dao.getShipments(sharedCompany, null, null, null).getResult();
+        List<LiteShipment> shipments = dao.getShipments(sharedCompany.getCompanyId(), null, null, null).getResult();
         assertEquals(3, shipments.size());
 
-        shipments = dao.getShipments(sharedCompany, null, null, new Page(1, 2)).getResult();
+        shipments = dao.getShipments(sharedCompany.getCompanyId(), null, null, new Page(1, 2)).getResult();
         assertEquals(2, shipments.size());
 
-        final LiteShipmentResult result = dao.getShipments(sharedCompany, null, null, new Page(3, 1));
+        final LiteShipmentResult result = dao.getShipments(sharedCompany.getCompanyId(), null, null, new Page(3, 1));
         shipments = result.getResult();
         assertEquals(1, shipments.size());
         assertEquals(3, result.getTotalCount());
@@ -141,10 +141,10 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
         createEvent(s, lat, lon);
 
         //check near by
-        assertEquals(1, dao.getShipmentsNearby(s.getCompany(), lat, lon, 500, null).size());
+        assertEquals(1, dao.getShipmentsNearby(s.getCompanyId(), lat, lon, 500, null).size());
 
         //check not near by
-        assertEquals(0, dao.getShipmentsNearby(s.getCompany(), lat - 20, lon - 20, 500, null).size());
+        assertEquals(0, dao.getShipmentsNearby(s.getCompanyId(), lat - 20, lon - 20, 500, null).size());
     }
     @Test
     public void testGetNearByExcludeTooOld() {
@@ -155,11 +155,11 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
         //create two events, latest is nearby
         final TrackerEvent e = createEvent(s, time, 10.);
 
-        assertEquals(1, dao.getShipmentsNearby(s.getCompany(), e.getLatitude(), e.getLongitude(), 500,
+        assertEquals(1, dao.getShipmentsNearby(s.getCompanyId(), e.getLatitude(), e.getLongitude(), 500,
                 new Date(time.getTime() - 100000l)).size());
 
         //check near by
-        assertEquals(0, dao.getShipmentsNearby(s.getCompany(), e.getLatitude(), e.getLongitude(), 500,
+        assertEquals(0, dao.getShipmentsNearby(s.getCompanyId(), e.getLatitude(), e.getLongitude(), 500,
                 new Date(time.getTime() + 100000l)).size());
     }
     @Test
@@ -170,11 +170,11 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
         //create two events, latest is nearby
         final TrackerEvent e = createEvent(s, new Date(), 10.);
 
-        assertEquals(1, dao.getShipmentsNearby(s.getCompany(), e.getLatitude(), e.getLongitude(), 500, null).size());
+        assertEquals(1, dao.getShipmentsNearby(s.getCompanyId(), e.getLatitude(), e.getLongitude(), 500, null).size());
 
         //create left company
         final Company c = createCompany("Left");
-        assertEquals(0, dao.getShipmentsNearby(c, e.getLatitude(), e.getLongitude(), 500, null).size());
+        assertEquals(0, dao.getShipmentsNearby(c.getCompanyId(), e.getLatitude(), e.getLongitude(), 500, null).size());
     }
     @Test
     public void testGetShipmentsKeyLocations() {
@@ -187,7 +187,7 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
         createEvent(s, new Date(t + 4000l), 2.);
         createEvent(s, new Date(t + 5000l), 2.);
 
-        final List<LiteShipment> result = dao.getShipments(sharedCompany, null, null, null).getResult();
+        final List<LiteShipment> result = dao.getShipments(sharedCompany.getCompanyId(), null, null, null).getResult();
         assertEquals(1, result.size());
         assertEquals(5, result.get(0).getKeyLocations().size());
     }

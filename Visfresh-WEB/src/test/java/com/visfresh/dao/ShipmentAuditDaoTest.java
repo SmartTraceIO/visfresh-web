@@ -46,7 +46,7 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         Device d = new Device();
         d.setImei("9238470983274987");
         d.setName("Test Device");
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         d.setTripCount(5);
         d = context.getBean(DeviceDao.class).save(d);
@@ -66,7 +66,7 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
     protected Shipment createShipment() {
         final Shipment s = new Shipment();
         s.setDevice(device);
-        s.setCompany(device.getCompany());
+        s.setCompany(device.getCompanyId());
         s.setStatus(ShipmentStatus.Arrived);
         return getContext().getBean(ShipmentDao.class).save(s);
     }
@@ -123,8 +123,8 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         final Filter filter = new Filter();
         filter.addFilter(ShipmentAuditConstants.USER_ID, user.getId());
 
-        assertEquals(1, dao.findAll(user.getCompany(), filter, null, null).size());
-        assertEquals(0, dao.findAll(createCompany("Other"), filter, null, null).size());
+        assertEquals(1, dao.findAll(user.getCompanyId(), filter, null, null).size());
+        assertEquals(0, dao.findAll(createCompany("Other").getCompanyId(), filter, null, null).size());
     }
     @Test
     public void testFindByShipment() {
@@ -151,8 +151,8 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         final Filter filter = new Filter();
         filter.addFilter(ShipmentAuditConstants.SHIPMENT_ID, shipment.getId());
 
-        assertEquals(1, dao.findAll(shipment.getCompany(), filter, null, null).size());
-        assertEquals(0, dao.findAll(createCompany("Other"), filter, null, null).size());
+        assertEquals(1, dao.findAll(shipment.getCompanyId(), filter, null, null).size());
+        assertEquals(0, dao.findAll(createCompany("Other").getCompanyId(), filter, null, null).size());
     }
     @Test
     public void testOrderById() {
@@ -160,14 +160,14 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         final ShipmentAuditItem item2 = createItem(null, shipment);
         final ShipmentAuditItem item3 = createItem(null, shipment);
 
-        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompany(),
+        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.ID), null);
 
         assertEquals(item1.getId(), items.get(0).getId());
         assertEquals(item2.getId(), items.get(1).getId());
         assertEquals(item3.getId(), items.get(2).getId());
 
-        items = dao.findAll(shipment.getCompany(),
+        items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(false, ShipmentAuditConstants.ID), null);
 
         assertEquals(item3.getId(), items.get(0).getId());
@@ -188,14 +188,14 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         item3.setAction(ShipmentAuditAction.DeletedNote);
         dao.save(item3);
 
-        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompany(),
+        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.ACTION), null);
 
         assertEquals(item1.getId(), items.get(0).getId());
         assertEquals(item2.getId(), items.get(1).getId());
         assertEquals(item3.getId(), items.get(2).getId());
 
-        items = dao.findAll(shipment.getCompany(),
+        items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(false, ShipmentAuditConstants.ACTION), null);
 
         assertEquals(item3.getId(), items.get(0).getId());
@@ -213,14 +213,14 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         final ShipmentAuditItem item1 = createItem(u1, shipment);
         final ShipmentAuditItem item3 = createItem(u3, shipment);
 
-        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompany(),
+        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.USER_ID), null);
 
         assertEquals(item1.getId(), items.get(0).getId());
         assertEquals(item2.getId(), items.get(1).getId());
         assertEquals(item3.getId(), items.get(2).getId());
 
-        items = dao.findAll(shipment.getCompany(),
+        items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(false, ShipmentAuditConstants.USER_ID), null);
 
         assertEquals(item3.getId(), items.get(0).getId());
@@ -238,14 +238,14 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         final ShipmentAuditItem item1 = createItem(null, s1);
         final ShipmentAuditItem item3 = createItem(null, s3);
 
-        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompany(),
+        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.SHIPMENT_ID), null);
 
         assertEquals(item1.getId(), items.get(0).getId());
         assertEquals(item2.getId(), items.get(1).getId());
         assertEquals(item3.getId(), items.get(2).getId());
 
-        items = dao.findAll(shipment.getCompany(),
+        items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(false, ShipmentAuditConstants.SHIPMENT_ID), null);
 
         assertEquals(item3.getId(), items.get(0).getId());
@@ -270,14 +270,14 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         item3.setTime(d3);
         dao.save(item3);
 
-        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompany(),
+        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.TIME), null);
 
         assertEquals(item1.getId(), items.get(0).getId());
         assertEquals(item2.getId(), items.get(1).getId());
         assertEquals(item3.getId(), items.get(2).getId());
 
-        items = dao.findAll(shipment.getCompany(),
+        items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(false, ShipmentAuditConstants.TIME), null);
 
         assertEquals(item3.getId(), items.get(0).getId());
@@ -307,15 +307,15 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
         final ShipmentAuditItem item1 = createItem(u1, shipment);
         final ShipmentAuditItem item3 = createItem(u3, shipment);
 
-        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompany(),
+        List<ShipmentAuditItem> items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.USER_ID), new Page(1, 1));
         assertEquals(item1.getId(), items.get(0).getId());
 
-        items = dao.findAll(shipment.getCompany(),
+        items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.USER_ID), new Page(2, 1));
         assertEquals(item2.getId(), items.get(0).getId());
 
-        items = dao.findAll(shipment.getCompany(),
+        items = dao.findAll(shipment.getCompanyId(),
                 null, new Sorting(ShipmentAuditConstants.USER_ID), new Page(3, 1));
         assertEquals(item3.getId(), items.get(0).getId());
     }
@@ -326,7 +326,7 @@ public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, Shipmen
     private User createUser(final String email) {
         final User u = new User();
         u.setActive(true);
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setFirstName("FirstName");
         u.setLastName("LastName");
         u.setEmail(email);

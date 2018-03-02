@@ -95,7 +95,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createAlert(e3, AlertType.Hot);
         createAlert(e3, AlertType.Cold);
 
-        final PerformanceReportBean report = dao.createReport(ap.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(time.getTime() - 10000000l), new Date(time.getTime() + 10000000l), TimeAtom.Month, null);
 
         assertNotNull(report);
@@ -138,7 +138,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createAlert(e3, AlertType.Hot);
         createAlert(e3, AlertType.Cold);
 
-        final PerformanceReportBean report = dao.createReport(ap.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(time.getTime() - 10000000l), new Date(time.getTime() + 10000000l), TimeAtom.Month, null);
 
         assertNotNull(report);
@@ -181,7 +181,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createAlert(e2, AlertType.Cold);
         createAlert(e2, AlertType.CriticalCold);
 
-        final PerformanceReportBean report = dao.createReport(ap.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(time.getTime() - 10000000l), new Date(time.getTime() + 10000000l), TimeAtom.Month, l1);
 
         assertNotNull(report);
@@ -214,7 +214,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createAlert(e1, AlertType.Hot);
         createAlert(e2, AlertType.Cold);
 
-        final PerformanceReportBean report = dao.createReport(ap.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(d1.getTime() - 10000000l), new Date(d2.getTime() + 10000000l), TimeAtom.Month, null);
 
         assertNotNull(report);
@@ -255,7 +255,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s1, d1, 1.);
         createEvent(s1, d2, 1.);
 
-        final PerformanceReportBean report = dao.createReport(ap.getCompany(), d1, d2, TimeAtom.Week, null);
+        final PerformanceReportBean report = dao.createReport(sharedCompany, d1, d2, TimeAtom.Week, null);
 
         assertNotNull(report);
         assertEquals(1, report.getAlertProfiles().size());
@@ -275,7 +275,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s1, d1, 1.);
         createEvent(s1, d2, 1.);
 
-        final PerformanceReportBean report = dao.createReport(ap.getCompany(), d1, d2, TimeAtom.Week, null);
+        final PerformanceReportBean report = dao.createReport(sharedCompany, d1, d2, TimeAtom.Week, null);
 
         assertNotNull(report);
         assertEquals(1, report.getAlertProfiles().size());
@@ -295,7 +295,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s1, d1, 1.);
         createEvent(s1, d2, 1.);
 
-        final PerformanceReportBean report = dao.createReport(ap.getCompany(), d1, d2, TimeAtom.Quarter, null);
+        final PerformanceReportBean report = dao.createReport(sharedCompany, d1, d2, TimeAtom.Quarter, null);
 
         assertNotNull(report);
         assertEquals(1, report.getAlertProfiles().size());
@@ -321,7 +321,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createAlert(e1, AlertType.Hot);
         createAlert(e2, AlertType.Cold);
 
-        final PerformanceReportBean report = dao.createReport(ap1.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(date.getTime() - 10000000l), new Date(date.getTime() + 10000000l), TimeAtom.Month, null);
 
         assertNotNull(report);
@@ -376,7 +376,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s1, new Date(startTime + 9 * dt), 0 * dt);
         createEvent(s2, new Date(startTime + 10 * dt), 0 * dt);
 
-        final PerformanceReportBean report = dao.createReport(s1.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(startTime - 10000000l), new Date(startTime + dt * 15), TimeAtom.Month, null);
 
         final List<TrackerEvent> events = context.getBean(TrackerEventDao.class).findAll(
@@ -419,7 +419,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s1, new Date(startTime2 + 3 * dt), 17.7);
         createEvent(s2, new Date(startTime2 + 4 * dt), 17.7);
 
-        final PerformanceReportBean report = dao.createReport(s1.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(startTime1 - 10000000l), new Date(startTime2 + dt * 15), TimeAtom.Month, null);
 
         TemperatureStats stats = report.getAlertProfiles().get(0).getTimedData().get(0).getTemperatureStats();
@@ -459,7 +459,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s2, new Date(startTime2 + 3 * dt), 17.7);
         createEvent(s2, new Date(startTime2 + 4 * dt), 17.7);
 
-        final PerformanceReportBean report = dao.createReport(s1.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(startTime1 - 10000000l), new Date(startTime2 + dt * 15), TimeAtom.Month, null);
 
         assertEquals(2, report.getAlertProfiles().size());
@@ -508,7 +508,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s2, new Date(startTime2 + 4 * dt), 17.7);
         createEvent(s3, new Date(startTime2 + 4 * dt), 0);
 
-        final PerformanceReportBean report = dao.createReport(s1.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(startTime1 - 10000000l), new Date(startTime2 + dt * 15), TimeAtom.Month, null);
 
         assertEquals(2, report.getAlertProfiles().get(0).getTemperatureExceptions().size());
@@ -551,7 +551,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         createEvent(s2, new Date(startTime2 + 4 * dt), 17.7);
         createEvent(s3, new Date(startTime2 + 4 * dt), 0);
 
-        final PerformanceReportBean report = dao.createReport(s1.getCompany(),
+        final PerformanceReportBean report = dao.createReport(sharedCompany,
                 new Date(startTime1 - 10000000l), new Date(startTime2 + dt * 15), TimeAtom.Month, null);
 
         assertEquals(1, getAlertProfileStats(report, name1).getTemperatureExceptions().size());
@@ -559,8 +559,8 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
     }
     @Test
     public void testNotCrushWithoutMonthlyData() {
-        final AlertProfile ap = createAlertProfile("JUnit");
-        final PerformanceReportBean r = dao.createReport(ap.getCompany(),
+        createAlertProfile("JUnit");
+        final PerformanceReportBean r = dao.createReport(sharedCompany,
                 getMiddleOfMonth("2016.05"), getMiddleOfMonth("2016.08"), TimeAtom.Month, null);
 
         assertNotNull(r);
@@ -583,7 +583,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
             final ShipmentStatus status) {
         final Shipment s = new Shipment();
         s.setAlertProfile(ap);
-        s.setCompany(device.getCompany());
+        s.setCompany(device.getCompanyId());
         s.setDevice(device);
         s.setStatus(status);
         return context.getBean(ShipmentDao.class).save(s);
@@ -594,7 +594,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
      */
     protected AlertProfile createAlertProfile(final String name) {
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName(name);
         ap.setLowerTemperatureLimit(-2.5);
@@ -661,7 +661,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         d.setImei(imei);
         d.setActive(true);
         d.setName("JUnit-" + imei);
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         return context.getBean(DeviceDao.class).save(d);
     }
     /**
@@ -675,7 +675,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         loc.setName(name);
         loc.getLocation().setLatitude(lat);
         loc.getLocation().setLongitude(lon);
-        loc.setCompany(sharedCompany);
+        loc.setCompany(sharedCompany.getCompanyId());
         loc.setRadius(500);
         loc.setStop(true);
         loc.setAddress("Odessa");

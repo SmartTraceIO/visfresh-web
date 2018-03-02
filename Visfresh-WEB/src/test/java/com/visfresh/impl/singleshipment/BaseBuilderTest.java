@@ -59,7 +59,7 @@ public abstract class BaseBuilderTest extends BaseDbTest {
     protected Shipment createDefaultNotSavedShipment(final Device device) {
         final Shipment s = new Shipment();
         s.setDevice(device);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         s.setShipmentDescription("JUnit shipment");
         return s;
@@ -72,7 +72,7 @@ public abstract class BaseBuilderTest extends BaseDbTest {
         final Device d = new Device();
         d.setImei(device);
         d.setName("JUnit-" + device);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("JUnit device");
         d.setColor(Color.Brown);
         return context.getBean(DeviceDao.class).save(d);
@@ -100,7 +100,7 @@ public abstract class BaseBuilderTest extends BaseDbTest {
      */
     protected AlertProfile createAlertProfile(final Shipment s) {
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setName("JUnit");
         s.setAlertProfile(ap);
         context.getBean(AlertProfileDao.class).save(ap);

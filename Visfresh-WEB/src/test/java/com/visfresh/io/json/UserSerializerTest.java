@@ -42,7 +42,6 @@ public class UserSerializerTest extends AbstractSerializerTest {
     @Before
     public void setUp() {
         serializer = new UserSerializer(SerializerUtils.UTС);
-        serializer.setCompanyResolver(resolver);
         serializer.setShipmentResolver(resolver);
     }
 
@@ -82,7 +81,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.getRoles().add(Role.NormalUser);
         u.getRoles().add(Role.BasicUser);
 
-        final JsonObject obj = serializer.toJson(u);
+        final JsonObject obj = serializer.toJson(u, null);
         u = serializer.parseUser(obj);
 
         assertEquals((Long) login, u.getId());
@@ -164,7 +163,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         r.setPassword(password);
         r.setResetOnLogin(resetOnLogin);
 
-        final JsonElement json = serializer.toJson(r);
+        final JsonElement json = serializer.toJson(r, c);
         r = serializer.parseSaveUserRequest(json);
 
         assertNotNull(user);

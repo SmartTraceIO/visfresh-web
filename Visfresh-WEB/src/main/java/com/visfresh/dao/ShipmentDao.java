@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.visfresh.dao.impl.SelectAllSupport;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
@@ -49,7 +48,7 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @param trip trip count.
      * @return shipment
      */
-    Shipment findBySnTrip(Company company, String sn, Integer trip);
+    Shipment findBySnTrip(Long company, String sn, Integer trip);
     /**
      * @param s shipment.
      * @param eta ETA.

@@ -364,7 +364,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
             final double lon, final int radius) {
         final LocationProfile l = new LocationProfile();
         l.setAddress("Any address");
-        l.setCompany(company);
+        l.setCompany(company.getCompanyId());
         l.setName("Loc (" + lat + ", " + lon + ")");
         l.setRadius(radius);
         l.getLocation().setLatitude(lat);
@@ -380,7 +380,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
     private AutoStartShipment createAutoStartShipment(final ShipmentTemplate tpl,
             final int priority, final LocationProfile... startLocations) {
         final AutoStartShipment aut = new AutoStartShipment();
-        aut.setCompany(company);
+        aut.setCompany(company.getCompanyId());
         aut.setPriority(priority);
         aut.setTemplate(tpl);
         for (final LocationProfile l : startLocations) {
@@ -396,7 +396,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         final ShipmentTemplate s = new ShipmentTemplate();
         s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setExcludeNotificationsIfNoAlerts(true);
         s.setName(shipmentDescription);
         s.setShipmentDescription(shipmentDescription);

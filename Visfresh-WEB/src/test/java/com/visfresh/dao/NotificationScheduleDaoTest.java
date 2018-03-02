@@ -42,7 +42,7 @@ public class NotificationScheduleDaoTest
 
     public User createUser() {
         final User u = new User();
-        u.setCompany(this.sharedCompany);
+        u.setCompany(this.sharedCompany.getCompanyId());
         u.setEmail("asuvorov@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
@@ -60,7 +60,7 @@ public class NotificationScheduleDaoTest
     @Override
     protected NotificationSchedule createTestEntity() {
         final NotificationSchedule s = new NotificationSchedule();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
@@ -75,7 +75,7 @@ public class NotificationScheduleDaoTest
      */
     @Override
     protected void assertCreateTestEntityOk(final NotificationSchedule s) {
-        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals(sharedCompany.getId(), s.getCompanyId());
         assertEquals("Schd-Test", s.getName());
         assertEquals("Test schedule", s.getDescription());
 
@@ -99,7 +99,7 @@ public class NotificationScheduleDaoTest
         super.assertTestGetAllOk(numberOfCreatedEntities, all);
 
         final NotificationSchedule s = all.get(0);
-        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals(sharedCompany.getId(), s.getCompanyId());
         assertEquals("Schd-Test", s.getName());
         assertEquals("Test schedule", s.getDescription());
 
@@ -117,7 +117,7 @@ public class NotificationScheduleDaoTest
         dao.save(createTestEntity());
         dao.save(createTestEntity());
 
-        assertEquals(2, dao.findByCompany(sharedCompany, null, null, null).size());
+        assertEquals(2, dao.findByCompany(sharedCompany.getCompanyId(), null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -125,12 +125,12 @@ public class NotificationScheduleDaoTest
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left, null, null, null).size());
+        assertEquals(0, dao.findByCompany(left.getCompanyId(), null, null, null).size());
     }
     @Test
     public void testGetDbReferences() {
         final NotificationSchedule s = new NotificationSchedule();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
@@ -151,7 +151,7 @@ public class NotificationScheduleDaoTest
      */
     private ShipmentTemplate createTemplate(final NotificationSchedule s) {
         final ShipmentTemplate tpl = new ShipmentTemplate();
-        tpl.setCompany(sharedCompany);
+        tpl.setCompany(sharedCompany.getCompanyId());
         tpl.setShipmentDescription("Created by autostart shipment rule");
         tpl.getAlertsNotificationSchedules().add(s);
         tpl.getArrivalNotificationSchedules().add(s);

@@ -59,8 +59,11 @@ public final class DateTimeUtils {
      * @return
      */
     public static String formatShipmentDate(final Company company, final Date date) {
-        final TimeZone tz = company.getTimeZone() != null? company.getTimeZone() : TimeZone.getTimeZone("UTC");
-        final Locale locale = company.getLanguage() != null ? company.getLanguage().getLocale() : Locale.ENGLISH;
+        final TimeZone timeZone = company.getTimeZone();
+        final Language language = company.getLanguage();
+
+        final TimeZone tz = timeZone != null? timeZone : TimeZone.getTimeZone("UTC");
+        final Locale locale = language != null ? language.getLocale() : Locale.ENGLISH;
         return formatDate(date, tz, locale);
     }
 

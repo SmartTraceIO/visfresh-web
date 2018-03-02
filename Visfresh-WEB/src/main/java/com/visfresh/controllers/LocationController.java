@@ -57,7 +57,7 @@ public class LocationController extends AbstractController implements LocationCo
     public JsonObject saveLocation(final @RequestBody JsonObject profile) throws RestServiceException {
         final User user = getLoggedInUser();
         final LocationProfile lp = createSerializer(user).parseLocationProfile(profile);
-        lp.setCompany(user.getCompany());
+        lp.setCompany(user.getCompanyId());
 
         final LocationProfile old = dao.findOne(lp.getId());
         checkCompanyAccess(user, old);
@@ -85,12 +85,12 @@ public class LocationController extends AbstractController implements LocationCo
         final User user = getLoggedInUser();
         final LocationSerializer ser = createSerializer(user);
 
-        final List<LocationProfile> locations = dao.findByCompany(user.getCompany(),
+        final List<LocationProfile> locations = dao.findByCompany(user.getCompanyId(),
                 createSorting(sc, so, getDefaultSortOrder(), 1),
                 page,
                 null);
 
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
         final JsonArray array = new JsonArray();
         for (final LocationProfile location : locations) {
             array.add(ser.toJson(location));

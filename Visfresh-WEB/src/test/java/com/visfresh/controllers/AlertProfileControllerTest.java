@@ -238,7 +238,7 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetTemperatureRuleCorrectiveActions() throws IOException, RestServiceException {
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(getCompany());
+        ap.setCompany(getCompanyId());
         ap.setName("AnyAlert");
         ap.setDescription("Any description");
 
@@ -260,7 +260,7 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSaveTemperatureRuleCorrectiveActions() throws RestServiceException, IOException {
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(getCompany());
+        ap.setCompany(getCompanyId());
         ap.setName("AnyAlert");
         ap.setDescription("Any description");
 
@@ -287,7 +287,7 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
      */
     private CorrectiveActionList createCorrectiveActions() {
         final CorrectiveActionList list = new CorrectiveActionList();
-        list.setCompany(getCompany());
+        list.setCompany(getCompanyId());
         list.setName("JUnit actions");
         list.setDescription("JUnit action list description");
         list.getActions().add(new CorrectiveAction("First action", true));

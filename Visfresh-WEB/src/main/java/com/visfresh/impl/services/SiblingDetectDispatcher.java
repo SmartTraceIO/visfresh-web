@@ -154,7 +154,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
             log.debug("New sibling detection has scheduled for shipment " + s.getId());
             final SystemMessage sm = new SystemMessage();
             sm.setType(SystemMessageType.Siblings);
-            sm.setMessageInfo(s.getCompany().getId().toString());
+            sm.setMessageInfo(s.getCompanyId().toString());
             sm.setTime(new Date());
             sm.setRetryOn(retryOn);
             sm.setGroup(group);

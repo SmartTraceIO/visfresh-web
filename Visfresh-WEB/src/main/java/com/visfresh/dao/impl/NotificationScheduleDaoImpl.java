@@ -99,7 +99,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         paramMap.put(ID_FIELD, sched.getId());
         paramMap.put(NAME_FIELD, sched.getName());
         paramMap.put(DESCRIPTION_FIELD, sched.getDescription());
-        paramMap.put(COMPANY_FIELD, sched.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, sched.getCompanyId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -271,6 +271,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         final NotificationSchedule no = new NotificationSchedule();
 
         no.setId(((Number) map.get(ID_FIELD)).longValue());
+        no.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
         no.setName((String) map.get(NAME_FIELD));
         no.setDescription((String) map.get(DESCRIPTION_FIELD));
         return no;
@@ -280,7 +281,6 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
      */
     @Override
     protected void resolveReferences(final NotificationSchedule t, final Map<String, Object> row, final Map<String, Object> cache) {
-        super.resolveReferences(t, row, cache);
         t.getSchedules().addAll(findPersonalSchedulesFor(t.getId()));
     }
     /* (non-Javadoc)

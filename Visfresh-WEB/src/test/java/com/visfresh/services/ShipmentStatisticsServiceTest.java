@@ -65,7 +65,7 @@ public class ShipmentStatisticsServiceTest extends ShipmentStatisticsServiceImpl
 
         //create shipment
         final Device d = new Device();
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setImei("23948579032574");
         d.setName("JUnit-" + d.getImei());
 
@@ -75,7 +75,7 @@ public class ShipmentStatisticsServiceTest extends ShipmentStatisticsServiceImpl
         final Shipment s = new Shipment();
         s.setAlertProfile(ap);
         s.setId(77l);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setShipmentDescription("Test_" + s.getId());
         s.setDevice(d);
         s.setStatus(ShipmentStatus.InProgress);

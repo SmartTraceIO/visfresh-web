@@ -28,7 +28,7 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
     /**
      * Company
      */
-    private Company company;
+    private Long company;
     /**
      * Current device trip count.
      */
@@ -191,14 +191,14 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
     @Override
-    public void setCompany(final Company company) {
+    public void setCompany(final Long company) {
         this.company = company;
     }
     /**

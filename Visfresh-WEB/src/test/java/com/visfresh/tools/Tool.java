@@ -43,7 +43,7 @@ public class Tool extends AbstractTool {
 
         final Device device = new Device();
         device.setImei(imei);
-        device.setCompany(company);
+        device.setCompany(company.getCompanyId());
         device.setName("Development/" + device.getSn());
         device.setDescription("Development device sn: " + device.getSn());
 
@@ -91,7 +91,7 @@ public class Tool extends AbstractTool {
             final String password) throws IOException, RestServiceException {
         final User u = new User();
         u.setEmail(email);
-        u.setCompany(company);
+        u.setCompany(company.getCompanyId());
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setTitle("Mr.");
@@ -99,6 +99,6 @@ public class Tool extends AbstractTool {
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Admin);
 
-        userService.saveUser(u, password, false);
+        userService.saveUser(u, company, password, false);
     }
 }

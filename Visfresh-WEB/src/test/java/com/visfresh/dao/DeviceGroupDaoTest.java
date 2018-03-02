@@ -97,7 +97,7 @@ public class DeviceGroupDaoTest extends BaseCrudTest<DeviceGroupDao, DeviceGroup
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei(imei);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         return context.getBean(DeviceDao.class).save(d);
     }
@@ -108,7 +108,7 @@ public class DeviceGroupDaoTest extends BaseCrudTest<DeviceGroupDao, DeviceGroup
     private Shipment createShipment(final Device d) {
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         return getContext().getBean(ShipmentDao.class).save(s);
     }
@@ -118,7 +118,7 @@ public class DeviceGroupDaoTest extends BaseCrudTest<DeviceGroupDao, DeviceGroup
      */
     @Override
     protected void assertCreateTestEntityOk(final DeviceGroup g) {
-        assertNotNull(g.getCompany());
+        assertNotNull(g.getCompanyId());
         assertTrue(g.getName().startsWith(NAME_PREFIX));
         assertTrue(g.getDescription().endsWith(g.getName()));
 
@@ -129,7 +129,7 @@ public class DeviceGroupDaoTest extends BaseCrudTest<DeviceGroupDao, DeviceGroup
     @Override
     protected DeviceGroup createTestEntity() {
         final DeviceGroup group = new DeviceGroup();
-        group.setCompany(sharedCompany);
+        group.setCompany(sharedCompany.getCompanyId());
         group.setName(NAME_PREFIX + (lastId++));
         group.setDescription("Description of group " + group.getName());
         return group;

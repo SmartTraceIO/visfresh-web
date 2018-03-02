@@ -155,7 +155,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             //avoid of rewriting to NULL values
             final JsonObject mereged = SerializerUtils.merge(device, ser.toJson(old));
             d = ser.parseDevice(mereged);
-            d.setCompany(old.getCompany());
+            d.setCompany(old.getCompanyId());
 
             //not allow to overwrite trip count
             d.setTripCount(old.getTripCount());
@@ -183,7 +183,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
                 emailService.sendMessageToSupport("Device " + d.getImei() + " state changed", msg.toString());
             }
         } else {
-            d.setCompany(user.getCompany());
+            d.setCompany(user.getCompanyId());
         }
 
         dao.save(d);
@@ -213,7 +213,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         final Device newDevice = createVirtualDevice(oldDevice);
 
         //switch device to new company
-        dao.moveToNewCompany(oldDevice, c);
+        dao.moveToNewCompany(oldDevice, company);
 
         deviceCommandDao.deleteCommandsFor(oldDevice);
         deviceGroupDao.moveToNewDevice(oldDevice, newDevice);
@@ -252,7 +252,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         final Device d = new Device();
         d.setActive(device.isActive());
         d.setAutostartTemplateId(null);
-        d.setCompany(device.getCompany());
+        d.setCompany(device.getCompanyId());
         d.setDescription(device.getDescription());
         d.setImei(createVirtualPrefix(device) + device.getImei());
         d.setModel(device.getModel());
@@ -266,7 +266,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return virtual prefix for given device.
      */
     private String createVirtualPrefix(final Device device) {
-        return device.getCompany().getId() + "_";
+        return device.getCompanyId() + "_";
     }
     /**
      * @param authToken authentication token.
@@ -288,10 +288,10 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final User user = getLoggedInUser();
             final DeviceSerializer ser = createSerializer(user);
 
-            final List<ListDeviceItem> devices = dao.getDevices(user.getCompany(),
+            final List<ListDeviceItem> devices = dao.getDevices(user.getCompanyId(),
                     createSorting(sc, so, getDefaultSortOrder(), 1),
                     page);
-            final int total = dao.getEntityCount(user.getCompany(), null);
+            final int total = dao.getEntityCount(user.getCompanyId(), null);
 
             final JsonArray array = new JsonArray();
             for (final ListDeviceItem item : devices) {
@@ -461,11 +461,11 @@ public class DeviceController extends AbstractController implements DeviceConsta
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
     public JsonObject initDeviceColors(final @RequestParam(required = false) Long company) throws RestServiceException {
         final User user = getLoggedInUser();
-        final Company c;
+        final Long c;
         if (company != null) {
-            c = companyDao.findOne(company);
+            c = company;
         } else {
-            c = user.getCompany();
+            c = user.getCompanyId();
         }
 
         checkCompanyAccess(user, c);
@@ -505,11 +505,11 @@ public class DeviceController extends AbstractController implements DeviceConsta
             events = getTrackerEventByDeviceDateRanges(device, startDateArg, endDateArg, user);
             file = fileDownload.createTmpFile("readings-" + createFileName(device, startDateArg, endDateArg), "csv");
         } else if (sn != null && trip != null) {
-            events = getTrackerEventByShipment(user.getCompany(), sn, trip);
+            events = getTrackerEventByShipment(user.getCompanyId(), sn, trip);
             file = fileDownload.createTmpFile("readings-" + sn + "(" + trip + ")", "csv");
         } else if (shipmentIdParam != null || shipmentParam != null) {
             final Long id = shipmentParam == null ? shipmentIdParam : shipmentParam;
-            events = getTrackerEventByShipment(user.getCompany(), id);
+            events = getTrackerEventByShipment(user.getCompanyId(), id);
             file = fileDownload.createTmpFile("readings-" + id, "csv");
         } else {
             throw new IOException("One from device IMEI or SN and trip count or shipmet or shipmentId"
@@ -543,9 +543,10 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return
      * @throws FileNotFoundException
      */
-    private List<ShortTrackerEventWithAlerts> getTrackerEventByShipment(final Company company, final Long id) throws FileNotFoundException {
+    private List<ShortTrackerEventWithAlerts> getTrackerEventByShipment(
+            final Long company, final Long id) throws FileNotFoundException {
         final Shipment s = shipmentDao.findOne(id);
-        if (s == null || !company.getId().equals(s.getCompany().getId())) {
+        if (s == null || !company.equals(s.getCompanyId())) {
             throw new FileNotFoundException("Shipment " + id + " not found");
         }
         return getTrackerEventByShipment(s);
@@ -557,7 +558,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return list of events.
      * @throws FileNotFoundException
      */
-    private List<ShortTrackerEventWithAlerts> getTrackerEventByShipment(final Company company,
+    private List<ShortTrackerEventWithAlerts> getTrackerEventByShipment(final Long company,
             final String sn, final int trip) throws FileNotFoundException {
         final Shipment s = shipmentDao.findBySnTrip(company, sn, trip);
         if (s == null) {

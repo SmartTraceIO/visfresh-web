@@ -21,7 +21,6 @@ import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.io.json.CorrectiveActionListSerializer;
@@ -244,9 +243,9 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
      * @see com.visfresh.dao.ActionTakenDao#findOne(java.lang.Long, com.visfresh.entities.Company)
      */
     @Override
-    public ActionTakenView findOne(final Long id, final Company company) {
+    public ActionTakenView findOne(final Long id, final Long company) {
         final DefaultCustomFilter cf = new DefaultCustomFilter();
-        cf.addValue("actionTaken_company", company.getId());
+        cf.addValue("actionTaken_company", company);
         cf.setFilter("s.company = :actionTaken_company");
 
         final Filter f = new Filter();

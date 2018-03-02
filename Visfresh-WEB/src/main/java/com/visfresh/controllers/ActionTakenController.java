@@ -136,7 +136,7 @@ public class ActionTakenController extends AbstractController {
         //check logged in.
         final User user = getLoggedInUser();
 
-        final ActionTakenView actionTaken = dao.findOne(id, user.getCompany());
+        final ActionTakenView actionTaken = dao.findOne(id, user.getCompanyId());
         return createSuccessResponse(createSerializer(user).toJson(actionTaken));
     }
     /**
@@ -152,7 +152,7 @@ public class ActionTakenController extends AbstractController {
         //check logged in.
         final User user = getLoggedInUser();
 
-        final ActionTakenView p = dao.findOne(id, user.getCompany());
+        final ActionTakenView p = dao.findOne(id, user.getCompanyId());
         if (p != null) {
             dao.delete(p);
         }

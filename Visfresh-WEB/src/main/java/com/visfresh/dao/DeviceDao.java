@@ -6,7 +6,6 @@ package com.visfresh.dao;
 import java.util.List;
 
 import com.visfresh.entities.Color;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.ListDeviceItem;
@@ -45,13 +44,13 @@ public interface DeviceDao extends EntityWithCompanyDaoBase<Device, Device, Stri
      * @param page page.
      * @return list of device items.
      */
-    List<ListDeviceItem> getDevices(Company company, Sorting sorting,
+    List<ListDeviceItem> getDevices(Long company, Sorting sorting,
             Page page);
     /**
      * @param device device.
      * @param c company.
      */
-    void moveToNewCompany(Device device, Company c);
+    void moveToNewCompany(Device device, Long c);
     /**
      * @param d device.
      * @param color color.

@@ -53,7 +53,7 @@ public class TemperatureStatsCollectorTest {
         d.setImei("239847098983748");
         d.setActive(true);
         d.setName("JUnit-" + d.getImei());
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         this.device = d;
 
         final AlertProfile ap = createAlertProfile("JUnit");
@@ -208,7 +208,7 @@ public class TemperatureStatsCollectorTest {
         final Shipment s = new Shipment();
         s.setId(lastId++);
         s.setAlertProfile(alertProfile);
-        s.setCompany(device.getCompany());
+        s.setCompany(device.getCompanyId());
         s.setDevice(device);
         s.setStatus(status);
         return s;
@@ -235,7 +235,7 @@ public class TemperatureStatsCollectorTest {
     private AlertProfile createAlertProfile(final String name) {
         final AlertProfile ap = new AlertProfile();
         ap.setId(lastId++);
-        ap.setCompany(device.getCompany());
+        ap.setCompany(device.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName(name);
         ap.setUpperTemperatureLimit(15.3);

@@ -84,7 +84,7 @@ public class SimulatorController extends AbstractController {
                     + dto.getUser() + " not found");
         }
         final AutoStartShipment auto = autoStartShipmentDao.findOne(dto.getAutoStart());
-        if (auto != null && !u.getCompany().getId().equals(auto.getCompany().getId())) {
+        if (auto != null && !u.getCompanyId().equals(auto.getCompanyId())) {
             throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Shipment template should be from same company as user");
         }
@@ -228,7 +228,7 @@ public class SimulatorController extends AbstractController {
         final Device d = new Device();
         d.setImei(imei);
         d.setActive(true);
-        d.setCompany(user.getCompany());
+        d.setCompany(user.getCompanyId());
         d.setName("Simulator device for user " + user.getEmail());
         return deviceDao.save(d);
     }

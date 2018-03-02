@@ -304,7 +304,7 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
 
         //set alert profile
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(company);
+        ap.setCompany(company.getCompanyId());
         ap.setName("JUnit AP");
         ap.setDescription("JUnit AP");
         context.getBean(AlertProfileDao.class).save(ap);
@@ -408,7 +408,7 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
     private LocationProfile createLocation() {
         LocationProfile loc = new LocationProfile();
         loc.setAddress("SPb");
-        loc.setCompany(company);
+        loc.setCompany(company.getCompanyId());
         loc.setName("Finish location");
         loc.getLocation().setLatitude(10);
         loc.getLocation().setLongitude(10);
@@ -422,7 +422,7 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
     private NotificationSchedule createEmailNotificaitonSchedule(final String email) {
         //create user
         final User user = new User();
-        user.setCompany(company);
+        user.setCompany(company.getCompanyId());
         user.setPassword("password");
         user.setEmail(email);
         user.setActive(true);
@@ -443,7 +443,7 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
         final NotificationSchedule s = new NotificationSchedule();
         s.setName("Arrival Notification");
         s.getSchedules().add(schedule);
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         return context.getBean(NotificationScheduleDao.class).save(s);
     }
     @After

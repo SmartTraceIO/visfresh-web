@@ -601,7 +601,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         //create interim stop location
         final LocationProfile loc = new LocationProfile();
         loc.setAddress("address");
-        loc.setCompany(getCompany());
+        loc.setCompany(getCompanyId());
         loc.setInterim(true);
         loc.setName("Unexpected stop");
         loc.setRadius(10);
@@ -1958,7 +1958,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
      */
     private DeviceGroup createDeviceGroup(final String name) {
         final DeviceGroup dg = new DeviceGroup();
-        dg.setCompany(getCompany());
+        dg.setCompany(getCompanyId());
         dg.setName(name);
         dg.setDescription("Description of group " + name);
         return context.getBean(DeviceGroupDao.class).save(dg);
@@ -1968,7 +1968,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
      */
     private CorrectiveActionList createCorrectiveActionList() {
         final CorrectiveActionList list = new CorrectiveActionList();
-        list.setCompany(getCompany());
+        list.setCompany(getCompanyId());
         list.setName("JUnit");
         list.getActions().add(new CorrectiveAction("A1"));
         list.getActions().add(new CorrectiveAction("A2"));

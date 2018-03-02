@@ -73,7 +73,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         shipmentTemplateDao = getContext().getBean(ShipmentTemplateDao.class);
 
         final AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
         ap.setWatchBatteryLow(true);
@@ -87,7 +87,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         LocationProfile p = new LocationProfile();
 
         p.setAddress("Odessa city, Deribasovskaya st. 1, apt. 1");
-        p.setCompany(sharedCompany);
+        p.setCompany(sharedCompany.getCompanyId());
         p.setInterim(true);
         p.setName("Test location 1");
         p.setNotes("Any notes");
@@ -102,7 +102,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         p = new LocationProfile();
 
         p.setAddress("Odessa city, Deribasovskaya st. 1, apt. 2");
-        p.setCompany(sharedCompany);
+        p.setCompany(sharedCompany.getCompanyId());
         p.setInterim(true);
         p.setName("Test location 2");
         p.setNotes("Any notes");
@@ -117,7 +117,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         notificationScheduleDao = getContext().getBean(NotificationScheduleDao.class);
 
         NotificationSchedule s = new NotificationSchedule();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
@@ -132,7 +132,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         alertNotifSched = notificationScheduleDao.save(s);
 
         s = new NotificationSchedule();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
@@ -154,7 +154,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
 
     private User createUser(final String email) {
         final User u = new User();
-        u.setCompany(this.sharedCompany);
+        u.setCompany(this.sharedCompany.getCompanyId());
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
         u.setEmail(email);
@@ -173,7 +173,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei(imei);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         return deviceDao.save(d);
     }
@@ -192,7 +192,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         s.setArrivalNotificationWithinKm(17);
         s.setSendArrivalReport(false);
         s.setSendArrivalReportOnlyIfAlerts(true);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.getCustomFields().put("field1", "Custom field 1");
         s.setExcludeNotificationsIfNoAlerts(true);
         s.setPalletId("PalletID");
@@ -241,7 +241,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(17, s.getArrivalNotificationWithinKm().intValue());
         assertFalse(s.isSendArrivalReport());
         assertTrue(s.isSendArrivalReportOnlyIfAlerts());
-        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals(sharedCompany.getId(), s.getCompanyId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
         assertEquals("PalletID", s.getPalletId());
@@ -349,7 +349,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(17, s.getArrivalNotificationWithinKm().intValue());
         assertFalse(s.isSendArrivalReport());
         assertTrue(s.isSendArrivalReportOnlyIfAlerts());
-        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals(sharedCompany.getId(), s.getCompanyId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
         assertEquals("PalletID", s.getPalletId());
@@ -419,7 +419,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
     @Test
     public void testSaveDefaultShipment() {
         final Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(device);
         dao.save(s);
 
@@ -430,7 +430,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         final Date time = new Date(System.currentTimeMillis() - 100000000l);
 
         final Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(device);
         s.setDeviceShutdownTime(time);
         dao.save(s);
@@ -454,7 +454,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         dao.save(createTestEntity());
         createShipmentTemplate();
 
-        assertEquals(1, dao.findByCompany(sharedCompany, null, null, null).size());
+        assertEquals(1, dao.findByCompany(sharedCompany.getCompanyId(), null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -462,7 +462,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left, null, null, null).size());
+        assertEquals(0, dao.findByCompany(left.getCompanyId(), null, null, null).size());
     }
     @Test
     public void testFindActiveShipments() {
@@ -597,7 +597,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         s0.setTripCount(trip);
         dao.save(s0);
 
-        assertNull(dao.findBySnTrip(sharedCompany, sn, trip));
+        assertNull(dao.findBySnTrip(sharedCompany.getCompanyId(), sn, trip));
 
         final Shipment s1 = createShipment(sharedCompany, ShipmentStatus.Arrived);
         final Device d1 = createDevice("1111113" + sn + "3");
@@ -605,8 +605,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         s1.setTripCount(trip);
         dao.save(s1);
 
-        assertNotNull(dao.findBySnTrip(sharedCompany, sn, trip));
-        assertNotNull(dao.findBySnTrip(sharedCompany, "1111", trip));
+        assertNotNull(dao.findBySnTrip(sharedCompany.getCompanyId(), sn, trip));
+        assertNotNull(dao.findBySnTrip(sharedCompany.getCompanyId(), "1111", trip));
 
         //create other device with same SN
         final Shipment s2 = createShipment(sharedCompany, ShipmentStatus.Arrived);
@@ -616,7 +616,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         dao.save(s2);
 
         try {
-            dao.findBySnTrip(sharedCompany, sn, trip);
+            dao.findBySnTrip(sharedCompany.getCompanyId(), sn, trip);
             throw new AssertionFailedError("Runtime exception should be thrown");
         } catch (final RuntimeException e) {
             //normal
@@ -627,12 +627,12 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
 
         final Shipment s3 = createShipment(left, ShipmentStatus.Arrived);
         final Device d3 = createDevice("1111112" + sn + "2");
-        d3.setCompany(left);
+        d3.setCompany(left.getCompanyId());
         s3.setDevice(d3);
         s3.setTripCount(trip);
         dao.save(s3);
 
-        assertNotNull(dao.findBySnTrip(left, sn, trip));
+        assertNotNull(dao.findBySnTrip(left.getCompanyId(), sn, trip));
     }
     @Test
     public void testOrderByLocation() {
@@ -748,7 +748,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
                 null, s.getDevice().getSn(), s.getTripCount());
 
         assertEquals(s.getId(), data.getShipment());
-        assertEquals(s.getCompany().getId(), data.getCompany());
+        assertEquals(s.getCompanyId(), data.getCompany());
         assertTrue(data.getSiblings().contains(sib1.getId()));
         assertTrue(data.getSiblings().contains(sib2.getId()));
     }
@@ -784,19 +784,19 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
 
         final AlertProfile ap = new AlertProfile();
         ap.setName("ApName");
-        ap.setCompany(sharedCompany);
+        ap.setCompany(sharedCompany.getCompanyId());
         context.getBean(AlertProfileDao.class).save(ap);
 
         final LocationProfile from = createLocationProfile("LocFrom");
         from.getLocation().setLatitude(12.2);
         from.getLocation().setLongitude(13.3);
-        from.setCompany(sharedCompany);
+        from.setCompany(sharedCompany.getCompanyId());
         context.getBean(LocationProfileDao.class).save(from);
 
         final LocationProfile to = createLocationProfile("LocTo");
         to.getLocation().setLatitude(12.2);
         to.getLocation().setLongitude(13.3);
-        to.setCompany(sharedCompany);
+        to.setCompany(sharedCompany.getCompanyId());
         context.getBean(LocationProfileDao.class).save(to);
 
         final Date arrivalDate = new Date(System.currentTimeMillis() - 293487l);
@@ -820,7 +820,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         s.setShipmentDescription(description);
         s.setStatus(status);
         s.setDevice(device);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setArrivalDate(arrivalDate);
 
         dao.save(s);
@@ -842,7 +842,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
                 lastReadingBattery, lastReadingTemperature);
 
         final ListShipmentItem item = dao.getCompanyShipments(
-                s.getCompany().getId(), null, null, null).getItems().get(0);
+                s.getCompanyId(), null, null, null).getItems().get(0);
 
         //check result
         assertEqualsDates(arrivalDate, item.getActualArrivalDate());
@@ -900,7 +900,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
      */
     private Shipment createShipment(final Company c, final ShipmentStatus status) {
         final Shipment s = createTestEntity();
-        s.setCompany(c);
+        s.setCompany(c.getCompanyId());
         s.setStatus(status);
         return dao.save(s);
     }
@@ -924,7 +924,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
     private LocationProfile createLocationProfile(final String name) {
         final LocationProfile p = new LocationProfile();
         p.setAddress("Address of " + name);
-        p.setCompany(sharedCompany);
+        p.setCompany(sharedCompany.getCompanyId());
         p.setInterim(true);
         p.setName(name);
         p.setNotes("Any notes");
@@ -942,7 +942,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
      */
     private Shipment createShipment(final Device d, final ShipmentStatus status) {
         final Shipment s = createTestEntity();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setStatus(status);
         s.setDevice(d);
         return dao.save(s);
@@ -954,7 +954,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         s.setAlertProfile(alertProfile);
         s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setExcludeNotificationsIfNoAlerts(true);
         s.setName("Shipment-1");
         s.setShipmentDescription("Test Shipment");

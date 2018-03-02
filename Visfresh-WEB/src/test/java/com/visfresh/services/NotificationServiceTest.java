@@ -81,7 +81,7 @@ public class NotificationServiceTest {
      */
     private Shipment createShipment(final ShipmentStatus status) {
         final Shipment s = new Shipment();
-        s.setCompany(company);
+        s.setCompany(company.getCompanyId());
         s.setStatus(status);
         s.setDevice(device);
         return context.getBean(ShipmentDao.class).save(s);
@@ -95,7 +95,7 @@ public class NotificationServiceTest {
         d.setActive(true);
         d.setImei(imei);
         d.setName("JUnit-" + imei);
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         return context.getBean(DeviceDao.class).save(d);
     }
 
@@ -109,7 +109,7 @@ public class NotificationServiceTest {
         final User u = createUser("junit@smarttrace.com.au");
 
         final NotificationSchedule sched = new NotificationSchedule();
-        sched.setCompany(company);
+        sched.setCompany(company.getCompanyId());
         sched.setName("JUnit-" + u.getEmail());
 
         final PersonSchedule s = new PersonSchedule();
@@ -139,7 +139,7 @@ public class NotificationServiceTest {
         context.getBean(UserDao.class).save(u);
 
         final NotificationSchedule sched = new NotificationSchedule();
-        sched.setCompany(company);
+        sched.setCompany(company.getCompanyId());
         sched.setName("JUnit-" + u.getEmail());
 
         final PersonSchedule s = new PersonSchedule();
@@ -222,7 +222,7 @@ public class NotificationServiceTest {
     private User createUser(final String email) {
         final User u = new User();
         u.setActive(true);
-        u.setCompany(company);
+        u.setCompany(company.getCompanyId());
         u.setEmail(email);
         u.setFirstName(email);
         u.setLastName("JUnit");

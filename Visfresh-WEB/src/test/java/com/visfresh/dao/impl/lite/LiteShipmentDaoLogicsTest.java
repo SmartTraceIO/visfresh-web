@@ -23,7 +23,6 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.impl.ShipmentDaoImpl;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentStatus;
 
 /**
@@ -52,7 +51,7 @@ public class LiteShipmentDaoLogicsTest extends LiteShipmentDaoImpl {
      * @see com.visfresh.controllers.lite.dao.LiteShipmentDao#getShipmentsDbData(com.visfresh.entities.Company, com.visfresh.dao.Sorting, com.visfresh.dao.Filter, com.visfresh.dao.Page)
      */
     @Override
-    protected List<Map<String, Object>> getShipmentsDbData(final Company company, final Sorting sorting, final Filter filter, final Page page) {
+    protected List<Map<String, Object>> getShipmentsDbData(final Long company, final Sorting sorting, final Filter filter, final Page page) {
         final List<LiteShipment> shipments = getSortedShipments();
 
         final List<Map<String, Object>> rows = new LinkedList<>();
@@ -165,7 +164,7 @@ public class LiteShipmentDaoLogicsTest extends LiteShipmentDaoImpl {
      * @see com.visfresh.controllers.lite.dao.LiteShipmentDao#getTotalCount(com.visfresh.entities.Company, com.visfresh.dao.Filter)
      */
     @Override
-    protected int getTotalCount(final Company company, final Filter filter) {
+    protected int getTotalCount(final Long company, final Filter filter) {
         int totalCount = 0;
         for (final LiteShipment s : shipments) {
             final List<LiteKeyLocation> locs = this.keyLocations.get(s.getShipmentId());

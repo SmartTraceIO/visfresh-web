@@ -27,6 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
@@ -100,6 +101,8 @@ public class NotificationServiceImpl implements NotificationService {
     private AlertDao alertDao;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private CompanyDao companyDao;
     @Autowired
     private ShipmentSessionDao shipmentSessionDao;
     @Autowired
@@ -244,8 +247,7 @@ public class NotificationServiceImpl implements NotificationService {
      * @return person description.
      */
     private String getPersonDescription(final User u) {
-        return u.getFirstName() + " " + u.getLastName() + ", "+ u.getPosition() + " of "
-                + u.getCompany().getName();
+        return u.getFirstName() + " " + u.getLastName() + ", "+ u.getPosition();
     }
     /**
      * @param shipment
@@ -357,7 +359,8 @@ public class NotificationServiceImpl implements NotificationService {
      */
     private ShipmentReportBean createShipmentReport(final Shipment s, final List<User> users) {
         //create report bean
-        final ShipmentReportBean report = shipmentReportDao.createReport(s);
+        final ShipmentReportBean report = shipmentReportDao.createReport(
+                s, companyDao.findOne(s.getCompanyId()));
 
         //in this case the list of report receivers is fully determined
         report.getWhoReceivedReport().clear();

@@ -125,7 +125,7 @@ public class EnterBrightEnvironmentAlertRuleTest extends BaseRuleTest {
         //enable battery low alerts
         final AlertProfile p = new AlertProfile();
         p.setName("Enter bright environment alert rule");
-        p.setCompany(s.getCompany());
+        p.setCompany(s.getCompanyId());
         p.setWatchEnterBrightEnvironment(true);
         context.getBean(AlertProfileDao.class).save(p);
 

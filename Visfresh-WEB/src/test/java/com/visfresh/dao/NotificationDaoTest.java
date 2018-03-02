@@ -55,7 +55,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
 
         //create device
         final Device d = new Device();
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         final String imei = "932487032487";
         d.setImei(imei);
         d.setName("Test Device");
@@ -65,7 +65,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
 
         //create arrival
         Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(d);
         s = shipmentDao.save(s);
 
@@ -78,7 +78,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
 
         //create User
         final User u = new User();
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail("asuvorov@google.com");
         u.setFirstName("Alexande");
         u.setLastName("Suvorov");
@@ -114,7 +114,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     @Test
     public void testFindForUser() {
         User u = new User();
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail("mkutuzov@google.com");
         u.setFirstName("Michael");
         u.setLastName("Kutuzov");
@@ -150,7 +150,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     @Test
     public void testFindForUserEntityCount() {
         User u = new User();
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail("mkutuzov@google.com");
         u.setFirstName("Michael");
         u.setLastName("Kutuzov");
@@ -184,7 +184,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     @Test
     public void testMarkAsReadenByUserAndId() {
         User u = new User();
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail("mkutuzov@google.com");
         u.setFirstName("Michael");
         u.setLastName("Kutuzov");
@@ -217,7 +217,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     public void testGetForIssues() {
         //craete user
         User u = new User();
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail("mkutuzov@google.com");
         u.setFirstName("Michael");
         u.setLastName("Kutuzov");

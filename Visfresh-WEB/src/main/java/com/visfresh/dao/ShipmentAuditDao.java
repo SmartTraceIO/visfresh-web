@@ -5,7 +5,6 @@ package com.visfresh.dao;
 
 import java.util.List;
 
-import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentAuditItem;
 
 /**
@@ -18,7 +17,7 @@ public interface ShipmentAuditDao extends DaoBase<ShipmentAuditItem, ShipmentAud
      * @param filter additional filter.
      * @return total items count.
      */
-    int getEntityCount(Company company, Filter filter);
+    int getEntityCount(Long company, Filter filter);
     /**
      * @param company company.
      * @param filter additional filter.
@@ -26,5 +25,5 @@ public interface ShipmentAuditDao extends DaoBase<ShipmentAuditItem, ShipmentAud
      * @param page page.
      * @return selected items by given criterias.
      */
-    List<ShipmentAuditItem> findAll(Company company, Filter filter, Sorting createSorting, Page page);
+    List<ShipmentAuditItem> findAll(Long company, Filter filter, Sorting createSorting, Page page);
 }

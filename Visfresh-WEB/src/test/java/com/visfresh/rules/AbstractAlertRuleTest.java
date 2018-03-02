@@ -72,7 +72,7 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
         this.shipment = new Shipment();
         shipment.setId(7l);
         shipment.setShipmentDate(new Date());
-        shipment.setCompany(c);
+        shipment.setCompany(c.getCompanyId());
 
         this.event = new TrackerEvent();
         event.setTime(new Date());
@@ -169,7 +169,7 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
     private NotificationSchedule createNotificationSchedule(final User... users) {
         final NotificationSchedule s = new NotificationSchedule();
         s.setId(lastID++);
-        s.setCompany(shipment.getCompany());
+        s.setCompany(shipment.getCompanyId());
         s.setName("Junit-" + s.getId());
 
         for (final User u : users) {
@@ -205,7 +205,7 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
         user.setEmail(user.getId() + "-user@junit.com");
         user.setPhone(Long.toString(11111111111l + user.getId()));
         user.setActive(true);
-        user.setCompany(shipment.getCompany());
+        user.setCompany(shipment.getCompanyId());
         user.setPassword("");
         return user;
     }

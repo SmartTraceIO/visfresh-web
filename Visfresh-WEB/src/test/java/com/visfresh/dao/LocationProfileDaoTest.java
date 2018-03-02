@@ -36,7 +36,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
         //create devcie.
         device = new Device();
         device.setName("JUnit device");
-        device.setCompany(sharedCompany);
+        device.setCompany(sharedCompany.getCompanyId());
         device.setImei("0891237987987987");
         device.setDescription("Test device");
         device = getContext().getBean(DeviceDao.class).save(device);
@@ -49,7 +49,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
         final LocationProfile p = new LocationProfile();
 
         p.setAddress("Odessa city, Deribasovskaya st. 1, apt. 1");
-        p.setCompany(sharedCompany);
+        p.setCompany(sharedCompany.getCompanyId());
         p.setInterim(true);
         p.setName("Test location");
         p.setNotes("Any notes");
@@ -67,7 +67,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
     @Override
     protected void assertCreateTestEntityOk(final LocationProfile lp) {
         assertEquals("Odessa city, Deribasovskaya st. 1, apt. 1", lp.getAddress());
-        assertEquals(sharedCompany.getId(), lp.getCompany().getId());
+        assertEquals(sharedCompany.getId(), lp.getCompanyId());
         assertTrue(lp.isInterim());
         assertEquals("Test location", lp.getName());
         assertEquals("Any notes", lp.getNotes());
@@ -84,7 +84,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
         createAndSaveLocationProfile(sharedCompany);
         createAndSaveLocationProfile(sharedCompany);
 
-        assertEquals(2, dao.findByCompany(sharedCompany, null, null, null).size());
+        assertEquals(2, dao.findByCompany(sharedCompany.getCompanyId(), null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -92,7 +92,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left, null, null, null).size());
+        assertEquals(0, dao.findByCompany(left.getCompanyId(), null, null, null).size());
     }
     @Test
     public void testGetOwnerShipments() {
@@ -117,7 +117,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
      */
     private Shipment createAutoStartShipment() {
         final Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(device);
         this.getContext().getBean(ShipmentDao.class).save(s);
         return s;
@@ -127,7 +127,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
      */
     private LocationProfile createAndSaveLocationProfile(final Company c) {
         final LocationProfile a = createTestEntity();
-        a.setCompany(c);
+        a.setCompany(c.getCompanyId());
         return dao.save(a);
     }
     /* (non-Javadoc)
@@ -140,7 +140,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
 
         final LocationProfile lp = all.get(0);
         assertEquals("Odessa city, Deribasovskaya st. 1, apt. 1", lp.getAddress());
-        assertEquals(sharedCompany.getId(), lp.getCompany().getId());
+        assertEquals(sharedCompany.getId(), lp.getCompanyId());
         assertTrue(lp.isInterim());
         assertEquals("Test location", lp.getName());
         assertEquals("Any notes", lp.getNotes());

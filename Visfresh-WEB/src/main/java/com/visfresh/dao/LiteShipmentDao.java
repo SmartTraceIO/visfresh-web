@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.controllers.lite.LiteShipment;
 import com.visfresh.controllers.lite.LiteShipmentResult;
-import com.visfresh.entities.Company;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -25,7 +24,7 @@ public interface LiteShipmentDao {
      * @param page page.
      * @return
      */
-    public LiteShipmentResult getShipments(final Company company, final Sorting sorting,
+    public LiteShipmentResult getShipments(final Long company, final Sorting sorting,
             final Filter filter, final Page page);
     /**
      * @param company company.
@@ -35,5 +34,5 @@ public interface LiteShipmentDao {
      * @param startDate start date. Can be null.
      * @return list of shipments near given location.
      */
-    public List<LiteShipment> getShipmentsNearby(Company company, double lat, double lon, int radius, Date startDate);
+    public List<LiteShipment> getShipmentsNearby(Long company, double lat, double lon, int radius, Date startDate);
 }

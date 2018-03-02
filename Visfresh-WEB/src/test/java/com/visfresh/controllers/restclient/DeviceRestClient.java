@@ -139,10 +139,10 @@ public class DeviceRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public void initDeviceColors(final Company company) throws IOException, RestServiceException {
+    public void initDeviceColors(final Long company) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (company != null) {
-            params.put("company", company.getId().toString());
+            params.put("company", company.toString());
         }
 
         sendGetRequest(getPathWithToken("initDeviceColors"), params);

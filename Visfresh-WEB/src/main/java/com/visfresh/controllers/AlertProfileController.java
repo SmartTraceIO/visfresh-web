@@ -20,7 +20,6 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
@@ -63,10 +62,10 @@ public class AlertProfileController extends AbstractController implements AlertP
     public JsonObject saveAlertProfile(
         final @RequestBody JsonObject alert) throws RestServiceException {
         final User user = getLoggedInUser();
-        final AlertProfile p = createSerializer(user, user.getCompany()).parseAlertProfile(alert);
+        final AlertProfile p = createSerializer(user, user.getCompanyId()).parseAlertProfile(alert);
 
         final AlertProfile old = dao.findOne(p.getId());
-        checkCompany(old, user.getCompany());
+        checkCompany(old, user.getCompanyId());
 
         final Long id = dao.save(p).getId();
         return createIdResponse("alertProfileId", id);
@@ -85,7 +84,7 @@ public class AlertProfileController extends AbstractController implements AlertP
         final User user = getLoggedInUser();
         final AlertProfile alert = dao.findOne(alertProfileId);
         checkCompanyAccess(user, alert);
-        return createSuccessResponse(createSerializer(user, alert.getCompany()).toJson(alert));
+        return createSuccessResponse(createSerializer(user, alert.getCompanyId()).toJson(alert));
     }
     /**
      * @param authToken authentication token.
@@ -124,14 +123,14 @@ public class AlertProfileController extends AbstractController implements AlertP
 
         //check logged in.
         final User user = getLoggedInUser();
-        final AlertProfileSerializer ser = createSerializer(user, user.getCompany());
+        final AlertProfileSerializer ser = createSerializer(user, user.getCompanyId());
 
         final List<AlertProfile> alerts = dao.findByCompany(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSorting(sc, so, getDefaultSortOrder(), 2),
                 page,
                 null);
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
 
         final JsonArray array = new JsonArray();
         for (final AlertProfile a : alerts) {
@@ -154,7 +153,7 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @param user
      * @return
      */
-    private AlertProfileSerializer createSerializer(final User user, final Company company) {
+    private AlertProfileSerializer createSerializer(final User user, final Long company) {
         return new AlertProfileSerializer(company, user.getTimeZone(), user.getTemperatureUnits());
     }
 

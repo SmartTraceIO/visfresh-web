@@ -126,7 +126,7 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
         paramMap.put(LATITUDE_FIELD, lp.getLocation().getLatitude());
         paramMap.put(LONGITUDE_FIELD, lp.getLocation().getLongitude());
         paramMap.put(RADIUS_FIELD, lp.getRadius());
-        paramMap.put(COMPANY_FIELD, lp.getCompany().getId());
+        paramMap.put(COMPANY_FIELD, lp.getCompanyId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -207,6 +207,7 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
     protected LocationProfile createEntity(final Map<String, Object> map) {
         final LocationProfile no = new LocationProfile();
         no.setId(((Number) map.get(ID_FIELD)).longValue());
+        no.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
 
         no.setAddress((String) map.get(ADDRESS_FIELD));
         no.setCompanyName((String) map.get(COMPANY_DESCRIPTION_FIELD));
@@ -220,5 +221,11 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
         no.getLocation().setLongitude(((Number) map.get(LONGITUDE_FIELD)).doubleValue());
 
         return no;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final LocationProfile t, final Map<String, Object> map, final Map<String, Object> cache) {
     }
 }

@@ -32,7 +32,7 @@ public class DeviceGroupSerializer extends AbstractJsonSerializer {
         group.setId(asLong(json.get(DeviceGroupConstants.PROPERTY_ID)));
         group.setName(asString(json.get(DeviceGroupConstants.PROPERTY_NAME)));
         group.setDescription(asString(json.get(DeviceGroupConstants.PROPERTY_DESCRIPTION)));
-        group.setCompany(user.getCompany());
+        group.setCompany(user.getCompanyId());
         return group;
     }
     /**

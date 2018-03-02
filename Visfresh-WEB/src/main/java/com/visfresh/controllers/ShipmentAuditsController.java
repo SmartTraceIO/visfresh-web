@@ -82,11 +82,11 @@ public class ShipmentAuditsController extends AbstractController implements Ship
         }
 
         final List<ShipmentAuditItem> items = dao.findAll(
-                user.getCompany(),
+                user.getCompanyId(),
                 filter,
                 createSorting(sc, so, getDefaultSortOrder(), 2),
                 page);
-        final int total = dao.getEntityCount(user.getCompany(), filter);
+        final int total = dao.getEntityCount(user.getCompanyId(), filter);
 
         final ShipmentAuditsSerializer ser = createSerializer(user);
 

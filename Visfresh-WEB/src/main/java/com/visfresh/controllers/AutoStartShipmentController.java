@@ -90,10 +90,10 @@ public class AutoStartShipmentController extends AbstractController
             checkCompanyAccess(user, dao.findOne(dto.getId()));
         } else {
             cfg = new AutoStartShipment();
-            cfg.setCompany(user.getCompany());
+            cfg.setCompany(user.getCompanyId());
 
             tpl = new ShipmentTemplate();
-            tpl.setCompany(user.getCompany());
+            tpl.setCompany(user.getCompanyId());
 
             cfg.setTemplate(tpl);
         }
@@ -263,11 +263,11 @@ public class AutoStartShipmentController extends AbstractController
         final AutoStartShipmentSerializer ser = createSerializer(user);
 
         final List<AutoStartShipment> configs = dao.findByCompany(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSorting(sc, so, getDefaultSortOrder(), 2),
                 page,
                 null);
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
 
         final JsonArray array = new JsonArray();
         for (final AutoStartShipment cfg : configs) {

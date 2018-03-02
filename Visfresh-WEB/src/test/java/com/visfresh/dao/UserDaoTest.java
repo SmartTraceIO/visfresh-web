@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
@@ -45,7 +44,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, User, Long> {
     @Before
     public void beforeTest() {
         final NotificationSchedule ns = new NotificationSchedule();
-        ns.setCompany(sharedCompany);
+        ns.setCompany(sharedCompany.getCompanyId());
         ns.setDescription("Test");
         ns.setName("JUnit");
         notificationSchedule = getContext().getBean(NotificationScheduleDao.class).save(ns);
@@ -53,12 +52,12 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, User, Long> {
         Device d = new Device();
         d.setName("Test Device");
         d.setImei("2938479898989834");
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         d = getContext().getBean(DeviceDao.class).save(d);
 
         Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(d);
         s.setShipmentDescription("Created by autostart shipment rule");
@@ -82,7 +81,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, User, Long> {
         u.setLastName("Suvorov");
         u.setPosition("Manager");
         u.setPhone("1111111117");
-        u.setCompany(sharedCompany);
+        u.setCompany(sharedCompany.getCompanyId());
         u.setEmail("asuvorov-" + (++ids) + "@google.com");
         u.setPassword("abrakadabra");
         u.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -109,10 +108,8 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, User, Long> {
         assertEquals("value", user.getSettings().get("key"));
 
         //test company
-        final Company c = user.getCompany();
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        final Long c = user.getCompanyId();
+        assertEquals(sharedCompany.getId(), c);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
@@ -138,10 +135,8 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, User, Long> {
         assertEquals("value", user.getSettings().get("key"));
 
         //test company
-        final Company c = user.getCompany();
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        final Long c = user.getCompanyId();
+        assertEquals(sharedCompany.getId(), c);
     }
     @Test
     public void testgetDbReferences() {

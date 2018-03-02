@@ -175,7 +175,7 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
 
         //configure notification schedule
         final NotificationSchedule sched = new NotificationSchedule();
-        sched.setCompany(company);
+        sched.setCompany(company.getCompanyId());
         sched.setDescription("JUnit");
         sched.setName("JUnit");
         s.getAlertsNotificationSchedules().add(sched);
@@ -187,7 +187,7 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
         Arrays.fill(ps.getWeekDays(), true);
 
         final User user = new User();
-        user.setCompany(company);
+        user.setCompany(company.getCompanyId());
         user.setActive(true);
         user.setEmail("abra@kada.bra");
         user.setLanguage(Language.English);
@@ -225,7 +225,7 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
         //enable battery low alerts
         final AlertProfile p = new AlertProfile();
         p.setName("BatteryLow alert rule");
-        p.setCompany(s.getCompany());
+        p.setCompany(s.getCompanyId());
         p.setWatchBatteryLow(true);
         context.getBean(AlertProfileDao.class).save(p);
 

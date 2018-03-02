@@ -108,9 +108,9 @@ public class AbstractTool {
             u.setLastName("Developer");
             u.setRoles(new HashSet<Role>());
             u.getRoles().add(Role.Admin);
-            u.setCompany(c);
+            u.setCompany(c.getCompanyId());
 
-            userService.saveUser(u, newPassword, false);
+            userService.saveUser(u, company, newPassword, false);
             token = userService.login(u.getEmail(), newPassword);
         }
 

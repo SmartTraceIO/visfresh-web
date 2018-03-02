@@ -34,7 +34,7 @@ public class CorrectiveActionListSerializerTest {
         company = new Company(7l);
         company.setName("JUnit");
 
-        serializer = new CorrectiveActionListSerializer(company);
+        serializer = new CorrectiveActionListSerializer(company.getCompanyId());
     }
 
     /**
@@ -49,7 +49,7 @@ public class CorrectiveActionListSerializerTest {
         final String description = "List description";
 
         CorrectiveActionList list = new CorrectiveActionList();
-        list.setCompany(company);
+        list.setCompany(company.getCompanyId());
         list.setId(id);
         list.setDescription(description);
         list.setName(name);
@@ -65,6 +65,6 @@ public class CorrectiveActionListSerializerTest {
         assertTrue(list.getActions().get(0).isRequestVerification());
         assertEquals(a2, list.getActions().get(1).getAction());
         assertFalse(list.getActions().get(1).isRequestVerification());
-        assertEquals(company.getId(), list.getCompany().getId());
+        assertEquals(company.getId(), list.getCompanyId());
     }
 }

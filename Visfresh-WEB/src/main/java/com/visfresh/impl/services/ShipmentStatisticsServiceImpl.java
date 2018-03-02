@@ -109,8 +109,8 @@ public class ShipmentStatisticsServiceImpl implements ShipmentStatisticsService 
      * @param s the shipment.
      */
     private void createStatisticsForShipment(final Shipment s) {
-        final String companyName = s.getCompany() == null ? "company NULL" : s.getCompany().getName();
-        log.debug("Calculate statistics for shipment " + s + " of " + companyName);
+        final Long companyId = s.getCompanyId();
+        log.debug("Calculate statistics for shipment " + s + " of company: " + companyId);
 
         final ShipmentStatistics stats = calculate(s);
         dao.saveStatistics(stats);

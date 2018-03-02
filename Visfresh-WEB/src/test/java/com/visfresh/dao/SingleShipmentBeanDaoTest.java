@@ -130,7 +130,7 @@ public class SingleShipmentBeanDaoTest extends BaseDaoTest<SingleShipmentBeanDao
     private Shipment createShipment(final Device device) {
         final Shipment s = new Shipment();
         s.setDevice(device);
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         s.setShipmentDescription("JUnit shipment");
         return shipmentDao.save(s);
@@ -144,7 +144,7 @@ public class SingleShipmentBeanDaoTest extends BaseDaoTest<SingleShipmentBeanDao
         bean.setShipmentId(s.getId());
         bean.setDevice(s.getDevice().getImei());
         bean.setStatus(s.getStatus());
-        bean.setCompanyId(s.getCompany().getId());
+        bean.setCompanyId(s.getCompanyId());
         bean.setShipmentDescription(s.getShipmentDescription());
         dao.saveShipmentBean(bean);
         return bean;
@@ -157,7 +157,7 @@ public class SingleShipmentBeanDaoTest extends BaseDaoTest<SingleShipmentBeanDao
         final Device d = new Device();
         d.setImei(device);
         d.setName("JUnit-" + device);
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("JUnit device");
         return context.getBean(DeviceDao.class).save(d);
     }

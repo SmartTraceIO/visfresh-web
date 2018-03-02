@@ -22,7 +22,7 @@ public class User implements EntityWithId<Long>, EntityWithCompany, Cloneable {
     /**
      * Company.
      */
-    private Company company;
+    private Long company;
     /**
      * First user name.
      */
@@ -129,14 +129,14 @@ public class User implements EntityWithId<Long>, EntityWithCompany, Cloneable {
      * @return the company
      */
     @Override
-    public Company getCompany() {
+    public Long getCompanyId() {
         return company;
     }
     /**
      * @param company the company to set
      */
     @Override
-    public void setCompany(final Company company) {
+    public void setCompany(final Long company) {
         this.company = company;
     }
     /**

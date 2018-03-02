@@ -15,12 +15,12 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.UserConstants;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
@@ -34,7 +34,6 @@ import com.visfresh.lists.ShortListUserItem;
 public class UserSerializer extends AbstractJsonSerializer {
     private static final String INTERNAL_COMPANY_NAME = "internalCompany";
     private ShipmentResolver shipmentResolver;
-    private CompanyResolver companyResolver;
 
     /**
      * Default constructor.
@@ -77,16 +76,14 @@ public class UserSerializer extends AbstractJsonSerializer {
             u.getRoles().addAll(parseRoles(roles.getAsJsonArray()));
         }
         final JsonElement companyId = json.get(UserConstants.PROPERTY_INTERNAL_COMPANY_ID);
-        if (getCompanyResolver() != null && companyId != null && !companyId.isJsonNull()) {
-            u.setCompany(getCompanyResolver().getCompany(companyId.getAsLong()));
-        }
+        u.setCompany(asLong(companyId));
         return u;
     }
     /**
      * @param u the user.
      * @return JSON object.
      */
-    public JsonObject toJson(final User u) {
+    public JsonObject toJson(final User u, final Company c) {
         final JsonObject obj = new JsonObject();
         obj.addProperty(UserConstants.PROPERTY_ID, u.getId());
         obj.addProperty(UserConstants.PROPERTY_FIRST_NAME, u.getFirstName());
@@ -94,9 +91,9 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty("title", u.getTitle());
 
         //company is readonly property, should not be serialized back
-        if (u.getCompany() != null) {
-            obj.addProperty(INTERNAL_COMPANY_NAME, u.getCompany().getName());
-            obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID, u.getCompany().getId());
+        if (c != null) {
+            obj.addProperty(INTERNAL_COMPANY_NAME, c.getName());
+            obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID, c.getId());
         }
 
         obj.addProperty(UserConstants.PROPERTY_EXTERNAL, u.getExternal());
@@ -135,14 +132,15 @@ public class UserSerializer extends AbstractJsonSerializer {
     }
     /**
      * @param req create user request.
+     * @param c TODO
      * @return JSON object.
      */
-    public JsonElement toJson(final SaveUserRequest req) {
+    public JsonElement toJson(final SaveUserRequest req, final Company c) {
         if (req == null) {
             return JsonNull.INSTANCE;
         }
         final JsonObject obj = new JsonObject();
-        obj.add("user", toJson(req.getUser()));
+        obj.add("user", toJson(req.getUser(), c));
         obj.addProperty("password", req.getPassword());
         obj.addProperty("resetOnLogin", req.getResetOnLogin());
         return obj;
@@ -303,17 +301,5 @@ public class UserSerializer extends AbstractJsonSerializer {
      */
     public void setShipmentResolver(final ShipmentResolver referenceResolver) {
         this.shipmentResolver = referenceResolver;
-    }
-    /**
-     * @return the companyResolver
-     */
-    public CompanyResolver getCompanyResolver() {
-        return companyResolver;
-    }
-    /**
-     * @param companyResolver the companyResolver to set
-     */
-    public void setCompanyResolver(final CompanyResolver companyResolver) {
-        this.companyResolver = companyResolver;
     }
 }

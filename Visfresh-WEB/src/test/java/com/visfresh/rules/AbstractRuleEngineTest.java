@@ -235,7 +235,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         final Device d = new Device();
         d.setImei(imei);
         d.setActive(true);
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         d.setName("JUnit");
         d.setDescription("JUnit device");
         devices.put(d.getImei(), d);

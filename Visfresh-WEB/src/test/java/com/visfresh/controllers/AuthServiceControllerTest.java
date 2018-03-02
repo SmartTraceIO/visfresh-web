@@ -25,7 +25,6 @@ import com.visfresh.io.email.EmailMessage;
 import com.visfresh.mock.MockEmailService;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.DefaultAuthService;
-import com.visfresh.services.DefaultReferenceResolver;
 import com.visfresh.services.RestServiceException;
 
 import junit.framework.AssertionFailedError;
@@ -63,7 +62,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final User user = new User();
         user.setEmail("a-" + (++lastLong) + "@b.c");
         final String password = "lkasdlfkj";
-        user.setCompany(getCompany());
+        user.setCompany(getCompanyId());
 
         authService.saveUser(user, password, false);
         final String token = client.login(user.getEmail(), password);
@@ -74,7 +73,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final User user = new User();
         user.setEmail("a-" + (++lastLong) + "@b.c");
         final String password = "lkasdlfkj";
-        user.setCompany(getCompany());
+        user.setCompany(getCompanyId());
 
         authService.saveUser(user, password, false);
         final String token = client.login(user.getEmail().toUpperCase(), password);
@@ -88,12 +87,12 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
 
         final User u1 = new User();
         u1.setEmail("user1@visfresh.com");
-        u1.setCompany(getCompany());
+        u1.setCompany(getCompanyId());
         u1.setRoles(roles);
 
         final User u2 = new User();
         u2.setEmail("user2@visfresh.com");
-        u2.setCompany(getCompany());
+        u2.setCompany(getCompanyId());
         u2.setRoles(roles);
 
         authService.saveUser(u1, password, false);
@@ -138,7 +137,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final User user = new User();
         user.setEmail(email);
         final String password = "lkasdlfkj";
-        user.setCompany(getCompany());
+        user.setCompany(getCompanyId());
 
         authService.saveUser(user, password, false);
 
@@ -150,7 +149,6 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         }
 
         final UserRestClient userRest = new UserRestClient(UTC);
-        userRest.setCompanyResolver(context.getBean(DefaultReferenceResolver.class));
         userRest.setServiceUrl(client.getServiceUrl());
 
         //check first token is alive
@@ -172,7 +170,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final User user = new User();
         user.setEmail("a-" + (++lastLong) + "@b.c");
         final String password = "lkasdlfkj";
-        user.setCompany(getCompany());
+        user.setCompany(getCompanyId());
 
         authService.saveUser(user, password, false);
 

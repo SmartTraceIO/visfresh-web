@@ -38,13 +38,13 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei("23984293087034");
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         d.setDescription("Test device");
         getContext().getBean(DeviceDao.class).save(d);
 
         final Shipment s = new Shipment();
         s.setDevice(d);
-        s.setCompany(d.getCompany());
+        s.setCompany(d.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         this.shipment = getContext().getBean(ShipmentDao.class).save(s);
     }
@@ -128,7 +128,7 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
         //test select by left shipment
         Shipment s = new Shipment();
         s.setDevice(shipment.getDevice());
-        s.setCompany(shipment.getCompany());
+        s.setCompany(shipment.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         s = getContext().getBean(ShipmentDao.class).save(s);
 
@@ -145,7 +145,7 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
         //test select by left shipment
         Shipment s = new Shipment();
         s.setDevice(shipment.getDevice());
-        s.setCompany(shipment.getCompany());
+        s.setCompany(shipment.getCompanyId());
         s.setStatus(ShipmentStatus.InProgress);
         s = getContext().getBean(ShipmentDao.class).save(s);
 

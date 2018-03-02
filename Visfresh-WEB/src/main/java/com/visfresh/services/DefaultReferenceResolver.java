@@ -7,20 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertProfileDao;
-import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
-import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UserResolver;
@@ -30,7 +27,7 @@ import com.visfresh.io.UserResolver;
  *
  */
 @Component
-public class DefaultReferenceResolver implements ReferenceResolver, CompanyResolver,
+public class DefaultReferenceResolver implements ReferenceResolver,
 ShipmentResolver, UserResolver {
     @Autowired
     private LocationProfileDao locationProfileDao;
@@ -42,8 +39,6 @@ ShipmentResolver, UserResolver {
     private DeviceDao deviceDao;
     @Autowired
     private ShipmentDao shipmentDao;
-    @Autowired
-    private CompanyDao companyDao;
     @Autowired
     private UserDao userDao;
 
@@ -89,13 +84,6 @@ ShipmentResolver, UserResolver {
     @Override
     public Shipment getShipment(final Long id) {
         return shipmentDao.findOne(id);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
-     */
-    @Override
-    public Company getCompany(final Long id) {
-        return companyDao.findOne(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.UserResolver#getUser(java.lang.String)

@@ -19,7 +19,6 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.CorrectiveActionsConstants;
 import com.visfresh.dao.CorrectiveActionListDao;
 import com.visfresh.dao.Page;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
@@ -57,7 +56,7 @@ public class CorrectiveActionController extends AbstractController implements Co
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public JsonObject saveCorrectiveActionList(final @RequestBody JsonObject list) throws RestServiceException {
         final User user = getLoggedInUser();
-        final CorrectiveActionList p = createSerializer(user.getCompany()).parseCorrectiveActionList(list);
+        final CorrectiveActionList p = createSerializer(user.getCompanyId()).parseCorrectiveActionList(list);
         final CorrectiveActionList old = dao.findOne(p.getId());
 
         checkCompanyAccess(user, old);
@@ -80,7 +79,7 @@ public class CorrectiveActionController extends AbstractController implements Co
         final CorrectiveActionList list = dao.findOne(id);
         checkCompanyAccess(user, list);
 
-        return createSuccessResponse(createSerializer(list.getCompany()).toJson(list));
+        return createSuccessResponse(createSerializer(list.getCompanyId()).toJson(list));
     }
     /**
      * @param authToken authentication token.
@@ -119,14 +118,14 @@ public class CorrectiveActionController extends AbstractController implements Co
 
         //check logged in.
         final User user = getLoggedInUser();
-        final CorrectiveActionListSerializer ser = createSerializer(user.getCompany());
+        final CorrectiveActionListSerializer ser = createSerializer(user.getCompanyId());
 
         final List<CorrectiveActionList> lists = dao.findByCompany(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSorting(sc, so, getDefaultSortOrder(), 2),
                 page,
                 null);
-        final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
 
         final JsonArray array = new JsonArray();
         for (final CorrectiveActionList a : lists) {
@@ -138,7 +137,7 @@ public class CorrectiveActionController extends AbstractController implements Co
     /**
      * @return
      */
-    private CorrectiveActionListSerializer createSerializer(final Company company) {
+    private CorrectiveActionListSerializer createSerializer(final Long company) {
         return new CorrectiveActionListSerializer(company);
     }
 

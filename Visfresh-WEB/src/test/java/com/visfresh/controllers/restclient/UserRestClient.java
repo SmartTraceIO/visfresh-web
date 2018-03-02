@@ -9,8 +9,8 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
-import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
@@ -50,20 +50,21 @@ public class UserRestClient extends RestClient {
     }
     /**
      * @param u user.
-     * @param c company.
+     * @param company TODO
      * @param password user password.
      * @param resetPasswordOnLogin reset password on first login flag.
+     * @param c company.
      * @throws RestServiceException
      * @throws IOException
      */
-    public Long saveUser(final User u, final String password, final boolean resetPasswordOnLogin) throws IOException, RestServiceException {
+    public Long saveUser(final User u, final Company company, final String password, final boolean resetPasswordOnLogin) throws IOException, RestServiceException {
         final SaveUserRequest req = new SaveUserRequest();
         req.setUser(u);
         req.setPassword(password);
         req.setResetOnLogin(resetPasswordOnLogin);
 
         return parseId(sendPostRequest(getPathWithToken("saveUser"),
-                serializer.toJson(req)).getAsJsonObject());
+                serializer.toJson(req, company)).getAsJsonObject());
     }
     /**
      * @param req update user details request.
@@ -148,12 +149,6 @@ public class UserRestClient extends RestClient {
         final Map<String, String> params = new HashMap<String, String>();
         params.put("userId", u.getId().toString());
         sendGetRequest(getPathWithToken("deleteUser"), params);
-    }
-    /**
-     * @param r company resolver.
-     */
-    public void setCompanyResolver(final CompanyResolver r) {
-        serializer.setCompanyResolver(r);
     }
     /**
      * @param r shipment resolver.

@@ -61,7 +61,7 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
         checkCompanyAccess(user, shipmentTemplateDao.findOne(dto.getId()));
 
         final ShipmentTemplate t = createTemplate(dto);
-        t.setCompany(user.getCompany());
+        t.setCompany(user.getCompanyId());
 
         //check company access to sub entiites
         resolveReferences(user, dto, t);
@@ -95,11 +95,11 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
         final Filter filter = new Filter();
         filter.addFilter(ShipmentTemplateDaoImpl.AUTOSTART_FIELD, false);
         final List<ShipmentTemplate> templates = shipmentTemplateDao.findByCompany(
-                user.getCompany(),
+                user.getCompanyId(),
                 createSorting(sc, so, getDefaultSortOrder(), 1),
                 page,
                 filter);
-        final int total = shipmentTemplateDao.getEntityCount(user.getCompany(), filter);
+        final int total = shipmentTemplateDao.getEntityCount(user.getCompanyId(), filter);
 
         final JsonArray array = new JsonArray();
         final ShipmentTemplateSerializer ser = createSerializer(user);

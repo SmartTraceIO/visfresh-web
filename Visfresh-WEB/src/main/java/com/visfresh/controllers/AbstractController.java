@@ -20,7 +20,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.Sorting;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.EntityWithCompany;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.Role;
@@ -56,16 +55,25 @@ public abstract class AbstractController {
      */
     protected void checkCompanyAccess(final User user,
             final EntityWithCompany s) throws RestServiceException {
-        if (s != null && s.getCompany() != null && !(
+        final Long companyId = s == null ? null : s.getCompanyId();
+        checkCompanyAccess(user, companyId);
+    }
+    /**
+     * @param user
+     * @param companyId
+     * @throws RestServiceException
+     */
+    protected void checkCompanyAccess(final User user, final Long companyId) throws RestServiceException {
+        if (companyId != null && !(
                 Role.SmartTraceAdmin.hasRole(user)
-                || s.getCompany().getId().equals(user.getCompany().getId()))) {
+                || companyId.equals(user.getCompanyId()))) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
         }
     }
-    protected void checkCompany(final EntityWithCompany s, final Company company)
+    protected void checkCompany(final EntityWithCompany s, final Long company)
             throws RestServiceException {
-        if (s != null && s.getCompany() != null
-                && !s.getCompany().getId().equals(company.getId())) {
+        if (s != null && s.getCompanyId() != null
+                && !s.getCompanyId().equals(company)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
         }
     }

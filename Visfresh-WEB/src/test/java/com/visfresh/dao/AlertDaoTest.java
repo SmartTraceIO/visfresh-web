@@ -51,7 +51,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Alert, Long> {
         shipmentDao = getContext().getBean(ShipmentDao.class);
 
         final Device d = new Device();
-        d.setCompany(sharedCompany);
+        d.setCompany(sharedCompany.getCompanyId());
         final String imei = "932487032487";
         d.setImei(imei);
         d.setDescription("JUnit device");
@@ -66,7 +66,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Alert, Long> {
      */
     private Shipment createShipment(final Device d) {
         Shipment s = new Shipment();
-        s.setCompany(sharedCompany);
+        s.setCompany(sharedCompany.getCompanyId());
         s.setDevice(d);
         s = shipmentDao.save(s);
         return s;
@@ -127,12 +127,10 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Alert, Long> {
 
         assertNotNull(alert.getShipment());
 
-        final Company c = d.getCompany();
+        final Long c = d.getCompanyId();
         assertNotNull(c);
 
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        assertEquals(sharedCompany.getId(), c);
     }
 
     /* (non-Javadoc)
@@ -163,12 +161,10 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Alert, Long> {
 
         assertNotNull(a.getShipment());
 
-        final Company c = d.getCompany();
+        final Long c = d.getCompanyId();
         assertNotNull(c);
 
-        assertEquals(sharedCompany.getId(), c.getId());
-        assertEquals(sharedCompany.getName(), c.getName());
-        assertEquals(sharedCompany.getDescription(), c.getDescription());
+        assertEquals(sharedCompany.getId(), c);
     }
     @Test
     public void testGetAlertsByShipmentAndTimeRanges() {
@@ -322,7 +318,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Alert, Long> {
         d.setImei(imei);
         d.setActive(true);
         d.setName("JUnit-" + imei);
-        d.setCompany(company);
+        d.setCompany(company.getCompanyId());
         return context.getBean(DeviceDao.class).save(d);
     }
 
