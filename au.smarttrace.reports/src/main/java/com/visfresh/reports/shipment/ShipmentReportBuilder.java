@@ -1039,26 +1039,4 @@ public class ShipmentReportBuilder {
             .setPadding(DEFAULT_PADDING);
         return style;
     }
-    /**
-     * @param u user.
-     * @return user name.
-     */
-    public static String createUserName(final User u) {
-        final StringBuilder sb = new StringBuilder();
-        if (u.getFirstName() != null) {
-            sb.append(u.getFirstName());
-        }
-        if (u.getLastName() != null) {
-            if (sb.length() > 0) {
-                sb.append(' ');
-            }
-            sb.append(u.getLastName());
-        }
-
-        //add email instead name if empty
-        if (sb.length() < 1) {
-            sb.append(u.getEmail());
-        }
-        return sb.toString();
-    }
 }

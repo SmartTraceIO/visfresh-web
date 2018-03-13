@@ -6,30 +6,20 @@ package com.visfresh.reports;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sf.jasperreports.engine.JRException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
-
 import com.visfresh.entities.User;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.performance.PerformanceReportBuilder;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
 
+import net.sf.jasperreports.engine.JRException;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Component
-@ComponentScan(basePackageClasses = {
-        PerformanceReportBuilder.class,
-        ShipmentReportBuilder.class})
 public class JasperDrReportBuilder implements PdfReportBuilder {
-    @Autowired
     private PerformanceReportBuilder performanceBuilder;
-    @Autowired
     private ShipmentReportBuilder shipmentBuilder;
 
     /**

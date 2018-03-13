@@ -30,7 +30,6 @@ import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.ui.RectangleEdge;
-import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.impl.TimeAtom;
 import com.visfresh.dao.impl.TimeRanges;
@@ -76,7 +75,6 @@ import net.sf.jasperreports.engine.design.JRDesignField;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Component
 public class PerformanceReportBuilder {
     private static final int DEFAULT_FONT_SIZE = 8;
     private static final int DEFAULT_PADDING = 3;
