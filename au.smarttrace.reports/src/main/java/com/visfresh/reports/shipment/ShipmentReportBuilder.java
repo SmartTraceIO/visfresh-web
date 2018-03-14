@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
@@ -82,7 +80,6 @@ import net.sf.jasperreports.engine.design.JRDesignField;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Component
 public class ShipmentReportBuilder {
     private static final Logger log = LoggerFactory.getLogger(ShipmentReportBuilder.class);
 
@@ -90,8 +87,7 @@ public class ShipmentReportBuilder {
     private static final int DEFAULT_FONT_SIZE = 8;
     static final int DEFAULT_PADDING = 3;
 
-    @Autowired
-    protected RuleBundle ruleBundle;
+    protected RuleBundle ruleBundle = new RuleBundle();
     private EventsNullCoordinatesCorrector nullCoordinatesCorrector = new EventsNullCoordinatesCorrector();
     /**
      * Default constructor.

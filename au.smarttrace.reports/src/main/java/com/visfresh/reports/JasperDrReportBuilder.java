@@ -19,8 +19,8 @@ import net.sf.jasperreports.engine.JRException;
  *
  */
 public class JasperDrReportBuilder implements PdfReportBuilder {
-    private PerformanceReportBuilder performanceBuilder;
-    private ShipmentReportBuilder shipmentBuilder;
+    private PerformanceReportBuilder performanceBuilder = new PerformanceReportBuilder();
+    private ShipmentReportBuilder shipmentBuilder = new ShipmentReportBuilder();
 
     /**
      * Default constructor.
