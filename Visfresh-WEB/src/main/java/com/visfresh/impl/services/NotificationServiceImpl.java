@@ -34,6 +34,7 @@ import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.dao.impl.ShipmentReportDaoImpl;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
@@ -51,9 +52,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.reports.PdfReportBuilder;
-import com.visfresh.reports.shipment.MapRenderingException;
 import com.visfresh.reports.shipment.ShipmentReportBean;
-import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.NotificationService;
@@ -365,7 +364,7 @@ public class NotificationServiceImpl implements NotificationService {
         //in this case the list of report receivers is fully determined
         report.getWhoReceivedReport().clear();
         for (final User u : users) {
-            report.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
+            report.getWhoReceivedReport().add(ShipmentReportDaoImpl.createUserName(u));
         }
         return report;
     }
@@ -453,7 +452,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         try (final OutputStream out = new FileOutputStream(f)) {
             reportBuilder.createShipmentReport(report, user, out);
-        } catch (final MapRenderingException exc) {
+        } catch (final RuntimeException exc) {
             //unwrap I/O exception
             if (exc.getCause() instanceof IOException) {
                 throw (IOException) exc.getCause();

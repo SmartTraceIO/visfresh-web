@@ -38,6 +38,7 @@ import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.dao.impl.ShipmentReportDaoImpl;
 import com.visfresh.dao.impl.TimeAtom;
 import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Device;
@@ -50,7 +51,6 @@ import com.visfresh.io.json.ReportsSerializer;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
-import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.rules.AbstractNotificationRule;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.RestServiceException;
@@ -264,7 +264,7 @@ public class ReportsController extends AbstractController {
             //calculate report receivers
             for(final User u: AbstractNotificationRule.getEmailingUsers(
                     s.getArrivalNotificationSchedules(), s.getArrivalDate())) {
-                bean.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
+                bean.getWhoReceivedReport().add(ShipmentReportDaoImpl.createUserName(u));
             }
         }
 

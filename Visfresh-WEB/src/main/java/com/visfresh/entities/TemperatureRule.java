@@ -3,9 +3,9 @@
  */
 package com.visfresh.entities;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -133,13 +133,13 @@ public class TemperatureRule extends AlertRule {
      */
     @Override
     public int hashCode() {
-        final HashCodeBuilder hb = new HashCodeBuilder();
-        hb.append(getType());
-        hb.append(getTemperature());
-        hb.append(getTimeOutMinutes());
-        hb.append(isCumulativeFlag());
-        hb.append(getMaxRateMinutes());
-        hb.append(getCorrectiveActions());
-        return hb.toHashCode();
+        final List<Object> hb = new LinkedList<>();
+        hb.add(getType());
+        hb.add(getTemperature());
+        hb.add(getTimeOutMinutes());
+        hb.add(isCumulativeFlag());
+        hb.add(getMaxRateMinutes());
+        hb.add(getCorrectiveActions());
+        return Objects.hash(hb.toArray(new Object[hb.size()]));
     }
 }

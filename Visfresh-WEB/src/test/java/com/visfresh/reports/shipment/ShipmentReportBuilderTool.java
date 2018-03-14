@@ -41,20 +41,17 @@ import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentLocationBean;
 import com.visfresh.io.shipment.TemperatureAlertBean;
 import com.visfresh.io.shipment.TemperatureRuleBean;
-import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListNotificationScheduleItem;
+import com.visfresh.reports.PdfReportBuilder;
+import com.visfresh.reports.PdfReportBuilderFactory;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.tools.SingleShipmentUtils;
-
-import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-import net.sf.dynamicreports.report.exception.DRException;
-import net.sf.jasperreports.engine.JRException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
+public final class ShipmentReportBuilderTool {
 
     /**
      * Default constructor.
@@ -74,10 +71,6 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
         user.setTimeZone(TimeZone.getDefault());
         return user;
     }
-
-    public void setRuleBundle(final RuleBundle b) {
-        this.ruleBundle = b;
-    }
     /**
      * @param bean
      * @param user
@@ -86,13 +79,11 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
      * @throws JRException
      */
     public static void showShipmentReport(final ShipmentReportBean bean, final User user)
-            throws DRException, IOException, JRException {
-        final ShipmentReportBuilderTool builder = new ShipmentReportBuilderTool();
-        builder.setRuleBundle(new RuleBundle());
-        final JasperReportBuilder report = builder.createReport(bean, user);
+            throws IOException {
+        final PdfReportBuilder builder = PdfReportBuilderFactory.createReportBuilder();
         final OutputStream out = createPdfOut();
         try {
-            report.toPdf(out);
+            builder.createShipmentReport(bean, user, out);
         } finally {
             out.close();
         }

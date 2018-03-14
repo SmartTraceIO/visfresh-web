@@ -104,24 +104,6 @@
 			<version>4.5.1</version>
 		</dependency>
 		
-		<!-- PDF reporting -->
-		<!-- http://mvnrepository.com/artifact/net.sourceforge.dynamicreports/dynamicreports-core -->
-		<dependency>
-		    <groupId>net.sourceforge.dynamicreports</groupId>
-		    <artifactId>dynamicreports-core</artifactId>
-		    <version>5.0.0</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>com.fasterxml.jackson.core</groupId>
-		    		<artifactId>jackson-core</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-		    		<groupId>com.fasterxml.jackson.core</groupId>
-		    		<artifactId>jackson-databind</artifactId>
-		    	</exclusion>
-		    </exclusions>
-		</dependency>
-
 		<!-- AspectJ -->
 		<dependency>
 		    <groupId>org.aspectj</groupId>

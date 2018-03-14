@@ -5,7 +5,10 @@ package com.visfresh.reports.performance;
 
 import static com.visfresh.utils.DateTimeUtils.getTimeRanges;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -16,9 +19,9 @@ import com.visfresh.dao.impl.TimeAtom;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
+import com.visfresh.reports.PdfReportBuilder;
+import com.visfresh.reports.PdfReportBuilderFactory;
 import com.visfresh.reports.TemperatureStats;
-
-import net.sf.dynamicreports.report.exception.DRException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,14 +51,21 @@ public final class PerformanceReportBuilderTool {
      * @throws DRException
      * @throws IOException
      */
-    public static void showPerformanceReport(final PerformanceReportBean bean, final User user)
-            throws DRException, IOException {
-        final PerformanceReportBuilder builder = new PerformanceReportBuilder();
-        builder.createReport(bean, user).show();
+    public static void showPerformanceReport(final PerformanceReportBean bean,
+            final User user, final OutputStream out)
+            throws Exception {
+        final PdfReportBuilder builder = PdfReportBuilderFactory.createReportBuilder();
+        builder.createPerformanceReport(bean, user, out);
     }
 
     public static void main(final String[] args) throws Exception {
-        showPerformanceReport(createPerformanceBean(), createUser());
+        final OutputStream out = new FileOutputStream(System.getProperty("user.home")
+                + File.separator + "performance.pdf");
+        try {
+            showPerformanceReport(createPerformanceBean(), createUser(), out);
+        } finally {
+            out.close();
+        }
     }
 
     /**
