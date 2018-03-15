@@ -5,7 +5,7 @@
 	<groupId>com.visfresh</groupId>
 	<artifactId>web</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<name>Visfresh WEB</name>
 
 	<properties>
