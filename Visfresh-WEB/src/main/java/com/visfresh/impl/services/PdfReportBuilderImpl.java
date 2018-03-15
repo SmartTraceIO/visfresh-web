@@ -16,6 +16,8 @@ import java.util.zip.ZipInputStream;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.User;
@@ -29,6 +31,7 @@ import com.visfresh.reports.shipment.ShipmentReportBean;
  */
 @Component
 public class PdfReportBuilderImpl implements PdfReportBuilder {
+    private static final Logger log = LoggerFactory.getLogger(PdfReportBuilderImpl.class);
     private static final String APPLICATION_NAME = "reports-0.0.1-app";
 
     private WeakReference<PdfReportBuilder> ref = new WeakReference<PdfReportBuilder>(null);
@@ -44,9 +47,13 @@ public class PdfReportBuilderImpl implements PdfReportBuilder {
     @PostConstruct
     public void unzipReportApp() throws FileNotFoundException, IOException {
         final File workDir = getWorkDir();
-        if (!workDir.exists()) {
-            workDir.mkdirs();
+        if (workDir.exists()) {
+            log.debug("PDF report application files already installed");
+            return;
         }
+
+        log.debug("Unzip PDF report application to "  + workDir.getAbsolutePath());
+        workDir.mkdirs();
 
         //unzip application to work dir.
         final ZipInputStream in = new ZipInputStream(PdfReportBuilderImpl.class.getClassLoader()
@@ -100,9 +107,13 @@ public class PdfReportBuilderImpl implements PdfReportBuilder {
     private synchronized PdfReportBuilder getDelegate() {
         PdfReportBuilder d = ref.get();
         if (d == null || numUsed > 10) {
+            log.debug("Load PDF report builder instance");
             numUsed = 0;
             d = loadDelegate();
             ref = new WeakReference<PdfReportBuilder>(d);
+            log.debug("PDF report builder instance has loaded");
+        } else {
+            log.debug("Old PDF report builder instance is reused");
         }
 
         numUsed++;
