@@ -13,6 +13,7 @@ public interface TrackerEventConstants {
     String PROPERTY_TEMPERATURE = "temperature";
     String PROPERTY_BATTERY = "battery";
     String PROPERTY_ID = "id";
+    String PROPERTY_BEACON = "beacon";
     String PROPERTY_TIME = "time";
     String PROPERTY_CREATEDON = "createdOn";
     String PROPERTY_SHIPMENT = "shipment";

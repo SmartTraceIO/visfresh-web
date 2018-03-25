@@ -466,6 +466,7 @@ create table trackerevents (
     latitude double default null,
     longitude double default null,
     device varchar(127) not null,
+    beacon varchar(127);
     shipment bigint(20),
     primary key (id),
     foreign key (shipment)

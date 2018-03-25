@@ -141,7 +141,7 @@ public class RepeatShutdownRuleTest extends
         assertEquals(0, savedEvents.size());
         assertEquals(0, this.sentMessages.size());
         assertEquals(0, savedShipments.size());
-        assertNotNull(getShutDownRepeatTime(context.getDeviceState()));
+        assertNotNull(getShutDownRepeatTime(context.getDeviceState(), e.getBeaconId()));
         assertNotNull(shutdowns.get(e.getDevice().getImei()));
     }
 
@@ -196,7 +196,7 @@ public class RepeatShutdownRuleTest extends
      * @see com.visfresh.rules.NoInitMessageAfterShutdownRule#findLastShipment(java.lang.String)
      */
     @Override
-    protected Shipment findLastShipment(final String imei) {
+    protected Shipment findLastShipment(final String imei, final String beaconId) {
         return lastShipment;
     }
     /* (non-Javadoc)

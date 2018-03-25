@@ -33,18 +33,20 @@ public class CleanShutdownRepeatStateRuleTest extends
         final Shipment s = new Shipment();
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(s);
+        final String beacon = "any-beacon-ID";
+        e.setBeaconId(beacon);
 
         final RuleContext context = new RuleContext(e, new SessionHolder());
         context.setDeviceState(new DeviceState());
-        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date(), beacon);
 
         assertTrue(accept(context));
 
         //test with not shutdown repeat time
-        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), null);
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), null, beacon);
         assertFalse(accept(context));
 
-        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date(), beacon);
         assertTrue(accept(context));
 
         //test with shutdown device time set
@@ -63,9 +65,9 @@ public class CleanShutdownRepeatStateRuleTest extends
         final TrackerEvent e = new TrackerEvent();
         final RuleContext context = new RuleContext(e, new SessionHolder());
         context.setDeviceState(new DeviceState());
-        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date(), e.getBeaconId());
 
         assertFalse(handle(context));
-        assertNull(RepeatShutdownRule.getShutDownRepeatTime(context.getDeviceState()));
+        assertNull(RepeatShutdownRule.getShutDownRepeatTime(context.getDeviceState(), e.getBeaconId()));
     }
 }

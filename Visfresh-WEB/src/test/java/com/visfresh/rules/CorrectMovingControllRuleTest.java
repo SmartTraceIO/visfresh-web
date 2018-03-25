@@ -78,7 +78,7 @@ public class CorrectMovingControllRuleTest extends CorrectMovingControllRule {
 
         assertFalse(handle(context));
 
-        assertNotNull(getLastLocationInfo(context.getDeviceState()));
+        assertNotNull(getLastLocationInfo(context.getDeviceState(), e.getBeaconId()));
     }
     @Test
     public void testNotClearLocationBigTimeOut() {
@@ -96,13 +96,13 @@ public class CorrectMovingControllRuleTest extends CorrectMovingControllRule {
         LastLocationInfo info = new LastLocationInfo();
         info.setLastLocation(startLocation);
         info.setLastReadTime(new Date(e.getTime().getTime() - TIME_OUT - 10000l));
-        setLastLocationInfo(context.getDeviceState(), info);
+        setLastLocationInfo(context.getDeviceState(), info, e.getBeaconId());
 
         //do test
         assertFalse(handle(context));
 
         //test updated location and time
-        info = getLastLocationInfo(context.getDeviceState());
+        info = getLastLocationInfo(context.getDeviceState(), e.getBeaconId());
         assertEquals(e.getLatitude(), info.getLastLocation().getLatitude(), 0.00001);
         assertEquals(e.getLongitude(), info.getLastLocation().getLongitude(), 0.00001);
         assertEquals(format.format(e.getTime()), format.format(info.getLastReadTime()));
@@ -126,13 +126,13 @@ public class CorrectMovingControllRuleTest extends CorrectMovingControllRule {
         LastLocationInfo info = new LastLocationInfo();
         info.setLastLocation(startLocation);
         info.setLastReadTime(new Date(e.getTime().getTime() - TIME_OUT + 10000l));
-        setLastLocationInfo(context.getDeviceState(), info);
+        setLastLocationInfo(context.getDeviceState(), info, e.getBeaconId());
 
         //do test
         assertFalse(handle(context));
 
         //test updated location and time
-        info = getLastLocationInfo(context.getDeviceState());
+        info = getLastLocationInfo(context.getDeviceState(), e.getBeaconId());
         assertEquals(e.getLatitude(), info.getLastLocation().getLatitude(), 0.00001);
         assertEquals(e.getLongitude(), info.getLastLocation().getLongitude(), 0.00001);
         assertEquals(format.format(e.getTime()), format.format(info.getLastReadTime()));
@@ -156,7 +156,7 @@ public class CorrectMovingControllRuleTest extends CorrectMovingControllRule {
         LastLocationInfo info = new LastLocationInfo();
         info.setLastLocation(startLocation);
         info.setLastReadTime(new Date(e.getTime().getTime() - TIME_OUT + 10000l));
-        setLastLocationInfo(context.getDeviceState(), info);
+        setLastLocationInfo(context.getDeviceState(), info, e.getBeaconId());
 
         //do test
         assertTrue(handle(context));
@@ -164,7 +164,7 @@ public class CorrectMovingControllRuleTest extends CorrectMovingControllRule {
         assertNull(e.getLongitude());
 
         //test updated location and time
-        info = getLastLocationInfo(context.getDeviceState());
+        info = getLastLocationInfo(context.getDeviceState(), e.getBeaconId());
         assertEquals(farLocation.getLatitude(), info.getLastLocation().getLatitude(), 0.00001);
         assertEquals(farLocation.getLongitude(), info.getLastLocation().getLongitude(), 0.00001);
         assertEquals(format.format(e.getTime()), format.format(info.getLastReadTime()));
@@ -188,13 +188,13 @@ public class CorrectMovingControllRuleTest extends CorrectMovingControllRule {
         LastLocationInfo info = new LastLocationInfo();
         info.setLastLocation(startLocation);
         info.setLastReadTime(new Date(e.getTime().getTime() - TIME_OUT + 10000l));
-        setLastLocationInfo(context.getDeviceState(), info);
+        setLastLocationInfo(context.getDeviceState(), info, e.getBeaconId());
 
         //do test
         assertFalse(handle(context));
 
         //test updated location and time
-        info = getLastLocationInfo(context.getDeviceState());
+        info = getLastLocationInfo(context.getDeviceState(), e.getBeaconId());
         assertEquals(e.getLatitude(), info.getLastLocation().getLatitude(), 0.00001);
         assertEquals(e.getLongitude(), info.getLastLocation().getLongitude(), 0.00001);
         assertEquals(format.format(e.getTime()), format.format(info.getLastReadTime()));

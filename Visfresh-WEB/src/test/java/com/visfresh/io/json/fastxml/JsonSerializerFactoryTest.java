@@ -173,6 +173,7 @@ public class JsonSerializerFactoryTest {
         final SingleShipmentLocationBean loc = new SingleShipmentLocationBean();
         data.getLocations().add(loc);
         loc.setId(58l);
+        loc.setBeaconId("beacond-id");
         loc.setLatitude(7.7);
         loc.setLongitude(8.8);
         loc.setTemperature(34.54);

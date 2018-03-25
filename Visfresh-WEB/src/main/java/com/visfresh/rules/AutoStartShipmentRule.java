@@ -82,9 +82,9 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final TrackerEvent event = context.getEvent();
 
         final Shipment shipment = service.autoStartNewShipment(event.getDevice(),
+                event.getBeaconId(),
                 event.getLatitude(),
-                event.getLongitude(),
-                event.getTime());
+                event.getLongitude(), event.getTime());
 
         event.setShipment(shipment);
         trackerEventDao.save(event);

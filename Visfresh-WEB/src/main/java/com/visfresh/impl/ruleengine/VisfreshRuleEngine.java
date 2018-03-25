@@ -63,32 +63,32 @@ public class VisfreshRuleEngine extends AbstractRuleEngine {
         }
     }
 
+    /**
+     * @param rule
+     * @param context
+     * @return
+     */
     @Override
-    public void invokeRules(final RuleContext context) {
-        boolean runAgain = true;
-
-        while (runAgain) {
-            runAgain = false;
-            for (final TrackerEventRule rule : rules) {
-                try {
-                    if (rule.accept(context)) {
-                        if (rule.handle(context)) {
-                            runAgain = true;
-                            break;
-                        }
-                    }
-                } catch (final Throwable e) {
-                    log.error("Fatal rulle processing error", e);
-                    try {
-                        emailer.sendMessageToSupport("Fatal rule processing error: " + e.getMessage(),
-                                ExceptionUtils.getSteackTraceAsString(e, 10) + "\n...");
-                    } catch (final MessagingException e1) {
-                        log.error("Failed to send message to support", e1);
-                    }
-                }
-            }
+    protected boolean runRule(final TrackerEventRule rule, final RuleContext context) {
+        try {
+            return super.runRule(rule, context);
+        } catch (Error | RuntimeException e) {
+            handleProcessRuleError(e);
+            throw e;
         }
     }
+    /**
+     * @param e throwable.
+     */
+    private void handleProcessRuleError(final Throwable e) {
+        try {
+            emailer.sendMessageToSupport("Fatal rule processing error: " + e.getMessage(),
+                    ExceptionUtils.getSteackTraceAsString(e, 10) + "\n...");
+        } catch (final MessagingException e1) {
+            log.error("Failed to send message to support", e1);
+        }
+    }
+
     /**
      * @param ruleName rule name.
      * @param priority the rule priority. Default rule priority is 0.
@@ -138,6 +138,14 @@ public class VisfreshRuleEngine extends AbstractRuleEngine {
 
         this.rules = rules.toArray(new TrackerEventRule[rules.size()]);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractRuleEngine#getOrderedRules()
+     */
+    @Override
+    protected TrackerEventRule[] getOrderedRules() {
+        return rules;
+    }
+
     /**
      * @param ruleName rule name.
      * @return priority associated by given rule.

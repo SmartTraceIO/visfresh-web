@@ -17,6 +17,7 @@ import com.visfresh.lists.ListNotificationScheduleItem;
  */
 public class SingleShipmentBean {
     private long shipmentId;
+    private String beaconId;
     private Long companyId;
     private String device;
     private String deviceName;
@@ -84,6 +85,18 @@ public class SingleShipmentBean {
         super();
     }
 
+    /**
+     * @return the beaconId
+     */
+    public String getBeaconId() {
+        return beaconId;
+    }
+    /**
+     * @param beaconId the beaconId to set
+     */
+    public void setBeaconId(final String beaconId) {
+        this.beaconId = beaconId;
+    }
     /**
      * @return the shipmentId
      */

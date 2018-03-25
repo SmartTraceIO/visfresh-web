@@ -36,6 +36,7 @@ public class ShortTrackerEventWithAlerts extends ShortTrackerEvent {
         this.setCreatedOn(e.getCreatedOn());
         this.setDeviceImei(e.getDeviceImei());
         this.setId(e.getId());
+        this.setBeaconId(e.getBeaconId());
         this.setLatitude(e.getLatitude());
         this.setLongitude(e.getLongitude());
         this.setShipmentId(e.getShipmentId());

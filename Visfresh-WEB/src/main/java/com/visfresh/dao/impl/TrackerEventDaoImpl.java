@@ -49,6 +49,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
     public static final String TABLE = "trackerevents";
 
     protected static final String ID_FIELD = "id";
+    protected static final String BEACON_FIELD = "beacon";
     protected static final String TYPE_FIELD = "type";
     protected static final String TIME_FIELD = "time";
     protected static final String CREATED_ON_FIELD = "createdon";
@@ -77,6 +78,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_TEMPERATURE, TEMPERATURE_FIELD);
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_BATTERY, BATTERY_FIELD);
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_ID, ID_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_BEACON, BEACON_FIELD);
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_TIME, TIME_FIELD);
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_TYPE, TYPE_FIELD);
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_SHIPMENT, SHIPMENT_FIELD);
@@ -104,6 +106,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         }
 
         paramMap.put(ID_FIELD, event.getId());
+        paramMap.put(BEACON_FIELD, event.getBeaconId());
         paramMap.put(TYPE_FIELD, event.getType().toString());
         paramMap.put(TIME_FIELD, event.getTime());
         paramMap.put(BATTERY_FIELD, event.getBattery());
@@ -147,6 +150,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         if (includeId) {
             fields.add(ID_FIELD);
         }
+        fields.add(BEACON_FIELD);
         return fields;
     }
     /* (non-Javadoc)
@@ -241,6 +245,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
             dto.setBattery(e.getBattery());
             dto.setCreatedOn(e.getCreatedOn());
             dto.setId(e.getId());
+            dto.setBeaconId(e.getBeaconId());
             dto.setLatitude(e.getLatitude());
             dto.setLongitude(e.getLongitude());
             dto.setTemperature(e.getTemperature());
@@ -339,6 +344,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
     protected TrackerEvent createEntity(final Map<String, Object> map) {
         final TrackerEvent e = new TrackerEvent();
         e.setId(((Number) map.get(ID_FIELD)).longValue());
+        e.setBeaconId((String) map.get(BEACON_FIELD));
         e.setBattery(((Number) map.get(BATTERY_FIELD)).intValue());
         e.setTemperature(((Number) map.get(TEMPERATURE_FIELD)).doubleValue());
         final Number lat = (Number) map.get(LATITUDE_FIELD);
@@ -547,6 +553,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         final ShortTrackerEvent ue = new ShortTrackerEvent();
         ue.setBattery(e.getBattery());
         ue.setId(e.getId());
+        ue.setBeaconId(e.getBeaconId());
         ue.setLatitude(e.getLatitude());
         ue.setLongitude(e.getLongitude());
         ue.setTemperature(e.getTemperature());
@@ -594,6 +601,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
             e.setBattery(DaoImplBase.dbInteger(row.get("battery")));
             e.setCreatedOn((Date) row.get("createdon"));
             e.setId(DaoImplBase.dbLong(row.get("id")));
+            e.setBeaconId((String) row.get("beacon"));
             e.setLatitude(DaoImplBase.dbDouble(row.get("latitude")));
             e.setLongitude(DaoImplBase.dbDouble(row.get("longitude")));
             e.setTemperature(DaoImplBase.dbDouble(row.get("temperature")));

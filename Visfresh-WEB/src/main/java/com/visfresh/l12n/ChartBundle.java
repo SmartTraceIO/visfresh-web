@@ -79,6 +79,7 @@ public class ChartBundle extends NotificationIssueBundle {
             final TemperatureUnits temperatureUnits) {
         final TrackerEvent e = new TrackerEvent();
         e.setId(dto.getId());
+        e.setBeaconId(dto.getBeaconId());
         e.setBattery(dto.getBattery());
         e.setDevice(alert.getDevice());
         e.setLatitude(dto.getLatitude());

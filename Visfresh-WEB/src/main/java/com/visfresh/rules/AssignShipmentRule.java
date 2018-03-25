@@ -14,6 +14,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -52,8 +53,9 @@ public class AssignShipmentRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final RuleContext context) {
-        if(context.getEvent().getShipment() == null && !context.isProcessed(this)) {
-            final Shipment s = shipmentDao.findLastShipment(context.getEvent().getDevice().getImei());
+        final TrackerEvent e = context.getEvent();
+        if(e.getShipment() == null && !context.isProcessed(this)) {
+            final Shipment s = shipmentDao.findLastShipment(e.getDevice().getImei(), e.getBeaconId());
             if (s != null && s.getStatus() != ShipmentStatus.Ended && s.getDeviceShutdownTime() == null) {
                 //cache shipment to request.
                 context.putClientProperty(this, s);

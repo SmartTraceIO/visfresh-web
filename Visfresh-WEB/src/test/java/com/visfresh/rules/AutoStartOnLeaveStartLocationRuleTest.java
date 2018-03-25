@@ -96,11 +96,17 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
     @Test
     public void testFirstTimeNextReading() {
         final TrackerEvent e = createEvent(location.getLocation().getLatitude(), location.getLocation().getLongitude());
+        e.setBeaconId("amy-beacon-ID");
         final RuleContext context = createContext(e);
         assertTrue(accept(context));
 
-        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState());
+        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState(),
+                e.getBeaconId());
         assertFalse(accept(context));
+
+        //check true for another beacon ID
+        e.setBeaconId("other-beacon-ID");
+        assertTrue(accept(context));
     }
     @Test
     public void testFirstTimeAcceptLocation() {
@@ -131,7 +137,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
                 location.getLocation().getLatitude() + 10,
                 location.getLocation().getLongitude() + 10);
         final RuleContext context = createContext(e);
-        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState());
+        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState(), null);
 
         assertTrue(accept(context));
 
@@ -149,8 +155,10 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         final TrackerEvent e = createEvent(
                 location.getLocation().getLatitude() + 10,
                 location.getLocation().getLongitude() + 10);
+        e.setBeaconId("any-beacon-id");
         final RuleContext context = createContext(e);
-        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState());
+        saveLeaveLocationState(new LeaveLocationState(location),
+                context.getDeviceState(), e.getBeaconId());
 
         assertTrue(accept(context));
 
@@ -164,7 +172,8 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
                 location.getLocation().getLatitude() + 10,
                 location.getLocation().getLongitude() + 10);
         final RuleContext context = createContext(e);
-        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState());
+        saveLeaveLocationState(new LeaveLocationState(location),
+                context.getDeviceState(), e.getBeaconId());
 
         final AutoStartShipment auto = findAutoStart(e.getDevice().getAutostartTemplateId());
         auto.setStartOnLeaveLocation(false);
@@ -183,7 +192,8 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
 
         assertFalse(accept(context));
 
-        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState());
+        saveLeaveLocationState(new LeaveLocationState(location), context.getDeviceState(),
+                e.getBeaconId());
         assertFalse(accept(context));
     }
 
@@ -193,12 +203,13 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         final RuleContext context = createContext(e);
 
         assertFalse(handle(context));
-        final LeaveLocationState lls = getLeaveLocationState(context.getDeviceState());
+        final LeaveLocationState lls = getLeaveLocationState(context.getDeviceState(), e.getBeaconId());
         assertNull(lls.getLeaveOn());
     }
     @Test
     public void testHandleJustLeaveLocation() {
         final TrackerEvent e = createEvent(location.getLocation().getLatitude(), location.getLocation().getLongitude());
+        e.setBeaconId("any-beacon-ID");
         final RuleContext context = createContext(e);
 
         assertFalse(handle(context));
@@ -207,12 +218,11 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         e.setLongitude(e.getLongitude() + 10);
 
         assertFalse(handle(context));
-        final LeaveLocationState lls = getLeaveLocationState(context.getDeviceState());
+        final LeaveLocationState lls = getLeaveLocationState(context.getDeviceState(), e.getBeaconId());
         assertNotNull(lls.getLeaveOn());
 
         //test ignore repeat
         assertFalse(handle(context));
-        assertNotNull(getLeaveLocationState(context.getDeviceState()));
     }
     @Test
     public void testHandleOutsideLocation() {
@@ -267,7 +277,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         assertNotNull(events.get(1).getShipment());
         assertNotNull(events.get(2).getShipment());
         assertEquals(context.getEvent().getShipment().getId(), events.get(3).getShipment().getId());
-        assertNull(getLeaveLocationState(state));
+        assertNull(getLeaveLocationState(state, e.getBeaconId()));
     }
 
     /**
@@ -285,13 +295,15 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
     }
     /**
      * @param device device.
+     * @param beaconId beacon ID.
      * @param latitude latitude of location.
      * @param longitude longitude of location.
      * @param date autostart date.
      * @return
      */
     @Override
-    protected Shipment autoStartNewShipment(final Device device, final double latitude, final double longitude, final Date date) {
+    protected Shipment autoStartNewShipment(final Device device, final String beaconId,
+            final double latitude, final double longitude, final Date date) {
         return shipmentsToAutostart.size() == 0 ? null : shipmentsToAutostart.remove(0);
     }
     /**

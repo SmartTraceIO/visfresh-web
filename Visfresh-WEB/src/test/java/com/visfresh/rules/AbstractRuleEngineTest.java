@@ -69,7 +69,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         final Device device = createDevice("3249870239847908");
 
         final DeviceState state = new DeviceState();
-        state.setProperty("key1", "value1");
+        state.setProperty("key1", "value1", null);
 
         saveDeviceState(device.getImei(), state);
 
@@ -84,7 +84,30 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         assertEquals(1, savedTrackerEvents.size());
 
         assertEquals(1, this.numInvoked);
-        assertEquals("value1", getDeviceState(device.getImei()).getProperty("key1"));
+        assertEquals("value1", getDeviceState(device.getImei()).getProperty(null, "key1"));
+    }
+    @Test
+    public void testExistsDeviceStateWithBeaconId() throws RetryableException {
+        final Device device = createDevice("3249870239847908");
+        final String beacon = "any-beacon-ID";
+
+        final DeviceState state = new DeviceState();
+        state.setProperty("key1", "value1", beacon);
+
+        saveDeviceState(device.getImei(), state);
+
+        //run
+        final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
+        e.setDate(new Date(System.currentTimeMillis() - 10000));
+        e.setType("AUT");
+        e.setImei(device.getImei());
+        processDcsEvent(e);
+
+        //check tracker event saved
+        assertEquals(1, savedTrackerEvents.size());
+
+        assertEquals(1, this.numInvoked);
+        assertEquals("value1", getDeviceState(device.getImei()).getProperty(beacon, "key1"));
     }
     @Test
     public void testNotExistsDeviceState() throws RetryableException {
@@ -129,6 +152,27 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
 
         assertEquals(1, savedShipments.size());
         assertEquals(1, sessions.size());
+    }
+    @Test
+    public void testBeaconSupport() throws RetryableException {
+        final Device device = createDevice("3249870239847908");
+
+        //run
+        final DeviceDcsNativeEvent nativeEvent = new DeviceDcsNativeEvent();
+        nativeEvent.setDate(new Date(System.currentTimeMillis() - 10000));
+        nativeEvent.setLocation(11.12, 13.14);
+        nativeEvent.setType("AUT");
+        nativeEvent.setImei(device.getImei());
+        nativeEvent.setBeacon("device-beacon-ID");
+
+        processDcsEvent(nativeEvent);
+
+        //check tracker event saved
+        assertEquals(1, savedTrackerEvents.size());
+
+        //tracker event
+        final TrackerEvent e = savedTrackerEvents.get(0);
+        assertEquals(nativeEvent.getBeacon(), e.getBeaconId());
     }
     @Test
     public void testAlertYetToFire() {
@@ -251,6 +295,13 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         if (detectedShipment != null) {
             getShipmentSession(detectedShipment);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractRuleEngine#getOrderedRules()
+     */
+    @Override
+    protected TrackerEventRule[] getOrderedRules() {
+        return new TrackerEventRule[0];
     }
 
     /* (non-Javadoc)

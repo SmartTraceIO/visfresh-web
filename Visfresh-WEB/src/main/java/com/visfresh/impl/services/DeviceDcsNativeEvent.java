@@ -13,12 +13,14 @@ import com.visfresh.entities.Location;
  */
 public class DeviceDcsNativeEvent {
     private String imei;
+    private String beacon;
     private Location location;
     private String type;
     private Date date;
     private Date createdOn = new Date();
     private double temperature;
     private int battery;
+
     /**
      * Default constructor.
      */
@@ -116,5 +118,17 @@ public class DeviceDcsNativeEvent {
      */
     public void setCreatedOn(final Date createdOn) {
         this.createdOn = createdOn;
+    }
+    /**
+     * @return
+     */
+    public String getBeacon() {
+        return beacon;
+    }
+    /**
+     * @param beacon the beacon to set
+     */
+    public void setBeacon(final String beacon) {
+        this.beacon = beacon;
     }
 }

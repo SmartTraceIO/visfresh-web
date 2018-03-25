@@ -317,6 +317,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         copyBaseData(dto, s);
 
         s.setPalletId(dto.getPalletId());
+        s.setBeaconId(dto.getBeaconId());
         s.setAssetNum(dto.getAssetNum());
         s.setTripCount(dto.getTripCount());
         s.setPoNum(dto.getPoNum());
@@ -362,7 +363,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      */
     private Long saveNewShipment(final Shipment newShipment, final boolean includePreviousData) {
         final String imei = newShipment.getDevice().getImei();
-        final Shipment current = includePreviousData ? shipmentDao.findLastShipment(imei) : null;
+        final String beaconId = newShipment.getBeaconId();
+        final Shipment current = includePreviousData ? shipmentDao.findLastShipment(imei, beaconId) : null;
 
         boolean shouldOverwritePrevious =
                 includePreviousData
@@ -821,6 +823,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             LAST_READING_TIME,
             LAST_READING_TIME_ISO,
             LAST_READING_TEMPERATURE,
+            BEACON_ID,
             ALERT_SUMMARY
         };
     }
@@ -1070,7 +1073,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     @RequestMapping(value = "/createNewAutoSthipment", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonElement createNewAutoSthipment(
-            @RequestParam final String device) throws RestServiceException {
+            @RequestParam final String device,
+            @RequestParam(required = false) final String beacon) throws RestServiceException {
         //check logged in.
         final User user = getLoggedInUser();
         //get device
@@ -1089,7 +1093,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     "Not last event found for device '" + device + "'");
         }
 
-        final Shipment s = autoStartService.autoStartNewShipment(d, e.getLatitude(), e.getLongitude(), new Date());
+        final Shipment s = autoStartService.autoStartNewShipment(d,
+                beacon == null ? e.getBeaconId() : beacon,
+                e.getLatitude(), e.getLongitude(), new Date());
         if (s != null) {
             auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
         }

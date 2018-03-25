@@ -214,13 +214,17 @@ public class ShipmentRestClient extends RestClient {
     }
     /**
      * @param device
+     * @param beacon TODO
      * @throws RestServiceException
      * @throws IOException
      * @return ID of new autostarted shipment.
      */
-    public Long autoStartShipment(final String device) throws IOException, RestServiceException {
+    public Long autoStartShipment(final String device, final String beacon) throws IOException, RestServiceException {
         final Map<String, String> params = new HashMap<>();
         params.put("device", device);
+        if (beacon != null) {
+            params.put("beacon", beacon);
+        }
 
         final JsonElement el = sendGetRequest(getPathWithToken("createNewAutoSthipment"), params);
         return parseId(el.getAsJsonObject());

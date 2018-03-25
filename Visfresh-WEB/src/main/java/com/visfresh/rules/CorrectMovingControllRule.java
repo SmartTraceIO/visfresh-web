@@ -78,7 +78,7 @@ public class CorrectMovingControllRule implements TrackerEventRule {
         boolean shouldClearLocation = false;
 
         //check correct moving
-        LastLocationInfo info = getLastLocationInfo(state);
+        LastLocationInfo info = getLastLocationInfo(state, e.getBeaconId());
         if (e.getType() != TrackerEventType.INIT && info != null) {
             final Location loc = info.getLastLocation();
             final int meters = (int) LocationUtils.getDistanceMeters(loc.getLatitude(), loc.getLongitude(),
@@ -94,7 +94,7 @@ public class CorrectMovingControllRule implements TrackerEventRule {
         info = new LastLocationInfo();
         info.setLastReadTime(e.getTime());
         info.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
-        setLastLocationInfo(state, info);
+        setLastLocationInfo(state, info, e.getBeaconId());
 
         if (shouldClearLocation) {
             e.setLatitude(null);
@@ -113,17 +113,20 @@ public class CorrectMovingControllRule implements TrackerEventRule {
     /**
      * @param state device state.
      * @param info  last location info.
+     * @param beacon TODO
      */
-    protected void setLastLocationInfo(final DeviceState state, final LastLocationInfo info) {
+    protected void setLastLocationInfo(
+            final DeviceState state, final LastLocationInfo info, final String beacon) {
         state.setProperty(LAST_LOCATION_INFO,
-                new LastLocationInfoParser().toJSon(info).toString());
+                new LastLocationInfoParser().toJSon(info).toString(), beacon);
     }
     /**
      * @param state device state.
+     * @param beacon TODO
      * @return
      */
-    protected LastLocationInfo getLastLocationInfo(final DeviceState state) {
-        final String str = state.getProperty(LAST_LOCATION_INFO);
+    protected LastLocationInfo getLastLocationInfo(final DeviceState state, final String beacon) {
+        final String str = state.getProperty(beacon, LAST_LOCATION_INFO);
         if (str == null) {
             return null;
         }

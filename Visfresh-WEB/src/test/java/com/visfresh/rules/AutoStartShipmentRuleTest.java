@@ -135,6 +135,21 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
     }
     @Test
+    public void testDefaultShipmentWithBeacon() {
+        final String beaconId = "device-beacon-ID";
+
+        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
+        e.setBeaconId(beaconId);
+        e.setTime(new Date(System.currentTimeMillis() - 1000000l));
+
+        final RuleContext c = new RuleContext(e, new SessionHolder());
+        rule.handle(c);
+
+        // check shipment created.
+        assertNotNull(e.getShipment());
+        assertEquals(beaconId, e.getShipment().getBeaconId());
+    }
+    @Test
     public void testHandleNullLocation() {
         final TrackerEvent e = createEvent(null, null, new Date());
         e.setTime(new Date(System.currentTimeMillis() - 1000000l));
@@ -222,6 +237,34 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertTrue(!shipmentId.equals(shipment.getId()));
         assertTrue(old.getTripCount() < shipment.getTripCount());
         assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
+    }
+    @Test
+    public void testSelectAutoStartShipmentWithBeacon() {
+        // create locations
+        final LocationProfile l1 = createLocationProfile(2, 2, 1000);
+        final LocationProfile l2 = createLocationProfile(1, 1, 1000);
+        final LocationProfile lok = createLocationProfile(17.14, 18.16, 1000);
+
+        // create shipment templates
+        final ShipmentTemplate t1 = createTemplate("t1");
+        final ShipmentTemplate t2 = createTemplate("t2");
+        final ShipmentTemplate tok = createTemplate("tok");
+
+        // create auto start shipments
+        createAutoStartShipment(t1, 1000, l1, l2);
+        createAutoStartShipment(t2, 1, l1, lok);
+        createAutoStartShipment(tok, 2, l1, lok);
+
+        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
+        final String beaconId = "device-beacon-ID";
+        e.setBeaconId(beaconId);
+
+        final RuleContext c = new RuleContext(e, new SessionHolder());
+        rule.handle(c);
+
+        // check shipment created.
+        assertNotNull(e.getShipment());
+        assertEquals(beaconId, e.getShipment().getBeaconId());
     }
     @Test
     public void testSelectAutoStartShipmentLocFromDuplicates() {

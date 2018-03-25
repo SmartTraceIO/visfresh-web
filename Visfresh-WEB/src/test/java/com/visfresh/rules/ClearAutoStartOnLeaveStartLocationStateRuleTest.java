@@ -57,7 +57,7 @@ public class ClearAutoStartOnLeaveStartLocationStateRuleTest extends
         lls.setName("Test");//set any name for suppress serialization errors
         lls.setLocationId(77l);//set any location ID for suppress serialization errors
         AutoStartOnLeaveStartLocationRule.saveLeaveLocationState(
-                lls, context.getDeviceState());
+                lls, context.getDeviceState(), e.getBeaconId());
 
         //assert not accept not leaved the start location.
         assertTrue(accept(context));
@@ -77,7 +77,7 @@ public class ClearAutoStartOnLeaveStartLocationStateRuleTest extends
         lls.setLeaveOn(new Date(System.currentTimeMillis() - 100000l));
         lls.setRadius(100);
         AutoStartOnLeaveStartLocationRule.saveLeaveLocationState(
-                lls, context.getDeviceState());
+                lls, context.getDeviceState(), e.getBeaconId());
 
         //test accept
         assertTrue(accept(context));
@@ -85,27 +85,27 @@ public class ClearAutoStartOnLeaveStartLocationStateRuleTest extends
         //test not accept not leaving start location
         lls.setLeaveOn(null);
         AutoStartOnLeaveStartLocationRule.saveLeaveLocationState(
-                lls, context.getDeviceState());
+                lls, context.getDeviceState(), e.getBeaconId());
         assertFalse(accept(context));
 
         //revert to correct.
         lls.setLeaveOn(new Date(System.currentTimeMillis() - 100000l));
         AutoStartOnLeaveStartLocationRule.saveLeaveLocationState(
-                lls, context.getDeviceState());
+                lls, context.getDeviceState(), e.getBeaconId());
         assertTrue(accept(context));
 
         //test not accept out of start location
         lls.setLatitude(e.getLatitude() + 10);
         lls.setLongitude(e.getLongitude() + 10);
         AutoStartOnLeaveStartLocationRule.saveLeaveLocationState(
-                lls, context.getDeviceState());
+                lls, context.getDeviceState(), e.getBeaconId());
         assertFalse(accept(context));
 
         //revert to correct
         lls.setLatitude(e.getLatitude());
         lls.setLongitude(e.getLongitude());
         AutoStartOnLeaveStartLocationRule.saveLeaveLocationState(
-                lls, context.getDeviceState());
+                lls, context.getDeviceState(), e.getBeaconId());
         assertTrue(accept(context));
 
         //check with set up shipment
@@ -129,10 +129,11 @@ public class ClearAutoStartOnLeaveStartLocationStateRuleTest extends
         lls.setLeaveOn(new Date(System.currentTimeMillis() - 100000l));
         lls.setRadius(100);
         AutoStartOnLeaveStartLocationRule.saveLeaveLocationState(
-                lls, context.getDeviceState());
+                lls, context.getDeviceState(), e.getBeaconId());
 
         assertFalse(handle(context));
-        assertNull(AutoStartOnLeaveStartLocationRule.getLeaveLocationState(context.getDeviceState()));
+        assertNull(AutoStartOnLeaveStartLocationRule.getLeaveLocationState(
+                context.getDeviceState(), e.getBeaconId()));
     }
 
     /**
@@ -142,6 +143,7 @@ public class ClearAutoStartOnLeaveStartLocationStateRuleTest extends
      */
     private TrackerEvent createEvent(final Double lat, final Double lon) {
         final TrackerEvent e = new TrackerEvent();
+        e.setBeaconId("any-beacon-ID");
         e.setDevice(device);
         e.setTime(new Date());
         e.setType(TrackerEventType.AUT);

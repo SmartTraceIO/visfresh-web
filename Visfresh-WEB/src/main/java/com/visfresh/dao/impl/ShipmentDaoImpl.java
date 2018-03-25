@@ -68,6 +68,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
     protected static final String ASSETTYPE_FIELD = "assettype";
     protected static final String LASTEVENT_FIELD = "lasteventdate";
     protected static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
+    private static final String BEACONID_FIELD = "beacon";
 
     @Autowired
     private DeviceDao deviceDao;
@@ -106,6 +107,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         propertyToDbFields.put(ShipmentConstants.ASSET_NUM, ASSETNUM_FIELD);
         propertyToDbFields.put(ShipmentConstants.PALLET_ID, PALETTID_FIELD);
         propertyToDbFields.put(ShipmentConstants.SHIPMENT_ID, ID_FIELD);
+        propertyToDbFields.put(ShipmentConstants.BEACON_ID, BEACONID_FIELD);
         propertyToDbFields.put(ShipmentConstants.ASSET_TYPE, ASSETTYPE_FIELD);
         propertyToDbFields.put(ShipmentConstants.ETA, ETA_FIELD);
         propertyToDbFields.put(ShipmentConstants.SIBLING_COUNT, SIBLINGCOUNT_FIELD);
@@ -195,12 +197,20 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      * @see com.visfresh.dao.ShipmentDao#findActiveShipment(java.lang.String)
      */
     @Override
-    public Shipment findLastShipment(final String imei) {
+    public Shipment findLastShipment(final String imei, final String beaconId) {
         //sorting
         final Sorting sort = new Sorting(false, ShipmentConstants.SHIPMENT_ID);
         //filter
         final Filter filter = new Filter();
         filter.addFilter(ShipmentConstants.DEVICE_IMEI, imei);
+        if (beaconId != null) {
+            filter.addFilter(BEACONID_FIELD, beaconId);
+        } else {
+            final DefaultCustomFilter f = new DefaultCustomFilter();
+            f.setFilter("shipments.beacon is NULL");
+            filter.addFilter("beacon", f);
+        }
+
         //page
         final List<Shipment> shipments = findAll(filter, sort, new Page(1, 1));
 
@@ -307,6 +317,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
     protected Shipment createEntity(final Map<String, Object> map) {
         final Shipment e = super.createEntity(map);
         e.setPalletId((String) map.get(PALETTID_FIELD));
+        e.setBeaconId((String) map.get(BEACONID_FIELD));
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
         e.setStartDate((Date) map.get(START_DATE));
@@ -347,6 +358,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
     protected Map<String, Object> createParameterMap(final Shipment s) {
         final Map<String, Object> params = super.createParameterMap(s);
         params.put(ISTEMPLATE_FIELD, false);
+        if (s.getBeaconId() != null) {
+            //save beacon ID only if not null
+            params.put(BEACONID_FIELD, s.getBeaconId());
+        }
         params.put(PALETTID_FIELD, s.getPalletId());
         params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());

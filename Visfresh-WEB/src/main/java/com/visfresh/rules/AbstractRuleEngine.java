@@ -172,6 +172,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     private TrackerEvent createTrackerEvent(final DeviceDcsNativeEvent event) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(event.getBattery());
+        e.setBeaconId(event.getBeacon());
         if (event.getLocation() != null) {
             e.setLatitude(event.getLocation().getLatitude());
             e.setLongitude(event.getLocation().getLongitude());
@@ -469,5 +470,37 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     protected Device findDevice(final String imei) {
         return deviceDao.findByImei(imei);
+    }
+
+    @Override
+    public void invokeRules(final RuleContext context) {
+        boolean runAgain = true;
+
+        while (runAgain) {
+            runAgain = false;
+            for (final TrackerEventRule rule : getOrderedRules()) {
+                try {
+                    runAgain = runRule(rule, context);
+                    if (runAgain) {
+                        break;
+                    }
+                } catch (final Throwable e) {
+                    log.error("Fatal rulle processing error", e);
+                }
+            }
+        }
+    }
+    /**
+     * @return
+     */
+    protected abstract TrackerEventRule[] getOrderedRules();
+
+    /**
+     * @param rule
+     * @param context
+     * @return
+     */
+    protected boolean runRule(final TrackerEventRule rule, final RuleContext context) {
+        return rule.accept(context) && rule.handle(context);
     }
 }

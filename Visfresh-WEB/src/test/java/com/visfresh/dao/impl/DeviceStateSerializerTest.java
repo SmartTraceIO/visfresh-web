@@ -36,13 +36,26 @@ public class DeviceStateSerializerTest {
     @Test
     public void testSerialize() {
         DeviceState s = new DeviceState();
-        s.setProperty("abra", "kadabra");
+        s.setProperty("abra", "kadabra", null);
 
         final String str = serializer.toString(s);
         s = serializer.parseState(str);
 
         assertNotNull(s);
 
-        assertEquals("kadabra", s.getProperty("abra"));
+        assertEquals("kadabra", s.getProperty(null, "abra"));
+    }
+    @Test
+    public void testSerializeWithBeaconID() {
+        final String beacon = "any-beacon-ID";
+        DeviceState s = new DeviceState();
+        s.setProperty("abra", "kadabra", beacon);
+
+        final String str = serializer.toString(s);
+        s = serializer.parseState(str);
+
+        assertNotNull(s);
+
+        assertEquals("kadabra", s.getProperty(beacon, "abra"));
     }
 }

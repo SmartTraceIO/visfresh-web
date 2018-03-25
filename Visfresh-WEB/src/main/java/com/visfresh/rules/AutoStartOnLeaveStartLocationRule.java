@@ -99,7 +99,8 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
         }
 
         //check need start to watch
-        final LeaveLocationState state = getLeaveLocationState(context.getDeviceState());
+        final LeaveLocationState state = getLeaveLocationState(
+                context.getDeviceState(), e.getBeaconId());
         final LocationProfile startLocation = getCurrentHostLocation(autoStart, e);
 
         //device entered one from start locations, need start to watch
@@ -124,7 +125,8 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
         final AutoStartShipment autoStart = findAutoStart(e.getDevice().getAutostartTemplateId());
 
         //check need start to watch
-        final LeaveLocationState state = getLeaveLocationState(context.getDeviceState());
+        final LeaveLocationState state = getLeaveLocationState(
+                context.getDeviceState(), e.getBeaconId());
 
         //device entered one from start locations, need start to watch
         if (state == null) {
@@ -132,7 +134,8 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
             log.debug("The device " + e.getDevice().getImei()
                     + " has entered autostart location "
                     + startLocation.getName() + ", the watch is started for it");
-            saveLeaveLocationState(new LeaveLocationState(startLocation), context.getDeviceState());
+            saveLeaveLocationState(new LeaveLocationState(startLocation),
+                    context.getDeviceState(), e.getBeaconId());
             return false;
         }
 
@@ -143,17 +146,17 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
                     + state.getName() + ", the watch is started for it");
             //need only start to watch of leaving location
             state.setLeaveOn(e.getTime());
-            saveLeaveLocationState(state, context.getDeviceState());
+            saveLeaveLocationState(state, context.getDeviceState(), e.getBeaconId());
             return false;
         }
 
         //check time out
         if (e.getTime().getTime() - state.getLeaveOn().getTime() > CHECK_TIMEOUT) {
             //clear leave start location watch
-            clearLeaveLocationState(context.getDeviceState());
+            clearLeaveLocationState(context.getDeviceState(), e.getBeaconId());
 
             //should autostart shipment
-            final Shipment s = autoStartNewShipment(e.getDevice(),
+            final Shipment s = autoStartNewShipment(e.getDevice(), e.getBeaconId(),
                     state.getLatitude(), state.getLongitude(), state.getLeaveOn());
             e.setShipment(s);
             assignShipment(e.getId(), s);
@@ -252,10 +255,11 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
     }
     /**
      * @param state device state.
+     * @param beacon TODO
      * @return leave start location state.
      */
-    public static LeaveLocationState getLeaveLocationState(final DeviceState state) {
-        final String str = state.getProperty("leaveLocationState");
+    public static LeaveLocationState getLeaveLocationState(final DeviceState state, final String beacon) {
+        final String str = state.getProperty(beacon, "leaveLocationState");
         if (str != null) {
             final JsonObject json = SerializerUtils.parseJson(str).getAsJsonObject();
 
@@ -273,9 +277,10 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
     /**
      * @param s leave location state.
      * @param deviceState device state.
+     * @param beacon TODO
      * @return leave start location state.
      */
-    protected static void saveLeaveLocationState(final LeaveLocationState s, final DeviceState deviceState) {
+    protected static void saveLeaveLocationState(final LeaveLocationState s, final DeviceState deviceState, final String beacon) {
         final JsonObject json = new JsonObject();
 
         json.addProperty("latitude", s.getLatitude());
@@ -287,13 +292,14 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
         }
         json.addProperty("radius", s.getRadius());
 
-        deviceState.setProperty("leaveLocationState", json.toString());
+        deviceState.setProperty("leaveLocationState", json.toString(), beacon);
     }
     /**
      * @param deviceState
+     * @param beacon TODO
      */
-    public static void clearLeaveLocationState(final DeviceState deviceState) {
-        deviceState.setProperty("leaveLocationState", null);
+    public static void clearLeaveLocationState(final DeviceState deviceState, final String beacon) {
+        deviceState.setProperty("leaveLocationState", null, beacon);
     }
 
     /**
@@ -328,13 +334,15 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
     }
     /**
      * @param device device.
+     * @param beaconId beacon ID.
      * @param latitude latitude of location.
      * @param longitude longitude of location.
      * @param date autostart date.
      * @return
      */
-    protected Shipment autoStartNewShipment(final Device device, final double latitude, final double longitude, final Date date) {
-        return autoStartService.autoStartNewShipment(device, latitude, longitude, date);
+    protected Shipment autoStartNewShipment(final Device device, final String beaconId,
+            final double latitude, final double longitude, final Date date) {
+        return autoStartService.autoStartNewShipment(device, beaconId, latitude, longitude, date);
     }
     /**
      * @param device device IMEI.

@@ -41,6 +41,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
     private Double latitude;
     private Double longitude;
     private Date createdOn;
+    private String beaconId;
 
     /**
      * Default constructor.
@@ -58,6 +59,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
         this.setCreatedOn(e.getCreatedOn());
         this.setDeviceImei(e.getDevice().getImei());
         this.setId(e.getId());
+        this.setBeaconId(e.getBeaconId());
         this.setLatitude(e.getLatitude());
         this.setLongitude(e.getLongitude());
         this.setShipmentId(e.getShipment() == null ? null : e.getShipment().getId());
@@ -75,6 +77,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
         this.setCreatedOn(e.getCreatedOn());
         this.setDeviceImei(e.getDeviceImei());
         this.setId(e.getId());
+        this.setBeaconId(e.getBeaconId());
         this.setLatitude(e.getLatitude());
         this.setLongitude(e.getLongitude());
         this.setShipmentId(e.getShipmentId());
@@ -95,6 +98,18 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
      */
     public void setId(final Long id) {
         this.id = id;
+    }
+    /**
+     * @param beaconId
+     */
+    public void setBeaconId(final String beaconId) {
+        this.beaconId = beaconId;
+    }
+    /**
+     * @return the setBeaconId
+     */
+    public String getBeaconId() {
+        return beaconId;
     }
     /**
      * @return the type

@@ -53,7 +53,7 @@ public class DeviceStateSerializer {
         final JsonObject props = new JsonObject();
         json.add(PROPERTIES, props);
         for (final String key : state.getKeys()) {
-            final String value = state.getProperty(key);
+            final String value = state.getProperty(null, key);
             if (value != null) {
                 props.addProperty(key, value);
             }
@@ -72,7 +72,7 @@ public class DeviceStateSerializer {
             final JsonObject obj = props.getAsJsonObject();
             final Set<Entry<String, JsonElement>> entrySet = obj.entrySet();
             for (final Entry<String, JsonElement> e : entrySet) {
-                s.setProperty(e.getKey(), e.getValue().getAsString());
+                s.setProperty(e.getKey(), e.getValue().getAsString(), null);
             }
         }
         return s;

@@ -69,6 +69,7 @@ public class Shipment extends ShipmentBase {
     private final Set<Long> siblings = new HashSet<>();
     private Date arrivalDate;
     private Date eta;
+    private String beaconId;
 
     /**
      * Default constructor.
@@ -274,6 +275,18 @@ public class Shipment extends ShipmentBase {
      */
     public void setCreatedBy(final String createdBy) {
         this.createdBy = createdBy;
+    }
+    /**
+     * @return the beaconId
+     */
+    public String getBeaconId() {
+        return beaconId;
+    }
+    /**
+     * @param beaconId the beaconId to set
+     */
+    public void setBeaconId(final String beaconId) {
+        this.beaconId = beaconId;
     }
 
     /**
