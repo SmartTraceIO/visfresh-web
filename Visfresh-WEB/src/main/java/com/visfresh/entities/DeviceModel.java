@@ -9,5 +9,6 @@ package com.visfresh.entities;
  */
 public enum DeviceModel {
     SmartTrace,
-    TT18
+    TT18,
+    BT04
 }
