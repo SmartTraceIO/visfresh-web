@@ -39,6 +39,7 @@ public class MessageDao {
     public static final String LONGITUDE_FIELD = "longitude";
     public static final String LATITUDE_FIELD = "latitude";
     public static final String PROCESSOR_FIELD = "processor";
+    public static final Object BEACON_FIELD = "beacon";
 
     //tables
     public static final String TABLE = "devicemsg";

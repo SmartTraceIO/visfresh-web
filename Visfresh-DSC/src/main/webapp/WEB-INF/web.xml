@@ -15,7 +15,16 @@
 		<servlet-class>com.visfresh.web.DeviceCommunicationServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<servlet-name>bt04</servlet-name>
+		<servlet-class>com.visfresh.web.Bt04Servlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
+	<servlet-mapping>
+		<servlet-name>bt04</servlet-name>
+		<url-pattern>/bt04</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>DSCService</servlet-name>
 		<url-pattern></url-pattern>

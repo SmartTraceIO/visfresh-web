@@ -5,7 +5,6 @@ package com.visfresh;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -148,24 +147,7 @@ public class DeviceMessageParser {
      * @throws IOException
      */
     public List<DeviceMessage> parse(final Reader reader) throws IOException {
-        final String msgData = getContent(reader);
+        final String msgData = MessageParserUtils.getContent(reader);
         return parse(msgData);
-    }
-
-    /**
-     * @param reader reader.
-     * @return stream content as string.
-     * @throws IOException
-     */
-    public static String getContent(final Reader reader) throws IOException {
-        final StringWriter sw = new StringWriter();
-
-        int len;
-        final char[] buff = new char[128];
-        while ((len = reader.read(buff)) > -1) {
-            sw.write(buff, 0, len);
-        }
-
-        return sw.toString();
     }
 }

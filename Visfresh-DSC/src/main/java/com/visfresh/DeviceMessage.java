@@ -52,6 +52,8 @@ public class DeviceMessage {
     private String message;
     private String typeString;
 
+    private String beaconId;
+
     /**
      * Default constructor.
      */
@@ -210,5 +212,18 @@ public class DeviceMessage {
      */
     public String getMessage() {
         return message;
+    }
+
+    /**
+     * @param id beacon ID.
+     */
+    public void setBeaconId(final String id) {
+        this.beaconId = id;
+    }
+    /**
+     * @return the beaconId
+     */
+    public String getBeaconId() {
+        return beaconId;
     }
 }

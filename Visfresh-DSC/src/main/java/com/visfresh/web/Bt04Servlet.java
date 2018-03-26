@@ -5,8 +5,8 @@ package com.visfresh.web;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,27 +16,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.visfresh.DeviceCommand;
-import com.visfresh.DeviceMessage;
-import com.visfresh.DeviceMessageParser;
 import com.visfresh.MessageParserUtils;
-import com.visfresh.service.DeviceMessageService;
+import com.visfresh.bt04.Bt04Message;
+import com.visfresh.bt04.Bt04Service;
+import com.visfresh.bt04.MessageParser;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceCommunicationServlet extends HttpServlet {
-    private static final Logger log = LoggerFactory.getLogger(DeviceCommunicationServlet.class);
-    private static final long serialVersionUID = -2549581331796018692L;
+public class Bt04Servlet extends HttpServlet {
+    private static final Logger log = LoggerFactory.getLogger(Bt04Servlet.class);
 
-    private DeviceMessageParser parser;
-    private DeviceMessageService service;
+    private final MessageParser parser = new MessageParser();
+
+    private Bt04Service service;
 
     /**
      * Default constructor.
      */
-    public DeviceCommunicationServlet() {
+    public Bt04Servlet() {
         super();
     }
 
@@ -64,55 +63,35 @@ public class DeviceCommunicationServlet extends HttpServlet {
      */
     private void processMessage(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final String rawData = MessageParserUtils.getContent(new InputStreamReader(req.getInputStream()));
-        log.debug("device message has received: " + rawData);
+        log.debug("BT04 message has received: " + rawData);
 
-        List<DeviceMessage> msgs;
+        Bt04Message msgs;
         try {
-            msgs = getParser().parse(rawData);
+            msgs = parser.parse(rawData);
         } catch (final Exception e) {
-            log.error("Failed to parse device message: " + rawData);
+            log.error("Failed to parse BT04 message: " + rawData);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
 
-        final DeviceCommand cmd = service.process(msgs);
+        service.process(msgs);
+
         resp.setStatus(HttpServletResponse.SC_OK);
-
-        if (cmd != null) {
-            final String command = cmd.getCommand();
-            log.debug("Sending command " + command + " to device " + msgs.get(0).getImei());
-            resp.getOutputStream().write(command.getBytes());
-        }
-
         resp.getOutputStream().flush();
         resp.getOutputStream().close();
     }
 
-    /**
-     * @return the parser
-     */
-    public DeviceMessageParser getParser() {
-        return parser;
-    }
-    /**
-     * @param parser the parser to set
-     */
-    public void setParser(final DeviceMessageParser parser) {
-        this.parser = parser;
-    }
-
     /* (non-Javadoc)
-     * @see javax.servlet.GenericServlet#init()
+     * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
      */
     @Override
-    public void init() throws ServletException {
-        super.init();
-        setParser(new DeviceMessageParser());
+    public void init(final ServletConfig config) throws ServletException {
+        super.init(config);
 
         final ConfigurableApplicationContext ctxt = ApplicationInitializer.getBeanContext(
                 getServletContext());
-        service = ctxt.getBean(DeviceMessageService.class);
+        service = ctxt.getBean(Bt04Service.class);
 
-        log.debug("Device communication servlet has initialized");
+        log.debug("BT04 servlet has initialized");
     }
 }

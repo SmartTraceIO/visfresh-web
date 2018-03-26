@@ -12,6 +12,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
@@ -62,6 +63,7 @@ public class SystemMessageDaoTest extends TestCase {
         final int numberOfRetry = 4;
         final Date retryOn = new Date(System.currentTimeMillis() + 10000000l);
         final double temperature = 36.6;
+        final String beaconId = "any-beacon-ID";
 
         //create device command
         final DeviceMessage m = new DeviceMessage();
@@ -72,13 +74,15 @@ public class SystemMessageDaoTest extends TestCase {
         m.setTemperature(temperature);
         m.setTime(new Date());
         m.setType(DeviceMessageType.AUT);
+        m.setBeaconId(beaconId);
 
         SystemMessage sm = dao.sendSystemMessageFor(m, location);
         sm = dao.findOne(sm.getId());
 
         final Reader in = new StringReader(sm.getMessageInfo());
-        final JsonElement e = new JsonParser().parse(in);
-        assertNotNull(e);
+        final JsonObject e = new JsonParser().parse(in).getAsJsonObject();
+        assertEquals(beaconId, e.get("beacon").getAsString());
+
         assertEquals(m.getImei(), sm.getGroup());
     }
     public void testSupportsNullLocations() {

@@ -71,6 +71,7 @@ public class MessageDaoTest extends TestCase {
         final DeviceMessageType type = DeviceMessageType.BRT;
         final Date retryOn = new Date(System.currentTimeMillis() + 11111111L);
         final int numRetry = 135;
+        final String beaconId = "any-beacon-ID";
 
         //add first station
         final StationSignal s1 = new StationSignal();
@@ -97,6 +98,7 @@ public class MessageDaoTest extends TestCase {
         message.setType(type);
         message.setNumberOfRetry(numRetry);
         message.setRetryOn(retryOn);
+        message.setBeaconId(beaconId);
 
         dao.create(message);
 
@@ -110,6 +112,7 @@ public class MessageDaoTest extends TestCase {
         assertEquals(battery, row.get(MessageDao.BATTERY_FIELD));
         assertEquals(imei, row.get(MessageDao.IMEI_FIELD));
         assertEquals(Double.toString(temperature), "" + row.get(MessageDao.TEMPERATURE_FIELD));
+        assertEquals(beaconId, row.get(MessageDao.BEACON_FIELD));
 
         final String dateFormat = "yyyyMMdd HHmm";
         assertEquals(format(time, dateFormat),
