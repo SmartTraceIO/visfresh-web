@@ -5,6 +5,7 @@ package com.visfresh.bt04;
 
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -45,7 +46,7 @@ public class MessageParser {
         final Beacon b = new Beacon();
         // SN|Name|Temperature|Humidity|RSSI|Distance|battery|LastScannedTime|HardwareModel|<\n>
         // 11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|
-        final String[] lines = str.split("|");
+        final String[] lines = str.split(Pattern.quote("|"));
         b.setSn(lines[0]);
         b.setName(lines[1]);
         b.setTemperature(parseDouble(lines[2]));
@@ -66,13 +67,13 @@ public class MessageParser {
     private void parseHeader(final String header, final Bt04Message msg) {
         // phone-imei|epoch-time|latitude|longitude|altitude|accuracy|speedKPH|<\n>
         // 356024089973101|1522093635378|21.0512713|105.7945854|0.0|20.0|0.0|
-        final String[] headers = header.split("|");
+        final String[] headers = header.split(Pattern.quote("|"));
         msg.setImei(headers[0]);
         msg.setTime(fromEpoch(headers[1]));
         msg.setLatitude(parseDouble(headers[2]));
         msg.setLongitude(parseDouble(headers[3]));
-        msg.setAltitude(parseDouble(headers[0]));
-        msg.setAccuracy(parseDouble(headers[0]));
+        msg.setAltitude(parseDouble(headers[4]));
+        msg.setAccuracy(parseDouble(headers[5]));
     }
 
     /**

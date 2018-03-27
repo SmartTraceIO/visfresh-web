@@ -22,6 +22,8 @@ import com.visfresh.service.InactiveDeviceAlertSender;
  */
 @Component
 public class Bt04Service {
+    public static final double BATTERY_FULL = 4070.0;
+
     private static final Logger log = LoggerFactory.getLogger(Bt04Message.class);
 
     @Autowired
@@ -77,7 +79,7 @@ public class Bt04Service {
      * @return compatible battery level.
      */
     private int convertToBatteryLevel(final double battery) {
-        return (int) Math.round(4070.0 * battery);
+        return (int) Math.round(BATTERY_FULL / 100. * battery);
     }
     /**
      * @param msgs BT04 message batch.

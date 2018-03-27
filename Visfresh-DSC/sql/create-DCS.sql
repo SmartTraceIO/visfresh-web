@@ -2,6 +2,7 @@ drop TABLE if exists devicemsg;
 CREATE TABLE devicemsg (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   imei varchar(15) NOT NULL,
+  beacon varchar(15),
   type varchar(4) NOT NULL,
   time datetime NOT NULL,
   battery int NOT NULL,

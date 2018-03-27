@@ -167,8 +167,10 @@ public class MessageDao {
             + ", " + TEMPERATURE_FIELD
             + ", " + NUMRETRY_FIELD
             + ", " + RETRYON_FIELD
-            + ", " + STATIONS_FIELD + ") "
-            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations)"
+            + ", " + STATIONS_FIELD
+            + ", " + BEACON_FIELD
+            + ") "
+            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations, :beacon)"
             , new MapSqlParameterSource(params), holder);
 
         msg.setId(holder.getKey().longValue());
@@ -194,6 +196,8 @@ public class MessageDao {
         map.put("numretry", msg.getNumberOfRetry());
         //the ready time.
         map.put("readyon", msg.getRetryOn());
+        //beacon id.
+        map.put("beacon", msg.getBeaconId());
 
         return map;
     }

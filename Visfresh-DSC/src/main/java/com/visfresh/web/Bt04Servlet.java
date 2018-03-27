@@ -26,6 +26,8 @@ import com.visfresh.bt04.MessageParser;
  *
  */
 public class Bt04Servlet extends HttpServlet {
+    private static final long serialVersionUID = 824070442463613374L;
+
     private static final Logger log = LoggerFactory.getLogger(Bt04Servlet.class);
 
     private final MessageParser parser = new MessageParser();
