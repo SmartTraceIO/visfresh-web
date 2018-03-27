@@ -4,6 +4,7 @@
 package com.visfresh.bt04;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -103,8 +104,8 @@ public class Bt04ServiceTest extends Bt04Service {
 
         final DeviceMessage m = messages.get(0);
         assertEquals(Bt04Service.BATTERY_FULL / 100. * battery, m.getBattery(), 0.001);
-        assertEquals(sn, m.getBeaconId());
-        assertEquals(device.getImei(), m.getImei());
+        assertNull(m.getBeaconId());
+        assertTrue(m.getImei().contains(sn));
         assertEquals(temperature, m.getTemperature(), 0.001);
         assertTrue(Math.abs(lastScannedTime.getTime() - m.getTime().getTime()) < 1000l);
         assertEquals(DeviceMessageType.AUT, m.getType());
@@ -169,6 +170,7 @@ public class Bt04ServiceTest extends Bt04Service {
      */
     private Beacon crateBeacon(final String imei) {
         final Beacon b = new Beacon();
+        b.setSn("123456");
         b.setBattery(50.);
         b.setDistance(100.);
         b.setHardwareModel("JUnit");

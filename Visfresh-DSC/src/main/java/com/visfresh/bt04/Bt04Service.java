@@ -23,6 +23,8 @@ import com.visfresh.service.InactiveDeviceAlertSender;
 @Component
 public class Bt04Service {
     public static final double BATTERY_FULL = 4070.0;
+    public static final String IMEI_PREFIX = "bt04-";
+    public static final String IMEI_SUFFIX = "x";
 
     private static final Logger log = LoggerFactory.getLogger(Bt04Message.class);
 
@@ -58,10 +60,11 @@ public class Bt04Service {
         }
 
         for (final Beacon b : msgs.getBeacons()) {
-            final DeviceMessage msg = createFromHeader(msgs);
+            final DeviceMessage msg = new DeviceMessage();
 
+            msg.setImei(createBt04Imei(b.getSn()));
             msg.setBattery(convertToBatteryLevel(b.getBattery()));
-            msg.setBeaconId(b.getSn());
+            // msg.setBeaconId(b.getSn());
             msg.setTime(b.getLastScannedTime());
             msg.setType(DeviceMessageType.AUT);
             msg.setTemperature(b.getTemperature());
@@ -75,20 +78,31 @@ public class Bt04Service {
         }
     }
     /**
+     * @param sn
+     * @return
+     */
+    private String createBt04Imei(final String sn) {
+        final StringBuilder sb = new StringBuilder(sn);
+        sb.append(IMEI_SUFFIX);
+
+        //add zero symbols
+        int len = 11 - sb.length() - IMEI_PREFIX.length();
+        while (len > 0) {
+            sb.insert(0, '0');
+            len--;
+        }
+
+        //add prefix
+        sb.insert(0, IMEI_PREFIX);
+        return sb.toString();
+    }
+
+    /**
      * @param battery in percents.
      * @return compatible battery level.
      */
     private int convertToBatteryLevel(final double battery) {
         return (int) Math.round(BATTERY_FULL / 100. * battery);
-    }
-    /**
-     * @param msgs BT04 message batch.
-     * @return
-     */
-    private DeviceMessage createFromHeader(final Bt04Message msgs) {
-        final DeviceMessage m = new DeviceMessage();
-        m.setImei(msgs.getImei());
-        return m;
     }
     /**
      * @param msg device message.
