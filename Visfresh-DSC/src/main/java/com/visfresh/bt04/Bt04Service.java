@@ -3,6 +3,9 @@
  */
 package com.visfresh.bt04;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,42 +49,53 @@ public class Bt04Service {
      * @param msgs
      */
     public void process(final Bt04Message msgs) {
-        final Device device = getDeviceByImei(msgs.getImei());
-
-        if (device == null) {
-            log.warn("Not found registered device " + msgs.getImei());
-            return;
-        } else if (!device.isActive()) {
-            log.debug("Device " + device.getImei() + " is inactive, message(s) ignored");
-
-            sendAlert("Attempt to send message to inactive device " + device.getImei(),
-                    "Message body:\n" + msgs.getRawData());
-            return;
-        }
+        final Map<String, Boolean> deviceCache = new HashMap<>();
 
         for (final Beacon b : msgs.getBeacons()) {
-            final DeviceMessage msg = new DeviceMessage();
+            final String beaconImei = createBt04Imei(b.getSn());
 
-            msg.setImei(createBt04Imei(b.getSn()));
-            msg.setBattery(convertToBatteryLevel(b.getBattery()));
-            // msg.setBeaconId(b.getSn());
-            msg.setTime(b.getLastScannedTime());
-            msg.setType(DeviceMessageType.AUT);
-            msg.setTemperature(b.getTemperature());
+            boolean foundDevice = false;
+            if (deviceCache.containsKey(beaconImei)) {
+                foundDevice = deviceCache.get(beaconImei) == Boolean.TRUE;
+            } else {
+                final Device d = getDeviceByImei(beaconImei);
+                foundDevice = d != null && d.isActive();
+                deviceCache.put(beaconImei, foundDevice ? Boolean.TRUE : Boolean.FALSE);
 
-            Location loc = null;
-            if (msgs.getLatitude() != null && msgs.getLongitude() != null) {
-                loc = new Location(msgs.getLatitude(), msgs.getLongitude());
+                //only send warning at first found time
+                if (d != null && !d.isActive()) {
+                    log.debug("Device " + beaconImei + " is inactive, message(s) ignored");
+                    sendAlert("Attempt to send message to inactive device " + beaconImei,
+                            "Message body:\n" + msgs.getRawData());
+                }
             }
 
-            sendMessage(msg, loc);
+            if (foundDevice) {
+                final DeviceMessage msg = new DeviceMessage();
+                msg.setImei(beaconImei);
+                msg.setBattery(convertToBatteryLevel(b.getBattery()));
+                // msg.setBeaconId(b.getSn());
+                msg.setTime(b.getLastScannedTime());
+                msg.setType(DeviceMessageType.AUT);
+                msg.setTemperature(b.getTemperature());
+
+                Location loc = null;
+                if (msgs.getLatitude() != null && msgs.getLongitude() != null) {
+                    loc = new Location(msgs.getLatitude(), msgs.getLongitude());
+                }
+
+                sendMessage(msg, loc);
+            } else {
+                log.warn("Not found registered device " + beaconImei
+                        + " for beacon " + b.getSn() + " message will ignored");
+            }
         }
     }
     /**
      * @param sn
      * @return
      */
-    private String createBt04Imei(final String sn) {
+    public static String createBt04Imei(final String sn) {
         final StringBuilder sb = new StringBuilder(sn);
         sb.append(IMEI_SUFFIX);
 

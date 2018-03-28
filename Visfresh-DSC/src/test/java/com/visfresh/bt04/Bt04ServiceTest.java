@@ -84,6 +84,9 @@ public class Bt04ServiceTest extends Bt04Service {
         final String name = "Test1";
         final double temperature = 33.;
 
+        //create device for SN
+        addDevice(Bt04Service.createBt04Imei(sn));
+
         final Beacon b = new Beacon();
         b.setSn(sn);
         b.setBattery(battery);
@@ -96,6 +99,8 @@ public class Bt04ServiceTest extends Bt04Service {
 
         msg.getBeacons().add(b);
         msg.getBeacons().add(crateBeacon("7654321"));
+        //create device for SN
+        addDevice(Bt04Service.createBt04Imei("7654321"));
 
         process(msg);
 
@@ -119,8 +124,11 @@ public class Bt04ServiceTest extends Bt04Service {
     }
     @Test
     public void testAlertForInactiveDevice() {
-        device.setActive(false);
-        process(createMessage(device.getImei()));
+        final Bt04Message m = createMessage(device.getImei());
+        final Device d = addDevice(Bt04Service.createBt04Imei(m.getBeacons().get(0).getSn()));
+        d.setActive(false);
+
+        process(m);
 
         assertEquals(0, messages.size());
         assertEquals(1, alerts.size());
@@ -165,12 +173,12 @@ public class Bt04ServiceTest extends Bt04Service {
         return msg;
     }
     /**
-     * @param imei
+     * @param sn
      * @return
      */
-    private Beacon crateBeacon(final String imei) {
+    private Beacon crateBeacon(final String sn) {
         final Beacon b = new Beacon();
-        b.setSn("123456");
+        b.setSn(sn);
         b.setBattery(50.);
         b.setDistance(100.);
         b.setHardwareModel("JUnit");
