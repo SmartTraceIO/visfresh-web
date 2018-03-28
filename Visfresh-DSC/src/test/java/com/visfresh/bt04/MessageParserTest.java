@@ -5,6 +5,7 @@ package com.visfresh.bt04;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,5 +60,29 @@ public class MessageParserTest {
         assertEquals(98, b.getBattery(), 0.1);
         assertNotNull(b.getLastScannedTime());
         assertEquals("3901", b.getHardwareModel());
+    }
+    @Test
+    public void testParseWithEmptyLocations() {
+        final String rawData = "356024089973101|1522093635378||||||\n"
+                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|\n"
+                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|";
+
+        final Bt04Message msg = parser.parse(rawData);
+        assertNull(msg.getLatitude());
+        assertNull(msg.getAccuracy());
+        assertNull(msg.getAltitude());
+        assertNull(msg.getLongitude());
+    }
+    @Test
+    public void testParseWithTruncatedLocations() {
+        final String rawData = "356024089973101|1522093635378|\n"
+                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|\n"
+                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|";
+
+        final Bt04Message msg = parser.parse(rawData);
+        assertNull(msg.getLatitude());
+        assertNull(msg.getAccuracy());
+        assertNull(msg.getAltitude());
+        assertNull(msg.getLongitude());
     }
 }

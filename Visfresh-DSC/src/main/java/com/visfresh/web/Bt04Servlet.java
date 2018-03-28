@@ -71,7 +71,7 @@ public class Bt04Servlet extends HttpServlet {
         try {
             msgs = parser.parse(rawData);
         } catch (final Exception e) {
-            log.error("Failed to parse BT04 message: " + rawData);
+            log.error("Failed to parse BT04 message: " + rawData, e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
