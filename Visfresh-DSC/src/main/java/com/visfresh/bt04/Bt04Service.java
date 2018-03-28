@@ -25,7 +25,7 @@ import com.visfresh.service.InactiveDeviceAlertSender;
  */
 @Component
 public class Bt04Service {
-    public static final double BATTERY_FULL = 25000.0;
+    public static final double BATTERY_FULL = 50000.0;
     public static final String IMEI_PREFIX = "bt04-";
     public static final String IMEI_SUFFIX = "x";
 
