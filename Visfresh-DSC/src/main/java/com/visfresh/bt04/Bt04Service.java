@@ -5,6 +5,7 @@ package com.visfresh.bt04;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +27,10 @@ import com.visfresh.service.InactiveDeviceAlertSender;
 @Component
 public class Bt04Service {
     public static final double BATTERY_FULL = 50000.0;
-    public static final String IMEI_PREFIX = "bt04-";
-    public static final String IMEI_SUFFIX = "x";
+    private static final String IMEI_PREFIX = "bt04-";
+    private static final String IMEI_SUFFIX = "x";
 
-    private static final Logger log = LoggerFactory.getLogger(Bt04Message.class);
+    private static final Logger log = LoggerFactory.getLogger(Bt04Service.class);
 
     @Autowired
     private SystemMessageDao messageDao;
@@ -52,7 +53,7 @@ public class Bt04Service {
         final Map<String, Boolean> deviceCache = new HashMap<>();
 
         for (final Beacon b : msgs.getBeacons()) {
-            final String beaconImei = createBt04Imei(b.getSn());
+            final String beaconImei = b.getSn();
 
             boolean foundDevice = false;
             if (deviceCache.containsKey(beaconImei)) {
@@ -95,7 +96,7 @@ public class Bt04Service {
      * @param sn
      * @return
      */
-    public static String createBt04Imei(final String sn) {
+    private static String createBt04Imei(final String sn) {
         final StringBuilder sb = new StringBuilder(sn);
         sb.append(IMEI_SUFFIX);
 
@@ -139,5 +140,92 @@ public class Bt04Service {
      */
     protected Device getDeviceByImei(final String imei) {
         return deviceDao.getByImei(imei);
+    }
+
+    public static void main(final String[] args) {
+        final String[] colors = {
+            "Black",
+            "Blue",
+            "BlueViolet",
+            "Brown",
+            "DarkBlue",
+            "DarkCyan",
+            "DarkGoldenrod",
+            "DarkGreen",
+            "DarkHhaki",
+            "DarkMagenta",
+            "DarkOlivegreen",
+            "DarkOrange",
+            "DarkOrchid",
+            "DarkRed",
+            "DarkSalmon",
+            "DarkTurquoise",
+            "DarksLategray",
+            "DimGray",
+            "Gold",
+            "GoldenRod",
+            "Gray",
+            "Green",
+            "HotPink",
+            "IndianRed",
+            "Indigo",
+            "Magenta",
+            "Maroon",
+            "MediumAquamarine",
+            "MediumsLateBlue",
+            "Navy",
+            "Olive",
+            "Orange",
+            "PaleVioletRed",
+            "Peru",
+            "Purple",
+            "Red",
+            "RosyBrown",
+            "RoyalBlue",
+            "SaddleBrown",
+            "Salmon",
+            "SandyBrown",
+            "SeaGreen",
+            "Sienna",
+            "SlateBlue",
+            "SteelBlue",
+            "Tan",
+            "Teal",
+            "Tomato",
+            "Violet",
+            "YellowGreen"
+        };
+        final String[] sns = {
+            "11181960",
+            "11160059",
+            "11181916",
+            "11181902",
+            "11181904",
+            "11181914",
+            "11181901",
+            "11181910",
+            "11181913",
+            "11181912",
+            "11181905",
+            "11160058",
+            "11181915",
+            "11181919"
+        };
+
+        final Random random = new Random();
+        //insert ignore into devices
+        for (final String sn : sns) {
+            final String sql = "insert ignore into devices (imei, name, description, company, active, model, color)"
+                    + " values ('"
+                    + createBt04Imei(sn)
+                    + "', 'B04 beacon "
+                    + sn
+                    + "', 'Primo BT04 beacon "
+                    + sn
+                    + "', 2, true, 'BT04', '"
+                    + colors[random.nextInt(colors.length)]
+                    + "');";
+            System.out.println(sql);
+        }
     }
 }

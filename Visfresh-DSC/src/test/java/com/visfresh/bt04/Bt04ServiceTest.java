@@ -85,7 +85,7 @@ public class Bt04ServiceTest extends Bt04Service {
         final double temperature = 33.;
 
         //create device for SN
-        addDevice(Bt04Service.createBt04Imei(sn));
+        addDevice(sn);
 
         final Beacon b = new Beacon();
         b.setSn(sn);
@@ -100,7 +100,7 @@ public class Bt04ServiceTest extends Bt04Service {
         msg.getBeacons().add(b);
         msg.getBeacons().add(crateBeacon("7654321"));
         //create device for SN
-        addDevice(Bt04Service.createBt04Imei("7654321"));
+        addDevice("7654321");
 
         process(msg);
 
@@ -125,7 +125,7 @@ public class Bt04ServiceTest extends Bt04Service {
     @Test
     public void testAlertForInactiveDevice() {
         final Bt04Message m = createMessage(device.getImei());
-        final Device d = addDevice(Bt04Service.createBt04Imei(m.getBeacons().get(0).getSn()));
+        final Device d = addDevice(m.getBeacons().get(0).getSn());
         d.setActive(false);
 
         process(m);
