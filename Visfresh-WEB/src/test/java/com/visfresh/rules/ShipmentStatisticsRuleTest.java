@@ -157,6 +157,17 @@ public class ShipmentStatisticsRuleTest extends ShipmentStatisticsRule {
         assertFalse(handle(context));
     }
     @Test
+    public void testHandleWithOneTime() {
+        shipment.setAlertProfile(new AlertProfile());
+        stats.put(shipment.getId(), new ShipmentStatistics(shipment.getId()));
+        final TrackerEvent e1 = createEvent(shipment);
+        final TrackerEvent e2 = createEvent(shipment);
+        e2.setTime(e1.getTime());
+
+        assertFalse(handle(new RuleContext(e1, new SessionHolder())));
+        assertFalse(handle(new RuleContext(e2, new SessionHolder())));
+    }
+    @Test
     public void testHandleWithoutAlertProfile() {
         shipment.setAlertProfile(null);
         stats.put(shipment.getId(), new ShipmentStatistics(shipment.getId()));

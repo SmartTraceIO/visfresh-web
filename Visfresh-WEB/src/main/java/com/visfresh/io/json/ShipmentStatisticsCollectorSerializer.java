@@ -45,6 +45,10 @@ public class ShipmentStatisticsCollectorSerializer extends AbstractJsonSerialize
     }
 
     public JsonObject toJson(final ShipmentTemperatureStatsCollector collector) {
+        if (collector == null) {
+            return null;
+        }
+
         final JsonObject json = new JsonObject();
 
         json.add(TIME_RANGES, toJson(collector.getTimeRanges()));
