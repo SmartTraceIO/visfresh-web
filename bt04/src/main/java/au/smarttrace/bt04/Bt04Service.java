@@ -3,10 +3,18 @@
  */
 package au.smarttrace.bt04;
 
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +44,7 @@ public class Bt04Service {
     private DeviceDao deviceDao;
     @Autowired
     private InactiveDeviceAlertSender alerter;
+    private Cache<Integer, Beacon> cache;
 
     /**
      * Default constructor.
@@ -44,13 +53,23 @@ public class Bt04Service {
         super();
     }
 
+    public void setCacheManagerFactory(final CacheManagerFactory f) {
+        final CacheManager mgr = f.getCacheManager();
+        final CacheConfigurationBuilder<Integer, Beacon> b = CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                Integer.class, Beacon.class,
+                ResourcePoolsBuilder.heap(1000))
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(30)))
+                .withExpiry(ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofSeconds(15)));
+
+        cache = mgr.createCache("tmp", b.build());
+    }
     /**
      * @param msgs
      */
     public void process(final Bt04Message msgs) {
         final Map<String, Boolean> deviceCache = new HashMap<>();
 
-        for (final Beacon b : msgs.getBeacons()) {
+        for (final Beacon b : filterNotAlreadyReceived(msgs.getBeacons())) {
             final String beaconImei = b.getSn();
 
             boolean foundDevice = false;
@@ -89,6 +108,27 @@ public class Bt04Service {
             }
         }
     }
+
+    /**
+     * @param origin
+     * @return
+     */
+    private List<Beacon> filterNotAlreadyReceived(final List<Beacon> origin) {
+        final List<Beacon> beacons = new LinkedList<>();
+        for (final Beacon beacon : beacons) {
+            final int hash = beacon.hashCode();
+            final Beacon old = cache.get(hash);
+
+            if (old == null || !old.equals(beacon)) {
+                beacons.add(beacon);
+                cache.put(hash, beacon);
+            } else {
+                log.debug("Beacon message ignored because already processed: " + beacon);
+            }
+        }
+        return beacons;
+    }
+
     /**
      * @param sn
      * @return

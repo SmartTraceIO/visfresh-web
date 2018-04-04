@@ -4,6 +4,7 @@
 package au.smarttrace.bt04;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -123,5 +124,49 @@ public class Beacon {
      */
     public void setHardwareModel(final String hardwareModel) {
         this.hardwareModel = hardwareModel;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof Beacon)) {
+            return false;
+        }
+
+        final Beacon other = (Beacon) obj;
+        return Objects.equals(this.sn, other.sn) &&
+            Objects.equals(this.name, other.name) &&
+            Objects.equals(this.temperature, other.temperature) &&
+            Objects.equals(this.humidity, other.humidity) &&
+            Objects.equals(this.distance, other.distance) &&
+            Objects.equals(this.battery, other.battery) &&
+            Objects.equals(this.lastScannedTime.getTime(), other.lastScannedTime.getTime()) &&
+            Objects.equals(this.hardwareModel, other.hardwareModel);
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(sn, name, temperature, humidity,
+                distance, battery, lastScannedTime.getTime(), hardwareModel);
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("sn: " + sn + ", ");
+        sb.append("name: " + name + ", ");
+        sb.append("temperature: " + temperature + ", ");
+        sb.append("humidity: " + humidity + ", ");
+        sb.append("distance: " + distance + ", ");
+        sb.append("battery: " + battery + ", ");
+        sb.append("lastScannedTime.getTime(): " + lastScannedTime.getTime() + ", ");
+        sb.append("hardwareModel: " + hardwareModel);
+        return sb.toString();
     }
 }
