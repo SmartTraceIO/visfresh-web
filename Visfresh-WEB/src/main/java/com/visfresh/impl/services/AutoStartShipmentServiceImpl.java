@@ -111,10 +111,10 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     }
 
     @Override
-    public Shipment autoStartNewShipment(final Device device, final String beaconId,
+    public Shipment autoStartNewShipment(final Device device,
             final Double latitude, final Double longitude, final Date shipmentDate) {
 
-        final Shipment last = shipmentDao.findLastShipment(device.getImei(), beaconId);
+        final Shipment last = shipmentDao.findLastShipment(device.getImei());
 
         ShipmentInit init = null;
         //first of all attempt to select autostart shipment template
@@ -133,10 +133,10 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
 
         Shipment shipment;
         if (init != null) {
-            shipment = createShipment(init, device, beaconId);
+            shipment = createShipment(init, device);
         } else {
             log.debug("Create new shipment for device " + device.getImei());
-            shipment = createNewDefaultShipment(device, beaconId);
+            shipment = createNewDefaultShipment(device);
         }
 
         shipment.setShipmentDate(shipmentDate);
@@ -260,11 +260,10 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         return init;
     }
     private Shipment createShipment(final ShipmentInit init,
-            final Device device, final String beaconId) {
+            final Device device) {
         final ShipmentTemplate tpl = init.getAutoStart().getTemplate();
 
         final Shipment s = shipmentDao.createNewFrom(tpl);
-        s.setBeaconId(beaconId);
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         if (!init.getFrom().isEmpty()) {
@@ -364,10 +363,9 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     /**
      * @param device
      */
-    private Shipment createNewDefaultShipment(final Device device, final String beaconId) {
+    private Shipment createNewDefaultShipment(final Device device) {
         final Shipment s = new Shipment();
         s.setCompany(device.getCompanyId());
-        s.setBeaconId(beaconId);
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");

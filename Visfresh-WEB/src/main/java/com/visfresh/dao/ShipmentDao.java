@@ -22,10 +22,9 @@ import com.visfresh.lists.ListShipmentItem;
 public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment, Long> {
     /**
      * @param imei device IMEI.
-     * @param beaconId beacon ID.
      * @return active shipment for given devcie.
      */
-    Shipment findLastShipment(String imei, String beaconId);
+    Shipment findLastShipment(String imei);
     /**
      * @param imei device IMEI.
      * @return active shipments for given devcie.

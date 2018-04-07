@@ -688,7 +688,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         final Map<Long, Integer> tripCounts = new HashMap<Long, Integer>();
         final DateFormat fmt = createCsvDateFormat(user.getLanguage(), user.getTimeZone());
 
-        out.write(("id,beacon,shipment,time,temperature "
+        out.write(("id,shipment,time,temperature "
                 + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())
                 + ",battery,latitude,longitude,device,createdon,type,alerts").getBytes());
         out.write((byte) '\n');
@@ -697,11 +697,6 @@ public class DeviceController extends AbstractController implements DeviceConsta
         for (final ShortTrackerEventWithAlerts e : events) {
             //id
             out.write(Long.toString(e.getId()).getBytes());
-            out.write((byte) ',');
-            //beacon
-            if (e.getBeaconId() != null) {
-                out.write(e.getBeaconId().getBytes());
-            }
             out.write((byte) ',');
             //shipment
             final Long shipmentId = e.getShipmentId();

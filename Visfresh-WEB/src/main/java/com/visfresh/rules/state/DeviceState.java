@@ -22,23 +22,15 @@ public class DeviceState {
         super();
     }
 
-    public String getProperty(final String beacon, final String originKey) {
-        return properties.get(creatKey(beacon, originKey));
+    public String getProperty(final String key) {
+        return properties.get(key);
     }
-    public void setProperty(final String originKey, final String value, final String beacon) {
+    public void setProperty(final String key, final String value) {
         if (value == null) {
-            properties.remove(creatKey(beacon, originKey));
+            properties.remove(key);
         } else {
-            properties.put(creatKey(beacon, originKey), value);
+            properties.put(key, value);
         }
-    }
-    /**
-     * @param beacon beacon ID.
-     * @param originKey origin key
-     * @return key with added beacon ID info
-     */
-    private String creatKey(final String beacon, final String originKey) {
-        return beacon == null ? originKey : "bkn-" + beacon + "-" + originKey;
     }
 
     public Set<String> getKeys() {

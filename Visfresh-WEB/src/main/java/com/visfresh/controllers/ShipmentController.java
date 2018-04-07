@@ -317,7 +317,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         copyBaseData(dto, s);
 
         s.setPalletId(dto.getPalletId());
-        s.setBeaconId(dto.getBeaconId());
         s.setAssetNum(dto.getAssetNum());
         s.setTripCount(dto.getTripCount());
         s.setPoNum(dto.getPoNum());
@@ -363,8 +362,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      */
     private Long saveNewShipment(final Shipment newShipment, final boolean includePreviousData) {
         final String imei = newShipment.getDevice().getImei();
-        final String beaconId = newShipment.getBeaconId();
-        final Shipment current = includePreviousData ? shipmentDao.findLastShipment(imei, beaconId) : null;
+        final Shipment current = includePreviousData ? shipmentDao.findLastShipment(imei) : null;
 
         boolean shouldOverwritePrevious =
                 includePreviousData
@@ -823,7 +821,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             LAST_READING_TIME,
             LAST_READING_TIME_ISO,
             LAST_READING_TEMPERATURE,
-            BEACON_ID,
             ALERT_SUMMARY
         };
     }
@@ -1094,7 +1091,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
 
         final Shipment s = autoStartService.autoStartNewShipment(d,
-                beacon == null ? e.getBeaconId() : beacon,
                 e.getLatitude(), e.getLongitude(), new Date());
         if (s != null) {
             auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);

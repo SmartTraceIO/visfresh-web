@@ -15,12 +15,10 @@ import com.visfresh.entities.Shipment;
 public interface AutoStartShipmentService {
     /**
      * @param device device.
-     * @param beaconId beacon ID.
      * @param latitude latitude of start location.
      * @param longitude longitude of start location.
      * @param shipmentDate shipment date.
      * @return
      */
-    Shipment autoStartNewShipment(Device device, String beaconId,
-            Double latitude, Double longitude, Date shipmentDate);
+    Shipment autoStartNewShipment(Device device, Double latitude, Double longitude, Date shipmentDate);
 }

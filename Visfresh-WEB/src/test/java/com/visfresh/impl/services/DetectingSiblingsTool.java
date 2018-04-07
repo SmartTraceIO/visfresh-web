@@ -61,7 +61,6 @@ public final class DetectingSiblingsTool {
             dto.setCreatedOn(e.getCreatedOn());
             dto.setDeviceImei(e.getDevice().getName());
             dto.setId(e.getId());
-            dto.setBeaconId(e.getBeaconId());
             dto.setLatitude(e.getLatitude());
             dto.setLongitude(e.getLongitude());
             dto.setShipmentId(e.getShipment().getId());

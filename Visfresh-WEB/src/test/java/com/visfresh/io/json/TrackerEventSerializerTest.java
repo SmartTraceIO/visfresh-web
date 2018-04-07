@@ -38,12 +38,10 @@ public class TrackerEventSerializerTest extends AbstractSerializerTest {
         final TrackerEventType type = TrackerEventType.RSP;
         final double latitude = 10.10;
         final double longitude = 11.11;
-        final String beaconId = "beacon-id";
 
         TrackerEvent e = new TrackerEvent();
         e.setBattery(battery);
         e.setId(id);
-        e.setBeaconId(beaconId);
         e.setTemperature(temperature);
         e.setTime(time);
         e.setType(type);
@@ -56,7 +54,6 @@ public class TrackerEventSerializerTest extends AbstractSerializerTest {
 
         assertEquals(battery, e.getBattery());
         assertEquals(id, e.getId());
-        assertEquals(beaconId, e.getBeaconId());
         assertEquals(temperature, e.getTemperature(), 0.00001);
         assertEquals(format(time), format(e.getTime()));
         assertEquals(format(createdOn), format(e.getCreatedOn()));

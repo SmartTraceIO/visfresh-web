@@ -69,7 +69,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         final Device device = createDevice("3249870239847908");
 
         final DeviceState state = new DeviceState();
-        state.setProperty("key1", "value1", null);
+        state.setProperty("key1", "value1");
 
         saveDeviceState(device.getImei(), state);
 
@@ -84,15 +84,14 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         assertEquals(1, savedTrackerEvents.size());
 
         assertEquals(1, this.numInvoked);
-        assertEquals("value1", getDeviceState(device.getImei()).getProperty(null, "key1"));
+        assertEquals("value1", getDeviceState(device.getImei()).getProperty("key1"));
     }
     @Test
     public void testExistsDeviceStateWithBeaconId() throws RetryableException {
         final Device device = createDevice("3249870239847908");
-        final String beacon = "any-beacon-ID";
 
         final DeviceState state = new DeviceState();
-        state.setProperty("key1", "value1", beacon);
+        state.setProperty("key1", "value1");
 
         saveDeviceState(device.getImei(), state);
 
@@ -107,7 +106,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         assertEquals(1, savedTrackerEvents.size());
 
         assertEquals(1, this.numInvoked);
-        assertEquals("value1", getDeviceState(device.getImei()).getProperty(beacon, "key1"));
+        assertEquals("value1", getDeviceState(device.getImei()).getProperty("key1"));
     }
     @Test
     public void testNotExistsDeviceState() throws RetryableException {
@@ -163,16 +162,11 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         nativeEvent.setLocation(11.12, 13.14);
         nativeEvent.setType("AUT");
         nativeEvent.setImei(device.getImei());
-        nativeEvent.setBeacon("device-beacon-ID");
 
         processDcsEvent(nativeEvent);
 
         //check tracker event saved
         assertEquals(1, savedTrackerEvents.size());
-
-        //tracker event
-        final TrackerEvent e = savedTrackerEvents.get(0);
-        assertEquals(nativeEvent.getBeacon(), e.getBeaconId());
     }
     @Test
     public void testAlertYetToFire() {

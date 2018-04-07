@@ -372,7 +372,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
     public void testFindLastShipment() {
         //test ignores shipment templates
         createShipmentTemplate();
-        assertNull(dao.findLastShipment(device.getImei(), null));
+        assertNull(dao.findLastShipment(device.getImei()));
 
         //check found active
         dao.save(createTestEntity());
@@ -383,28 +383,14 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         dao.save(s);
 
         //check ignores in complete state
-        assertEquals(s.getId(), dao.findLastShipment(device.getImei(), null).getId());
+        assertEquals(s.getId(), dao.findLastShipment(device.getImei()).getId());
 
         //check ignores other devices
         final Device d = createDevice("2340982349");
         s.setDevice(d);
         dao.save(s);
-        assertNotSame(s.getId(), dao.findLastShipment(device.getImei(), null).getId());
-        assertEquals(s.getId(), dao.findLastShipment(d.getImei(), null).getId());
-    }
-    @Test
-    public void testFindLastShipmentWithBaconId() {
-        final String beaconId = "device-beracon-ID";
-
-        //test ignores shipment templates
-        final Shipment s = createTestEntity();
-        s.setBeaconId(beaconId);
-        dao.save(s);
-
-        //check ignores in complete state
-        assertNull(dao.findLastShipment(device.getImei(), null));
-        assertEquals(s.getId(), dao.findLastShipment(device.getImei(), beaconId).getId());
-        assertNull(dao.findLastShipment(device.getImei(), "abrakadabra"));
+        assertNotSame(s.getId(), dao.findLastShipment(device.getImei()).getId());
+        assertEquals(s.getId(), dao.findLastShipment(d.getImei()).getId());
     }
     @Test
     public void testGetShipmentId() {
@@ -821,10 +807,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         final Date shipmentDate = new Date(System.currentTimeMillis() - 239570987l);
         final String description = "Shipment Description";
         final ShipmentStatus status = ShipmentStatus.InProgress;
-        final String beaconId = "beacon-ID";
 
         s.setAlertProfile(ap);
-        s.setBeaconId(beaconId);
         s.setShippedFrom(from);
         s.setShippedTo(to);
         s.setArrivalDate(arrivalDate);
@@ -888,7 +872,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(to.getName(), item.getShippedTo());
         assertEquals(status, item.getStatus());
         assertEquals(s.getTripCount(), item.getTripCount());
-        assertEquals(beaconId, item.getBeaconId());
     }
     /**
      * @param time

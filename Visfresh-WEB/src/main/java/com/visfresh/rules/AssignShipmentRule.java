@@ -55,7 +55,7 @@ public class AssignShipmentRule implements TrackerEventRule {
     public boolean accept(final RuleContext context) {
         final TrackerEvent e = context.getEvent();
         if(e.getShipment() == null && !context.isProcessed(this)) {
-            final Shipment s = shipmentDao.findLastShipment(e.getDevice().getImei(), e.getBeaconId());
+            final Shipment s = shipmentDao.findLastShipment(e.getDevice().getImei());
             if (s != null && s.getStatus() != ShipmentStatus.Ended && s.getDeviceShutdownTime() == null) {
                 //cache shipment to request.
                 context.putClientProperty(this, s);

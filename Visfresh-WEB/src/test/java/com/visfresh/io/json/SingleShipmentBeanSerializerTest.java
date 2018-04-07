@@ -392,7 +392,6 @@ public class SingleShipmentBeanSerializerTest {
     @Test
     public void testLocations() {
         final Long id = 56l;
-        final String beaconId = "beacon-id";
         final Double latitude = 7.7;
         final Double longitude = 8.8;
         final double temperature = 34.45;
@@ -401,7 +400,6 @@ public class SingleShipmentBeanSerializerTest {
 
         SingleShipmentLocationBean loc = new SingleShipmentLocationBean();
         loc.setId(id);
-        loc.setBeaconId(beaconId);
         loc.setLatitude(latitude);
         loc.setLongitude(longitude);
         loc.setTemperature(temperature);
@@ -412,7 +410,6 @@ public class SingleShipmentBeanSerializerTest {
         loc = serializer.parseSingleShipmentLocationBean(serializer.toJson(loc));
 
         assertEquals(id, loc.getId());
-        assertEquals(beaconId, loc.getBeaconId());
         assertEquals(latitude, loc.getLatitude(), 0.001);
         assertEquals(longitude, loc.getLongitude(), 0.001);
         assertEquals(temperature, loc.getTemperature(), 0.001);

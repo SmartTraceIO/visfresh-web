@@ -254,7 +254,6 @@ public final class ShipmentReportBuilderTool {
         final TrackerEvent e = new TrackerEvent();
         e.setCreatedOn(bean.getTime());
         e.setId(bean.getId());
-        e.setBeaconId(bean.getBeaconId());
         e.setLatitude(bean.getLatitude());
         e.setLongitude(bean.getLongitude());
         e.setTemperature(bean.getTemperature());
@@ -349,7 +348,6 @@ public final class ShipmentReportBuilderTool {
         e.setCreatedOn(bean.getTime());
         e.setDeviceImei(s.getDevice());
         e.setId(bean.getId());
-        e.setBeaconId(bean.getBeaconId());
         e.setLatitude(bean.getLatitude());
         e.setLongitude(bean.getLongitude());
         e.setShipmentId(s.getShipmentId());

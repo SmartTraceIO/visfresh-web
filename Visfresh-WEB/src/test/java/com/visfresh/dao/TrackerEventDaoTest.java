@@ -118,7 +118,6 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(27);
         e.setDevice(device);
-        e.setBeaconId("beaconId");
         e.setShipment(shipment);
         e.setTemperature(temperature);
         e.setTime(time);
@@ -133,7 +132,6 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
     @Override
     protected void assertCreateTestEntityOk(final TrackerEvent e) {
         assertNotNull(e.getTime());
-        assertEquals("beaconId", e.getBeaconId());
         assertNotNull(e.getCreatedOn());
         assertEquals(27, e.getBattery());
         assertEquals(5.5, e.getTemperature(), 0.00001);
@@ -245,7 +243,6 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         final TrackerEvent e = createAndSave(new Date((time+=10000)), 10);
 
         assertEquals(e.getId(), dao.getLastEvent(shipment).getId());
-        assertNotNull(dao.getLastEvent(shipment).getBeaconId());
 
         //create left shipment.
         Shipment s = shipmentDao.findOne(shipment.getId());
@@ -286,7 +283,6 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         createAndSave(new Date((time+=10000)), 10);
 
         assertEquals(e.getId(), dao.getFirstEvent(shipment).getId());
-        assertNotNull(dao.getFirstEvent(shipment).getBeaconId());
     }
     @Test
     public void testGetEvents() {
@@ -351,7 +347,6 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
 
         //fully check fields of first tracker event.
         assertEquals(e1.getId(), ute1.getId());
-        assertEquals(e1.getBeaconId(), ute1.getBeaconId());
         assertEquals(e1.getDevice().getImei(), ute1.getDeviceImei());
         assertEquals(e1.getShipment().getId(), ute1.getShipmentId());
         assertEquals(e1.getBattery(), ute1.getBattery());

@@ -135,21 +135,6 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
     }
     @Test
-    public void testDefaultShipmentWithBeacon() {
-        final String beaconId = "device-beacon-ID";
-
-        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
-        e.setBeaconId(beaconId);
-        e.setTime(new Date(System.currentTimeMillis() - 1000000l));
-
-        final RuleContext c = new RuleContext(e, new SessionHolder());
-        rule.handle(c);
-
-        // check shipment created.
-        assertNotNull(e.getShipment());
-        assertEquals(beaconId, e.getShipment().getBeaconId());
-    }
-    @Test
     public void testHandleNullLocation() {
         final TrackerEvent e = createEvent(null, null, new Date());
         e.setTime(new Date(System.currentTimeMillis() - 1000000l));
@@ -256,15 +241,12 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         createAutoStartShipment(tok, 2, l1, lok);
 
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
-        final String beaconId = "device-beacon-ID";
-        e.setBeaconId(beaconId);
 
         final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         // check shipment created.
         assertNotNull(e.getShipment());
-        assertEquals(beaconId, e.getShipment().getBeaconId());
     }
     @Test
     public void testSelectAutoStartShipmentLocFromDuplicates() {

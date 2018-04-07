@@ -48,5 +48,4 @@ public interface ShipmentConstants extends BaseShipmentConstants {
 
     String INTERIM_STOPS = "interimStops";
     String INTERIM_LOCATIONS = "interimLocations";
-    String BEACON_ID = "beacon";
 }

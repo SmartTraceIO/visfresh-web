@@ -636,7 +636,6 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = new JsonObject();
         json.addProperty("id", loc.getId());
-        json.addProperty("beacon", loc.getBeaconId());
         json.addProperty("latitude", loc.getLatitude());
         json.addProperty("longitude", loc.getLongitude());
         json.addProperty("temperature", loc.getTemperature());
@@ -657,7 +656,6 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         final JsonObject json = el.getAsJsonObject();
         final SingleShipmentLocationBean bean = new SingleShipmentLocationBean();
         bean.setId(asLong(json.get("id")));
-        bean.setBeaconId(asString(json.get("beacon")));
         bean.setLatitude(asDouble(json.get("latitude")));
         bean.setLongitude(asDouble(json.get("longitude")));
         bean.setTemperature(asDouble(json.get("temperature")));

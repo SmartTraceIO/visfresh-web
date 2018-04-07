@@ -38,13 +38,11 @@ public class DeviceDcsNativeEventSerializerTest extends AbstractSerializerTest {
         final double lat = 100.500;
         final double lon = 100.501;
         final String type = "Tracker";
-        final String beacon = "beacon-ID";
 
         e.setBattery(battery);
         e.setDate(date);
         e.setCreatedOn(createdOn);
         e.setImei(imei);
-        e.setBeacon(beacon);
         e.setLocation(new Location(lat, lon));
         e.setType(type);
 
@@ -58,6 +56,5 @@ public class DeviceDcsNativeEventSerializerTest extends AbstractSerializerTest {
         assertEquals(lat, e.getLocation().getLatitude(), 0.00001);
         assertEquals(lon, e.getLocation().getLongitude(), 0.00001);
         assertEquals(type, e.getType());
-        assertEquals(beacon, e.getBeacon());
     }
 }

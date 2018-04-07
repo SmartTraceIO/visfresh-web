@@ -316,7 +316,6 @@ public class SingleShipmentUtils {
         e.setCreatedOn(bean.getTime());
         e.setDevice(s.getDevice());
         e.setId(bean.getId());
-        e.setBeaconId(bean.getBeaconId());
         e.setLatitude(bean.getLatitude());
         e.setLongitude(bean.getLongitude());
         e.setShipment(s);

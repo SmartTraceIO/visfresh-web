@@ -41,7 +41,7 @@ public class CleanShutdownRepeatStateRule implements TrackerEventRule {
         final Shipment s = context.getEvent().getShipment();
         return s != null && s.getDeviceShutdownTime() == null
                 && RepeatShutdownRule.getShutDownRepeatTime(
-                        context.getDeviceState(), context.getEvent().getBeaconId()) != null;
+                        context.getDeviceState()) != null;
     }
 
     /* (non-Javadoc)
@@ -49,8 +49,7 @@ public class CleanShutdownRepeatStateRule implements TrackerEventRule {
      */
     @Override
     public boolean handle(final RuleContext context) {
-        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), null,
-                context.getEvent().getBeaconId());
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), null);
         return false;
     }
 }

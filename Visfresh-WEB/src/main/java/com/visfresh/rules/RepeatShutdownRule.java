@@ -67,7 +67,7 @@ public class RepeatShutdownRule implements TrackerEventRule {
 
         //check already in processing
         final DeviceState deviceState = context.getDeviceState();
-        final Date shutdownRepeatTime = getShutDownRepeatTime(deviceState, e.getBeaconId());
+        final Date shutdownRepeatTime = getShutDownRepeatTime(deviceState);
 
         //if already sent shutdown
         if (shutdownRepeatTime != null) {
@@ -98,7 +98,7 @@ public class RepeatShutdownRule implements TrackerEventRule {
             log.debug("Shutdown faulure has detected for " + device.getImei()
                     + ". Resending shutdown");
             final Date date = new Date();
-            setShutDownRepeatTime(context.getDeviceState(), date, e.getBeaconId());
+            setShutDownRepeatTime(context.getDeviceState(), date);
             shutDownDevice(device, date);
         }
 
@@ -110,24 +110,23 @@ public class RepeatShutdownRule implements TrackerEventRule {
      * @param beacon TODO
      * @return
      */
-    public static Date getShutDownRepeatTime(final DeviceState deviceState, final String beacon) {
-        final String str = deviceState.getProperty(beacon, createKey());
+    public static Date getShutDownRepeatTime(final DeviceState deviceState) {
+        final String str = deviceState.getProperty(createKey());
         try {
             return str == null ? null : createDateFormat().parse(str);
         } catch (final ParseException e) {
             log.error("Failed to parse date " + str);
-            setShutDownRepeatTime(deviceState, null, beacon);
+            setShutDownRepeatTime(deviceState, null);
             return null;
         }
     }
     /**
      * @param deviceState
      * @param date
-     * @param beacon TODO
      */
-    public static void setShutDownRepeatTime(final DeviceState deviceState, final Date date, final String beacon) {
+    public static void setShutDownRepeatTime(final DeviceState deviceState, final Date date) {
         deviceState.setProperty(createKey(), date == null
-                ? null : createDateFormat().format(date), beacon);
+                ? null : createDateFormat().format(date));
     }
 
     /**
@@ -151,7 +150,7 @@ public class RepeatShutdownRule implements TrackerEventRule {
     private Shipment getLastShutDownedShipment(final TrackerEvent e) {
         Shipment s = e.getShipment();
         if (s == null) {
-            s = findLastShipment(e.getDevice().getImei(), e.getBeaconId());
+            s = findLastShipment(e.getDevice().getImei());
         }
 
         if (s != null && !(s.hasFinalStatus() && s.getDeviceShutdownTime() != null)) {
@@ -174,7 +173,7 @@ public class RepeatShutdownRule implements TrackerEventRule {
      */
     private boolean shouldRepeatShutdown(final RuleContext context) {
         final TrackerEvent e = context.getEvent();
-        final boolean should = getShutDownRepeatTime(context.getDeviceState(), e.getBeaconId()) == null;
+        final boolean should = getShutDownRepeatTime(context.getDeviceState()) == null;
         if (should) {
             final Shipment s = getLastShutDownedShipment(e);
             if (e.getTime().getTime() - s.getDeviceShutdownTime().getTime() > 2 * CHECK_SHUTDOWN_TIMEOUT) {
@@ -191,10 +190,9 @@ public class RepeatShutdownRule implements TrackerEventRule {
     }
     /**
      * @param imei device IMEI.
-     * @param beaconId beacon ID.
      * @return shipment.
      */
-    protected Shipment findLastShipment(final String imei, final String beaconId) {
-        return shipmentDao.findLastShipment(imei, beaconId);
+    protected Shipment findLastShipment(final String imei) {
+        return shipmentDao.findLastShipment(imei);
     }
 }

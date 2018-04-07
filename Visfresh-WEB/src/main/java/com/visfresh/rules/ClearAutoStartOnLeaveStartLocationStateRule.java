@@ -45,7 +45,7 @@ public class ClearAutoStartOnLeaveStartLocationStateRule implements TrackerEvent
     public boolean accept(final RuleContext context) {
         final TrackerEvent e = context.getEvent();
         final LeaveLocationState s = AutoStartOnLeaveStartLocationRule.getLeaveLocationState(
-                context.getDeviceState(), e.getBeaconId());
+                context.getDeviceState());
         if (s == null) {
             return false;
         }
@@ -64,8 +64,7 @@ public class ClearAutoStartOnLeaveStartLocationStateRule implements TrackerEvent
     @Override
     public boolean handle(final RuleContext context) {
         log.debug("Clearing leave location state for device " + context.getEvent().getDevice().getImei());
-        AutoStartOnLeaveStartLocationRule.clearLeaveLocationState(context.getDeviceState(),
-                context.getEvent().getBeaconId());
+        AutoStartOnLeaveStartLocationRule.clearLeaveLocationState(context.getDeviceState());
         return false;
     }
 }

@@ -172,7 +172,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     private TrackerEvent createTrackerEvent(final DeviceDcsNativeEvent event) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(event.getBattery());
-        e.setBeaconId(event.getBeacon());
         if (event.getLocation() != null) {
             e.setLatitude(event.getLocation().getLatitude());
             e.setLongitude(event.getLocation().getLongitude());

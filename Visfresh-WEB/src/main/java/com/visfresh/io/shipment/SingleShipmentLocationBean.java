@@ -22,7 +22,6 @@ public class SingleShipmentLocationBean {
     private Date time;
     private final List<AlertBean> alerts = new LinkedList<>();
     private TrackerEventType type;
-    private String beaconId;
 
     /**
      * Default constructor.
@@ -36,7 +35,6 @@ public class SingleShipmentLocationBean {
     public SingleShipmentLocationBean(final TrackerEventDto e) {
         super();
         setId(e.getId());
-        setBeaconId(e.getBeaconId());
         setLatitude(e.getLatitude());
         setLongitude(e.getLongitude());
         setTemperature(e.getTemperature());
@@ -55,18 +53,6 @@ public class SingleShipmentLocationBean {
      */
     public Long getId() {
         return id;
-    }
-    /**
-     * @param beaconId
-     */
-    public void setBeaconId(final String beaconId) {
-        this.beaconId = beaconId;
-    }
-    /**
-     * @return the setBeaconId
-     */
-    public String getBeaconId() {
-        return beaconId;
     }
     /**
      * @return the latitude

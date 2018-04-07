@@ -109,7 +109,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         s.setAssetType(asString(json.get(ShipmentConstants.ASSET_TYPE)));
         s.setId(asLong(json.get(ShipmentConstants.SHIPMENT_ID)));
-        s.setBeaconId(asString(json.get(ShipmentConstants.BEACON_ID)));
         s.setShipmentDescription(asString(json.get(ShipmentConstants.SHIPMENT_DESCRIPTION)));
         s.setPalletId(asString(json.get(ShipmentConstants.PALLET_ID)));
         s.setAssetNum(asString(json.get(ShipmentConstants.ASSET_NUM)));
@@ -151,7 +150,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.TRIP_COUNT, s.getTripCount());
 
         obj.addProperty(ShipmentConstants.SHIPMENT_ID, s.getId());
-        obj.addProperty(ShipmentConstants.BEACON_ID, s.getBeaconId());
         obj.addProperty(ShipmentConstants.SHIPMENT_DESCRIPTION, s.getShipmentDescription());
 
         obj.addProperty(ShipmentConstants.PALLET_ID, s.getPalletId());
@@ -322,7 +320,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("tripCount", dto.getTripCount());
 
         json.addProperty("shipmentId", dto.getShipmentId());
-        json.addProperty(ShipmentConstants.BEACON_ID, dto.getBeaconId());
         json.addProperty("shipmentDescription", dto.getShipmentDescription());
         json.addProperty("shipmentDate", getFormatted(prettyFormat, dto.getShipmentDate()));
         json.addProperty("shipmentDateISO", getFormatted(isoFormat, dto.getShipmentDate()));

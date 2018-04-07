@@ -41,7 +41,6 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
     private Shipment shipment;
     private Double latitude;
     private Double longitude;
-    private String beaconId;
 
     /**
      * Default constructor.
@@ -178,18 +177,6 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
     @Override
     public int compareTo(final TrackerEvent o) {
         return getTime().compareTo(o.getTime());
-    }
-    /**
-     * @return the beaconId
-     */
-    public String getBeaconId() {
-        return beaconId;
-    }
-    /**
-     * @param beaconId the beaconId to set
-     */
-    public void setBeaconId(final String beaconId) {
-        this.beaconId = beaconId;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

@@ -68,7 +68,6 @@ public class DeviceDcsNativeEventSerializer extends AbstractJsonSerializer {
         }
 
         e.setImei(asString(obj.get(IMEI)));
-        e.setBeacon(asString(obj.get(TrackerEventConstants.PROPERTY_BEACON)));
 
         return e;
     }
@@ -92,7 +91,6 @@ public class DeviceDcsNativeEventSerializer extends AbstractJsonSerializer {
             obj.add(TrackerEventConstants.PROPERTY_LONGITUDE, JsonNull.INSTANCE);
         }
         obj.addProperty(IMEI, e.getImei());
-        obj.addProperty(TrackerEventConstants.PROPERTY_BEACON, e.getBeacon());
         return obj;
     }
     /**

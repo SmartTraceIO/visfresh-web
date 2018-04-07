@@ -459,7 +459,6 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         final Shipment s = createShipment(d1, true);
         final TrackerEvent e = createTrackerEvent(d1, new Date(t0 + 4 * dt));
-        e.setBeaconId("device-beacon-ID");
         e.setShipment(s);
         context.getBean(TrackerEventDao.class).save(e);
 
@@ -481,26 +480,24 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final String[] str = data.split("\n")[3].split(",");
         //id
         assertEquals(Long.toString(e.getId()), str[0]);
-        //beacon id
-        assertEquals(e.getBeaconId(), str[1]);
         //shipment
-        assertEquals("703948(1)", str[2]);
+        assertEquals("703948(1)", str[1]);
         //time
-        assertTrue(getDiferenceMs(e.getTime(), str[3]) < 61000);
+        assertTrue(getDiferenceMs(e.getTime(), str[2]) < 61000);
         //temperature
-        assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[4]);
+        assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
         //battery
-        assertEquals(Integer.toString(e.getBattery()), str[5]);
+        assertEquals(Integer.toString(e.getBattery()), str[4]);
         //latitude
-        assertEquals(Double.toString(e.getLatitude()), str[6]);
+        assertEquals(Double.toString(e.getLatitude()), str[5]);
         //longitude
-        assertEquals(Double.toString(e.getLongitude()), str[7]);
+        assertEquals(Double.toString(e.getLongitude()), str[6]);
         //device
-        assertEquals("\"" + e.getDevice().getImei() + "\"", str[8]);
+        assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
         //createdon
-        assertTrue(getDiferenceMs(e.getCreatedOn(), str[9]) <  61000);
+        assertTrue(getDiferenceMs(e.getCreatedOn(), str[8]) <  61000);
         //type
-        assertEquals("SwitchedOn", str[10]);
+        assertEquals("SwitchedOn", str[9]);
     }
     @Test
     public void testGetReadingsByShipmentId() throws IOException, RestServiceException {
@@ -559,7 +556,6 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         final Shipment s = createShipment(d1, true);
         final TrackerEvent e = createTrackerEvent(d1, new Date(t0 + 4 * dt));
-        e.setBeaconId("device-beaco-ID");
         e.setShipment(s);
         context.getBean(TrackerEventDao.class).save(e);
 
@@ -569,26 +565,24 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final String[] str = data.split("\n")[1].split(",");
         //id
         assertEquals(Long.toString(e.getId()), str[0]);
-        //beacon
-        assertEquals(e.getBeaconId(), str[1]);
         //shipment
-        assertEquals("703948(1)", str[2]);
+        assertEquals("703948(1)", str[1]);
         //time
-        assertTrue(getDiferenceMs(e.getTime(), str[3]) < 61000l);
+        assertTrue(getDiferenceMs(e.getTime(), str[2]) < 61000l);
         //temperature
-        assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[4]);
+        assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
         //battery
-        assertEquals(Integer.toString(e.getBattery()), str[5]);
+        assertEquals(Integer.toString(e.getBattery()), str[4]);
         //latitude
-        assertEquals(Double.toString(e.getLatitude()), str[6]);
+        assertEquals(Double.toString(e.getLatitude()), str[5]);
         //longitude
-        assertEquals(Double.toString(e.getLongitude()), str[7]);
+        assertEquals(Double.toString(e.getLongitude()), str[6]);
         //device
-        assertEquals("\"" + e.getDevice().getImei() + "\"", str[8]);
+        assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
         //createdon
-        assertTrue(getDiferenceMs(e.getCreatedOn(), str[9]) < 61000l);
+        assertTrue(getDiferenceMs(e.getCreatedOn(), str[8]) < 61000l);
         //type
-        assertEquals("SwitchedOn", str[10]);
+        assertEquals("SwitchedOn", str[9]);
     }
     @Test
     public void testGetReadingsAlerts() throws IOException, RestServiceException {
@@ -613,7 +607,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         final String line = lines[1];
         int index = 0;
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < 10; i++) {
             index = line.indexOf(',', index + 1);
         }
 

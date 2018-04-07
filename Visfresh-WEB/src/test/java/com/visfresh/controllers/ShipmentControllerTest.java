@@ -152,11 +152,9 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSaveShipment() throws RestServiceException, IOException {
         final String comments = "Some comments for receiver saved for shipment";
-        final String beaconId = "beacon-ID";
 
         final ShipmentDto s = new ShipmentDto(createShipment(true));
         s.setCommentsForReceiver(comments);
-        s.setBeaconId(beaconId);
 
         //add interim locations
         final List<Long> locs = new LinkedList<Long>();
@@ -189,7 +187,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(2, shp.getUserAccess().size());
         assertEquals(2, shp.getCompanyAccess().size());
         assertEquals(2, context.getBean(AlternativeLocationsDao.class).getBy(shp).getInterim().size());
-        assertEquals(beaconId, shp.getBeaconId());
 
         //test audit
         final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
@@ -510,7 +507,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     }
     @Test
     public void testGetShipmentsBeaconId() throws RestServiceException, IOException {
-        final String beaconId = "shipment-beacon-ID";
         final Shipment s = createShipment(true);
         s.getShippedTo().setAddress("Coles Perth DC");
         final Date eta = context.getBean(EtaCalculationRule.class).estimateArrivalDate(s,
@@ -518,13 +514,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
                 s.getShipmentDate(),
                 new Date(s.getShipmentDate().getTime() + 100000l));
         s.setEta(eta);
-        s.setBeaconId(beaconId);
 
         shipmentDao.save(s);
 
         assertEquals(1, shipmentClient.getShipments(null, null).size());
-        final JsonObject json = shipmentClient.getShipments(null, null).get(0).getAsJsonObject();
-        assertEquals(beaconId, json.get(ShipmentConstants.BEACON_ID).getAsString());
+        shipmentClient.getShipments(null, null).get(0).getAsJsonObject();
     }
     @Test
     public void testGetShipmentsWithoutTrackerEvents() throws RestServiceException, IOException {
@@ -987,7 +981,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
-        final String beaconId = "shipment-beacon-ID";
 
         sp.setDeviceShutdownTime(new Date(System.currentTimeMillis() - 10000000l));
         //user access
@@ -996,7 +989,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         //company access
         sp.getCompanyAccess().add(createCompany("C1"));
         sp.getCompanyAccess().add(createCompany("C2"));
-        sp.setBeaconId(beaconId);
 
         saveShipmentDirectly(sp);
 
@@ -1012,7 +1004,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(2, dto.getInterimLocations().size());
         assertEquals(2, dto.getCompanyAccess().size());
         assertEquals(2, dto.getUserAccess().size());
-        assertEquals(beaconId, dto.getBeaconId());
 
         //test audits
         final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
@@ -1642,7 +1633,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         //test not device found
         try {
-            shipmentClient.autoStartShipment("1111111111111111", null);
+            shipmentClient.autoStartShipment("1111111111111111");
             throw new AssertionFailedError("Not device found exception should be thrown");
         } catch (final Exception e) {
             //ok
@@ -1650,7 +1641,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         //test not last reading found
         try {
-            shipmentClient.autoStartShipment(d.getImei(), null);
+            shipmentClient.autoStartShipment(d.getImei());
             throw new AssertionFailedError("Not last reading found exception should be thrown");
         } catch (final Exception e) {
             //ok
@@ -1666,7 +1657,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         trackerEventDao.save(e);
 
-        final Long id = shipmentClient.autoStartShipment(d.getImei(), null);
+        final Long id = shipmentClient.autoStartShipment(d.getImei());
         assertNotNull(id);
         final Shipment s = shipmentDao.findOne(id);
         assertNotNull(s);
@@ -1690,11 +1681,9 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         trackerEventDao.save(e);
 
-        final String beacon = "any-beacon-ID";
-        final Long id = shipmentClient.autoStartShipment(d.getImei(), beacon);
+        final Long id = shipmentClient.autoStartShipment(d.getImei());
         final Shipment s = shipmentDao.findOne(id);
         assertNotNull(s);
-        assertEquals(beacon, s.getBeaconId());
     }
     @Test
     public void testAutoStartShipmentWithoutBeacon() throws IOException, RestServiceException {
@@ -1707,15 +1696,13 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         e.setType(TrackerEventType.AUT);
         e.setLatitude(50.50);
         e.setLongitude(51.51);
-        e.setBeaconId("device-beacon-ID");
 
         trackerEventDao.save(e);
 
-        final Long id = shipmentClient.autoStartShipment(d.getImei(), null);
+        final Long id = shipmentClient.autoStartShipment(d.getImei());
         assertNotNull(id);
         final Shipment s = shipmentDao.findOne(id);
         assertNotNull(s);
-        assertEquals(e.getBeaconId(), s.getBeaconId());
     }
     @Test
     public void testGetShipmentsNearBy() throws IOException, RestServiceException {

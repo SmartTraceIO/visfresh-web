@@ -20,7 +20,6 @@ import com.visfresh.io.shipment.TemperatureRuleBean;
  */
 public class ListShipmentItem implements EntityWithId<Long> {
     private Long shipmentId;
-    private String beaconId;
     private String deviceSN;
     private String deviceName;
     private int tripCount;
@@ -81,7 +80,6 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.setPercentageComplete(0);
         this.setShipmentDescription(s.getShipmentDescription());
         this.setShipmentId(s.getId());
-        this.setBeaconId(s.getBeaconId());
         this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getName());
         this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getName());
         this.setStatus(s.getStatus());
@@ -513,17 +511,5 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public List<TemperatureRuleBean> getTemperatureRules() {
         return temperatureRules;
-    }
-    /**
-     * @return the beaconId
-     */
-    public String getBeaconId() {
-        return beaconId;
-    }
-    /**
-     * @param beaconId the beaconId to set
-     */
-    public void setBeaconId(final String beaconId) {
-        this.beaconId = beaconId;
     }
 }

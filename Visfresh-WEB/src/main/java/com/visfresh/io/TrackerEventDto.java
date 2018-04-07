@@ -43,7 +43,6 @@ public class TrackerEventDto {
     private Long shipmentId;
     private Double latitude;
     private Double longitude;
-    private String beaconId;
 
     /**
      * Default constructor.
@@ -63,18 +62,6 @@ public class TrackerEventDto {
      */
     public void setId(final Long id) {
         this.id = id;
-    }
-    /**
-     * @param beaconId
-     */
-    public void setBeaconId(final String beaconId) {
-        this.beaconId = beaconId;
-    }
-    /**
-     * @return the setBeaconId
-     */
-    public String getBeaconId() {
-        return beaconId;
     }
     /**
      * @return the type

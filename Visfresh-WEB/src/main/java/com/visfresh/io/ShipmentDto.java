@@ -17,7 +17,6 @@ import com.visfresh.entities.ShipmentStatus;
  */
 public class ShipmentDto extends ShipmentBaseDto {
     private String deviceImei;
-    private String beaconId;
     private String deviceSN;
     private String deviceName;
     private List<Long> interimStops;
@@ -91,7 +90,6 @@ public class ShipmentDto extends ShipmentBaseDto {
             setDeviceName(s.getDevice().getName());
         }
 
-        setBeaconId(s.getBeaconId());
         setPalletId(s.getPalletId());
         setAssetNum(s.getAssetNum());
         setTripCount(s.getTripCount());
@@ -330,17 +328,5 @@ public class ShipmentDto extends ShipmentBaseDto {
      */
     public void setInterimStops(final List<Long> interimStops) {
         this.interimStops = interimStops;
-    }
-    /**
-     * @return the beaconId
-     */
-    public String getBeaconId() {
-        return beaconId;
-    }
-    /**
-     * @param beaconId the beaconId to set
-     */
-    public void setBeaconId(final String beaconId) {
-        this.beaconId = beaconId;
     }
 }
