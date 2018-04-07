@@ -37,6 +37,7 @@ drop table if exists devicegroups;
 drop table if exists restproperties;
 drop table if exists restsessions;
 drop table if exists users;
+drop table if exists beacongateways;
 drop table if exists companies;
 
 -- creates
