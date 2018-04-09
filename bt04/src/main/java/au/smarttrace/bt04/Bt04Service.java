@@ -3,6 +3,7 @@
  */
 package au.smarttrace.bt04;
 
+import java.io.PrintStream;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -232,37 +233,57 @@ public class Bt04Service {
             "Violet",
             "YellowGreen"
         };
-        final String[] sns = {
-            "11181960",
-            "11160059",
-            "11181916",
-            "11181902",
-            "11181904",
-            "11181914",
-            "11181901",
-            "11181910",
-            "11181913",
-            "11181912",
-            "11181905",
-            "11160058",
-            "11181915",
-            "11181919"
-        };
 
+        //create array of serial numbers.
+        final long start = 11181950;
+        final long end = 11181999;
+        final long company = 3;
+
+        final PrintStream out = System.out;
+        for (long sn = start; sn <= end; sn++) {
+            printCreateSql(colors, Long.toString(sn), company, out);
+//            tmpPrintUpdateNameSql(Long.toString(sn), out);
+        }
+    }
+
+    /**
+     * @param colors
+     * @param sns
+     * @param out
+     */
+    protected static void printCreateSql(final String[] colors, final String sn,
+            final long company, final PrintStream out) {
         final Random random = new Random();
         //insert ignore into devices
-        for (final String sn : sns) {
-            final String sql = "insert ignore into devices (imei, name, description, company, active, model, color)"
-                    + " values ('"
-                    + createBt04Imei(sn)
-                    + "', 'B04 beacon "
-                    + sn
-                    + "', 'Primo BT04 beacon "
-                    + sn
-                    + "', 2, true, 'BT04', '"
-                    + colors[random.nextInt(colors.length)]
-                    + "');";
-            System.out.println(sql);
-        }
+        final String sql = "insert ignore into devices (imei, name, description, company, active, model, color)"
+                + " values ('"
+                + createBt04Imei(sn)
+                + "', 'B04 beacon "
+                + sn
+                + "', 'BT04 beacon "
+                + sn
+                + "', "
+                + company
+                + ", true, 'BT04', '"
+                + colors[random.nextInt(colors.length)]
+                + "');";
+        out.println(sql);
+    }
+    /**
+     * @param colors
+     * @param sns
+     * @param out
+     */
+    protected static void tmpPrintUpdateNameSql(final String sn, final PrintStream out) {
+        final String name = "Primo Beacon R " + sn;
+        //insert ignore into devices
+        final String sql = "update devices set name = '"
+                + name
+                + "', description = '"
+                + name
+                + "', autostart = 19 where imei = '"
+                + createBt04Imei(sn)
+                + "';";
+        out.println(sql);
     }
 }
