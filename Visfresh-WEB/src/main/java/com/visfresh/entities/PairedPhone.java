@@ -7,18 +7,18 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class BeaconGateway implements EntityWithId<Long> {
+public class PairedPhone implements EntityWithId<Long> {
     private Long id;
     private Long company;
-    private String gateway;
-    private String beacon;
+    private String beaconId;
+    private String imei;
     private boolean active;
     private String description;
 
     /**
      * Default constructor.
      */
-    public BeaconGateway() {
+    public PairedPhone() {
         super();
     }
 
@@ -50,26 +50,26 @@ public class BeaconGateway implements EntityWithId<Long> {
     /**
      * @return the gateway
      */
-    public String getGateway() {
-        return gateway;
+    public String getBeaconId() {
+        return beaconId;
     }
     /**
      * @param gateway the gateway to set
      */
-    public void setGateway(final String gateway) {
-        this.gateway = gateway;
+    public void setBeaconId(final String gateway) {
+        this.beaconId = gateway;
     }
     /**
      * @return the beacon
      */
-    public String getBeacon() {
-        return beacon;
+    public String getImei() {
+        return imei;
     }
     /**
      * @param beacon the beacon to set
      */
-    public void setBeacon(final String beacon) {
-        this.beacon = beacon;
+    public void setImei(final String beacon) {
+        this.imei = beacon;
     }
     /**
      * @return the active

@@ -5,35 +5,37 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import com.visfresh.entities.BeaconGateway;
+import com.visfresh.entities.PairedPhone;
 
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class BeaconGatewayTest extends BaseCrudTest<BeaconGatewayDao, BeaconGateway, BeaconGateway, Long> {
+public class PairedPhoneDaoTest extends BaseCrudTest<PairedPhoneDao, PairedPhone, PairedPhone, Long> {
+    int lastId = 1;
     /**
      * Default constructor.
      */
-    public BeaconGatewayTest() {
-        super(BeaconGatewayDao.class);
+    public PairedPhoneDaoTest() {
+        super(PairedPhoneDao.class);
     }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
      */
     @Override
-    protected BeaconGateway createTestEntity() {
-        final BeaconGateway g = new BeaconGateway();
+    protected PairedPhone createTestEntity() {
+        final PairedPhone g = new PairedPhone();
         g.setActive(true);
-        g.setBeacon("beacon");
+        g.setImei("imei-" + (lastId)++);
         g.setCompany(sharedCompany.getCompanyId());
         g.setDescription("description");
-        g.setGateway("gateway");
+        g.setBeaconId("beacon");
         return g;
     }
 
@@ -41,20 +43,20 @@ public class BeaconGatewayTest extends BaseCrudTest<BeaconGatewayDao, BeaconGate
      * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
      */
     @Override
-    protected void assertCreateTestEntityOk(final BeaconGateway g) {
+    protected void assertCreateTestEntityOk(final PairedPhone g) {
         assertNotNull(g.getId());
         assertEquals(true, g.isActive());
-        assertEquals("beacon", g.getBeacon());
+        assertTrue(g.getImei().startsWith("imei-"));
         assertEquals(sharedCompany.getCompanyId(), g.getCompany());
         assertEquals("description", g.getDescription());
-        assertEquals("gateway", g.getGateway());
+        assertEquals("beacon", g.getBeaconId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
      */
     @Override
     protected void assertTestGetAllOk(final int numberOfCreatedEntities,
-            final List<BeaconGateway> all) {
+            final List<PairedPhone> all) {
         super.assertTestGetAllOk(numberOfCreatedEntities, all);
         assertCreateTestEntityOk(all.get(0));
     }
