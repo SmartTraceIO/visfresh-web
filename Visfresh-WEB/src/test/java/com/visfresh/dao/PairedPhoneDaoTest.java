@@ -9,6 +9,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import com.visfresh.constants.PairedPhoneConstants;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.PairedPhone;
 
 
@@ -30,9 +34,26 @@ public class PairedPhoneDaoTest extends BaseCrudTest<PairedPhoneDao, PairedPhone
      */
     @Override
     protected PairedPhone createTestEntity() {
+        return createPairedPhone("imei-" + (lastId)++);
+    }
+
+    /**
+     * @param imei phone IMEI
+     * @return
+     */
+    private PairedPhone createAndSavePairedPhone(final String imei, final String beacon) {
+        final PairedPhone p = createPairedPhone(imei);
+        p.setBeaconId(beacon);
+        return dao.save(p);
+    }
+    /**
+     * @param imei
+     * @return
+     */
+    private PairedPhone createPairedPhone(final String imei) {
         final PairedPhone g = new PairedPhone();
         g.setActive(true);
-        g.setImei("imei-" + (lastId)++);
+        g.setImei(imei);
         g.setCompany(sharedCompany.getCompanyId());
         g.setDescription("description");
         g.setBeaconId("beacon");
@@ -59,5 +80,55 @@ public class PairedPhoneDaoTest extends BaseCrudTest<PairedPhoneDao, PairedPhone
             final List<PairedPhone> all) {
         super.assertTestGetAllOk(numberOfCreatedEntities, all);
         assertCreateTestEntityOk(all.get(0));
+    }
+
+    @Test
+    public void testGetEntityCount() {
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        final PairedPhone p1 = createPairedPhone("imei1");
+        p1.setCompany(c1.getCompanyId());
+        dao.save(p1);
+
+        final PairedPhone p2 = createPairedPhone("imei2");
+        p2.setCompany(c2.getCompanyId());
+        dao.save(p2);
+
+        final Filter filter = new Filter();
+        assertEquals(1, dao.getEntityCount(c1.getCompanyId(), filter));
+        assertEquals(1, dao.getEntityCount(c1.getCompanyId(), null));
+
+        filter.addFilter(PairedPhoneConstants.IMEI, "abrakadabra");
+        assertEquals(0, dao.getEntityCount(c1.getCompanyId(), filter));
+    }
+    @Test
+    public void testFindByCompany() {
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        final PairedPhone p1 = createPairedPhone("imei1");
+        p1.setCompany(c1.getCompanyId());
+        dao.save(p1);
+
+        final PairedPhone p2 = createPairedPhone("imei2");
+        p2.setCompany(c2.getCompanyId());
+        dao.save(p2);
+
+        final Filter filter = new Filter();
+        assertEquals(1, dao.findByCompany(c1.getCompanyId(), null, null, filter).size());
+        assertEquals(1, dao.findByCompany(c1.getCompanyId(), null, null, null).size());
+
+        filter.addFilter(PairedPhoneConstants.IMEI, "abrakadabra");
+        assertEquals(0, dao.findByCompany(c1.getCompanyId(), null, null, filter).size());
+    }
+    @Test
+    public void testGetPairedBeacons() {
+        createAndSavePairedPhone("imei1", "b1");
+        createAndSavePairedPhone("imei1", "b2");
+        createAndSavePairedPhone("imei2", "b3");
+
+        assertEquals(2, dao.getPairedBeacons("imei1").size());
+        assertEquals(1, dao.getPairedBeacons("imei2").size());
     }
 }

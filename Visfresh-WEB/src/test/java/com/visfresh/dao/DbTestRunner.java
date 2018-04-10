@@ -86,6 +86,7 @@ public class DbTestRunner extends BlockJUnit4ClassRunner {
         context.getBean(DeviceGroupDao.class).deleteAll();
         context.getBean(DeviceDao.class).deleteAll();
         context.getBean(UserDao.class).deleteAll();
+        context.getBean(PairedPhoneDao.class).deleteAll();
         context.getBean(CompanyDao.class).deleteAll();
     }
 }

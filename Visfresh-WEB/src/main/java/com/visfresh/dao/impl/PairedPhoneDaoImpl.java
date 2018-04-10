@@ -59,8 +59,8 @@ public class PairedPhoneDaoImpl extends DaoImplBase<PairedPhone, PairedPhone, Lo
 
         paramMap.put(ID, g.getId());
         paramMap.put(COMPANY, g.getCompany());
-        paramMap.put(IMEI, g.getBeaconId());
-        paramMap.put(BEACONID, g.getImei());
+        paramMap.put(IMEI, g.getImei());
+        paramMap.put(BEACONID, g.getBeaconId());
         paramMap.put(ACTIVE, g.isActive());
         paramMap.put(DESCRIPTION, g.getDescription());
 
@@ -160,8 +160,8 @@ public class PairedPhoneDaoImpl extends DaoImplBase<PairedPhone, PairedPhone, Lo
         final PairedPhone a = new PairedPhone();
         a.setId(((Number) map.get(ID)).longValue());
         a.setCompany(((Number) map.get(COMPANY)).longValue());
-        a.setBeaconId((String) map.get(IMEI));
-        a.setImei((String) map.get(BEACONID));
+        a.setBeaconId((String) map.get(BEACONID));
+        a.setImei((String) map.get(IMEI));
         a.setActive(Boolean.TRUE.equals(map.get(ACTIVE)));
         a.setDescription((String) map.get(DESCRIPTION));
         return a;
