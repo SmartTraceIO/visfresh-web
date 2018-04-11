@@ -54,7 +54,7 @@ public class PairedPhoneController extends AbstractController {
      */
     @RequestMapping(value = "/getPairedPhone", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getUser(final @RequestParam Long id) throws RestServiceException {
+    public JsonObject getPairedPhone(final @RequestParam Long id) throws RestServiceException {
         final User user = getLoggedInUser();
 
         final PairedPhone p = dao.findOne(id);

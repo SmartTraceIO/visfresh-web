@@ -28,10 +28,10 @@ public class PairedPhoneSerializer extends AbstractJsonSerializer {
         final PairedPhone g = new PairedPhone();
         g.setId(asLong(json.get(PairedPhoneConstants.ID)));
         g.setActive(!Boolean.FALSE.equals(asBoolean(json.get(PairedPhoneConstants.ACTIVE))));
-        g.setImei(asString(json.get(PairedPhoneConstants.BEACON_ID)));
+        g.setImei(asString(json.get(PairedPhoneConstants.IMEI)));
         g.setCompany(asLong(json.get(PairedPhoneConstants.COMAPNY)));
         g.setDescription(asString(json.get(PairedPhoneConstants.DESCRIPTION)));
-        g.setBeaconId(asString(json.get(PairedPhoneConstants.IMEI)));
+        g.setBeaconId(asString(json.get(PairedPhoneConstants.BEACON_ID)));
         return g;
     }
     /**
@@ -46,10 +46,10 @@ public class PairedPhoneSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
         json.addProperty(PairedPhoneConstants.ID, g.getId());
         json.addProperty(PairedPhoneConstants.ACTIVE, g.isActive());
-        json.addProperty(PairedPhoneConstants.BEACON_ID, g.getImei());
+        json.addProperty(PairedPhoneConstants.IMEI, g.getImei());
         json.addProperty(PairedPhoneConstants.COMAPNY, g.getCompany());
         json.addProperty(PairedPhoneConstants.DESCRIPTION, g.getDescription());
-        json.addProperty(PairedPhoneConstants.IMEI, g.getBeaconId());
+        json.addProperty(PairedPhoneConstants.BEACON_ID, g.getBeaconId());
         return json;
     }
 }

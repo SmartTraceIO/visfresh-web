@@ -54,10 +54,10 @@ public class PairedPhone implements EntityWithId<Long> {
         return beaconId;
     }
     /**
-     * @param gateway the gateway to set
+     * @param beacon the gateway to set
      */
-    public void setBeaconId(final String gateway) {
-        this.beaconId = gateway;
+    public void setBeaconId(final String beacon) {
+        this.beaconId = beacon;
     }
     /**
      * @return the beacon
@@ -66,10 +66,10 @@ public class PairedPhone implements EntityWithId<Long> {
         return imei;
     }
     /**
-     * @param beacon the beacon to set
+     * @param imei the IMEI to set
      */
-    public void setImei(final String beacon) {
-        this.imei = beacon;
+    public void setImei(final String imei) {
+        this.imei = imei;
     }
     /**
      * @return the active

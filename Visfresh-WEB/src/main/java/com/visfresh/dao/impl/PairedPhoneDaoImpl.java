@@ -104,7 +104,7 @@ public class PairedPhoneDaoImpl extends DaoImplBase<PairedPhone, PairedPhone, Lo
         map.put(PairedPhoneConstants.COMAPNY, COMPANY);
         map.put(PairedPhoneConstants.IMEI, IMEI);
         map.put(PairedPhoneConstants.BEACON_ID, BEACONID);
-        map.put(PairedPhoneConstants.BEACON_ID, ACTIVE);
+        map.put(PairedPhoneConstants.ACTIVE, ACTIVE);
         map.put(PairedPhoneConstants.DESCRIPTION, DESCRIPTION);
 
         return map;
