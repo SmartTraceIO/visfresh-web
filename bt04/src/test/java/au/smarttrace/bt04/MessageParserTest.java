@@ -51,7 +51,7 @@ public class MessageParserTest {
         //beacon
         // SN|Name|Temperature|Humidity|RSSI|Distance|battery|LastScannedTime|HardwareModel|<\n>
         // 11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|
-        final Beacon b = msg.getBeacons().get(0);
+        final BeaconSignal b = msg.getBeacons().get(0);
         assertEquals("11160058", b.getSn());
         assertEquals("RT_T", b.getName());
         assertEquals(26.28, b.getTemperature(), 0.01);

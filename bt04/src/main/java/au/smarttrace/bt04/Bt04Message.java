@@ -19,7 +19,7 @@ public class Bt04Message {
     private Double accuracy;
     private String rawData;
 
-    private final List<Beacon> beacons = new LinkedList<>();
+    private final List<BeaconSignal> beacons = new LinkedList<>();
     private Date time;
 
     /**
@@ -32,7 +32,7 @@ public class Bt04Message {
     /**
      * @return the beacons
      */
-    public List<Beacon> getBeacons() {
+    public List<BeaconSignal> getBeacons() {
         return beacons;
     }
 

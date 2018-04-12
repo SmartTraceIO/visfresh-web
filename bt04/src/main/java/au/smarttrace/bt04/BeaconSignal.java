@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Beacon {
+public class BeaconSignal {
     // SN|Name|Temperature|Humidity|RSSI|Distance|battery|LastScannedTime|HardwareModel|<LF>
     // SN|Name|Temperature|Humidity|RSSI|Distance|battery|LastScannedTime|HardwareModel|<LF>
     private String sn;
@@ -25,7 +25,7 @@ public class Beacon {
     /**
      * Default constructor.
      */
-    public Beacon() {
+    public BeaconSignal() {
         super();
     }
 
@@ -131,11 +131,11 @@ public class Beacon {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (!(obj instanceof Beacon)) {
+        if (!(obj instanceof BeaconSignal)) {
             return false;
         }
 
-        final Beacon other = (Beacon) obj;
+        final BeaconSignal other = (BeaconSignal) obj;
         return Objects.equals(this.sn, other.sn) &&
             Objects.equals(this.name, other.name) &&
             Objects.equals(this.temperature, other.temperature) &&

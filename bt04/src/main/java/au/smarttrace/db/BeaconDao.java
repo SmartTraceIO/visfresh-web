@@ -11,20 +11,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import au.smarttrace.Device;
+import au.smarttrace.Beacon;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class DeviceDao {
+public class BeaconDao {
     public static final String TABLE = "devices";
 
-    public static final String DESCRIPTION_FIELD = "description";
-    public static final String NAME_FIELD = "name";
     public static final String IMEI_FIELD = "imei";
     public static final String ACTIVE_FIELD = "active";
+    public static final String COMPANY_FIELD = "company";
 
     @Autowired
     protected NamedParameterJdbcTemplate jdbc;
@@ -32,11 +31,11 @@ public class DeviceDao {
     /**
      * Default constructor.
      */
-    public DeviceDao() {
+    public BeaconDao() {
         super();
     }
 
-    public Device getByImei(final String imei) {
+    public Beacon getByImei(final String imei) {
         final String entityName = "d";
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(IMEI_FIELD, imei);
@@ -57,12 +56,11 @@ public class DeviceDao {
      * @param map
      * @return
      */
-    public static Device createDevice(final Map<String, Object> map) {
-        final Device d = new Device();
-        d.setName((String) map.get(NAME_FIELD));
-        d.setDescription((String) map.get(DESCRIPTION_FIELD));
+    public static Beacon createDevice(final Map<String, Object> map) {
+        final Beacon d = new Beacon();
         d.setImei((String) map.get(IMEI_FIELD));
         d.setActive(Boolean.TRUE.equals(map.get(ACTIVE_FIELD)));
+        d.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
         return d;
     }
     /**
@@ -71,10 +69,9 @@ public class DeviceDao {
      */
     public static Map<String, String> createSelectAsMapping(final String entityName) {
         final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + NAME_FIELD, NAME_FIELD);
-        map.put(entityName + "." + DESCRIPTION_FIELD, DESCRIPTION_FIELD);
         map.put(entityName + "." + IMEI_FIELD, IMEI_FIELD);
         map.put(entityName + "." + ACTIVE_FIELD, ACTIVE_FIELD);
+        map.put(entityName + "." + COMPANY_FIELD, COMPANY_FIELD);
         return map ;
     }
     /**

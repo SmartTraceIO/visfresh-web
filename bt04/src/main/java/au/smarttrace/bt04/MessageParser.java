@@ -65,8 +65,8 @@ public class MessageParser {
      * @param str string to parse.
      * @return
      */
-    private Beacon parseBeacon(final String str) {
-        final Beacon b = new Beacon();
+    private BeaconSignal parseBeacon(final String str) {
+        final BeaconSignal b = new BeaconSignal();
         // SN|Name|Temperature|Humidity|RSSI|Distance|battery|LastScannedTime|HardwareModel|<\n>
         // 11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|
         final String[] lines = str.split(Pattern.quote("|"));

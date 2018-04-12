@@ -15,8 +15,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import au.smarttrace.Device;
+import au.smarttrace.Beacon;
 import au.smarttrace.DeviceMessage;
+import au.smarttrace.GatewayBinding;
 import au.smarttrace.Location;
 
 /**
@@ -24,8 +25,8 @@ import au.smarttrace.Location;
  *
  */
 public class Bt04ServiceTest extends Bt04Service {
-    private Device device;
-    private Map<String, Device> devices = new HashMap<>();
+    private Beacon beacon;
+    private Map<String, Beacon> beacons = new HashMap<>();
     private long lastId;
     private final List<DeviceMessage> messages = new LinkedList<>();
     private final List<String> alerts = new LinkedList<>();
@@ -39,20 +40,19 @@ public class Bt04ServiceTest extends Bt04Service {
     }
     @Before
     public void setUp() {
-        this.device = addDevice("1289374698773");
+        this.beacon = addBeacon("1289374698773");
     }
 
     /**
      * @param imei
      */
-    private Device addDevice(final String imei) {
-        final Device d = new Device();
+    private Beacon addBeacon(final String imei) {
+        final Beacon d = new Beacon();
         d.setImei(imei);
-        d.setName("JUnit-" + imei);
-        d.setDescription("Test device");
         d.setActive(true);
+        d.setCompany(77777l);
 
-        devices.put(d.getImei(), d);
+        beacons.put(d.getImei(), d);
         return d;
     }
 
@@ -65,7 +65,7 @@ public class Bt04ServiceTest extends Bt04Service {
         final Date time = new Date(System.currentTimeMillis() - 10000000l);
 
         final Bt04Message msg = new Bt04Message();
-        msg.setImei(device.getImei());
+        msg.setImei(beacon.getImei());
         msg.setAccuracy(accuracy);
         msg.setLatitude(latitude);
         msg.setLongitude(longitude);
@@ -83,9 +83,9 @@ public class Bt04ServiceTest extends Bt04Service {
         final double temperature = 33.;
 
         //create device for SN
-        addDevice(sn);
+        addBeacon(sn);
 
-        final Beacon b = new Beacon();
+        final BeaconSignal b = new BeaconSignal();
         b.setSn(sn);
         b.setBattery(battery);
         b.setDistance(distance);
@@ -98,7 +98,7 @@ public class Bt04ServiceTest extends Bt04Service {
         msg.getBeacons().add(b);
         msg.getBeacons().add(crateBeacon("7654321"));
         //create device for SN
-        addDevice("7654321");
+        addBeacon("7654321");
 
         process(msg);
 
@@ -119,9 +119,57 @@ public class Bt04ServiceTest extends Bt04Service {
         assertEquals(0, alerts.size());
     }
     @Test
+    public void testNotSendSystemMessageForNotActiveGateway() {
+        final Bt04Message msg = createMessage(beacon.getImei());
+
+        final GatewayBinding g = new GatewayBinding();
+        g.setActive(false);
+        g.setCompany(beacon.getCompany());
+        g.setId(77l);
+        g.setImei("2304874320987209");
+        beacon.setGateway(g);
+
+        process(msg);
+
+        assertEquals(0, messages.size());
+        assertEquals(1, alerts.size());
+    }
+    @Test
+    public void testNotSendSystemMessageForAnotherCompanyGateway() {
+        final Bt04Message msg = createMessage(beacon.getImei());
+
+        final GatewayBinding g = new GatewayBinding();
+        g.setActive(true);
+        g.setCompany(-111111l);
+        g.setId(77l);
+        g.setImei("2304874320987209");
+        beacon.setGateway(g);
+
+        process(msg);
+
+        assertEquals(0, messages.size());
+        assertEquals(1, alerts.size());
+    }
+    @Test
+    public void testNotSendIfDeviceNotGateway() {
+        final Bt04Message msg = createMessage(beacon.getImei());
+
+        final GatewayBinding g = new GatewayBinding();
+        g.setActive(true);
+        g.setCompany(beacon.getCompany());
+        g.setId(77l);
+        g.setImei("2304874320987209");
+        beacon.setGateway(g);
+
+        process(msg);
+
+        assertEquals(0, messages.size());
+        assertEquals(0, alerts.size());
+    }
+    @Test
     public void testAlertForInactiveDevice() {
-        final Bt04Message m = createMessage(device.getImei());
-        final Device d = addDevice(m.getBeacons().get(0).getSn());
+        final Bt04Message m = createMessage(beacon.getImei());
+        final Beacon d = addBeacon(m.getBeacons().get(0).getSn());
         d.setActive(false);
 
         process(m);
@@ -150,30 +198,31 @@ public class Bt04ServiceTest extends Bt04Service {
      * @see com.visfresh.bt04.Bt04Service#getDeviceByImei(java.lang.String)
      */
     @Override
-    protected Device getDeviceByImei(final String imei) {
-        return devices.get(imei);
+    protected Beacon getDeviceByImei(final String imei) {
+        return beacons.get(imei);
     }
     /**
      * BT04 message
      */
-    protected Bt04Message createMessage(final String imei) {
+    protected Bt04Message createMessage(final String beaconId) {
         final Bt04Message msg = new Bt04Message();
-        msg.setImei(imei);
+        msg.setImei("any-gateway");
         msg.setAccuracy(11.11);
         msg.setLatitude(22.22);
         msg.setLongitude(33.33);
         msg.setAltitude(44.44);
         msg.setTime(new Date(System.currentTimeMillis() - 10000000l));
 
-        msg.getBeacons().add(crateBeacon("76432"));
+        msg.getBeacons().add(crateBeacon(beaconId));
+
         return msg;
     }
     /**
      * @param sn
      * @return
      */
-    private Beacon crateBeacon(final String sn) {
-        final Beacon b = new Beacon();
+    private BeaconSignal crateBeacon(final String sn) {
+        final BeaconSignal b = new BeaconSignal();
         b.setSn(sn);
         b.setBattery(50.);
         b.setDistance(100.);
