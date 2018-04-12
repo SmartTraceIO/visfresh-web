@@ -77,7 +77,7 @@ public class Bt04Service {
                         foundDevice = false;
                     } else if (!deviceIsGateway(msgs.getImei(), beacon)) {
                         log.debug("Beacon " + beaconImei
-                                + " has gateway " + beacon.getGateway().getImei()
+                                + " has gateway " + beacon.getGateway().getGateway()
                                 + ", but attempted to send using " + msgs.getImei());
                         foundDevice = false;
                     }
@@ -114,7 +114,7 @@ public class Bt04Service {
      */
     private boolean deviceIsGateway(final String imei, final Beacon beacon) {
         final GatewayBinding gateway = beacon.getGateway();
-        return gateway == null || imei.equals(gateway.getImei());
+        return gateway == null || imei.equals(gateway.getGateway());
     }
 
     /**
@@ -178,7 +178,7 @@ public class Bt04Service {
      * @return device.
      */
     protected Beacon getDeviceByImei(final String imei) {
-        return deviceDao.getByImei(imei);
+        return deviceDao.getById(imei);
     }
 
     public static void main(final String[] args) {

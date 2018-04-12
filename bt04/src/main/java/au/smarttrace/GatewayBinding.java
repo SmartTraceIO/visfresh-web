@@ -10,7 +10,7 @@ package au.smarttrace;
 public class GatewayBinding {
     private Long id;
     private Long company;
-    private String imei;
+    private String gateway;
     private boolean active;
 
     /**
@@ -47,14 +47,14 @@ public class GatewayBinding {
     /**
      * @return the beacon
      */
-    public String getImei() {
-        return imei;
+    public String getGateway() {
+        return gateway;
     }
     /**
      * @param imei the IMEI to set
      */
-    public void setImei(final String imei) {
-        this.imei = imei;
+    public void setGateway(final String imei) {
+        this.gateway = imei;
     }
     /**
      * @return the active

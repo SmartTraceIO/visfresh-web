@@ -126,7 +126,7 @@ public class Bt04ServiceTest extends Bt04Service {
         g.setActive(false);
         g.setCompany(beacon.getCompany());
         g.setId(77l);
-        g.setImei("2304874320987209");
+        g.setGateway("2304874320987209");
         beacon.setGateway(g);
 
         process(msg);
@@ -142,7 +142,7 @@ public class Bt04ServiceTest extends Bt04Service {
         g.setActive(true);
         g.setCompany(-111111l);
         g.setId(77l);
-        g.setImei("2304874320987209");
+        g.setGateway("2304874320987209");
         beacon.setGateway(g);
 
         process(msg);
@@ -158,7 +158,7 @@ public class Bt04ServiceTest extends Bt04Service {
         g.setActive(true);
         g.setCompany(beacon.getCompany());
         g.setId(77l);
-        g.setImei("2304874320987209");
+        g.setGateway("2304874320987209");
         beacon.setGateway(g);
 
         process(msg);
