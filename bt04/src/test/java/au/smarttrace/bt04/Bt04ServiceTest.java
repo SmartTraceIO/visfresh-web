@@ -74,7 +74,7 @@ public class Bt04ServiceTest extends Bt04Service {
 
         //beacons
         final String sn = "beacon-ID";
-        final double battery = 50.;
+        final int battery = 50;
         final double distance = 100.;
         final String hardwareModel = "M123";
         final double humidity = 45.;
@@ -106,7 +106,7 @@ public class Bt04ServiceTest extends Bt04Service {
         assertEquals(2, messages.size());
 
         final DeviceMessage m = messages.get(0);
-        assertEquals(Bt04Service.BATTERY_FULL / 100. * battery, m.getBattery(), 0.001);
+        assertEquals(battery, Math.round(m.getBattery()));
         assertTrue(m.getImei().contains(sn));
         assertEquals(temperature, m.getTemperature(), 0.001);
         assertTrue(Math.abs(lastScannedTime.getTime() - m.getTime().getTime()) < 1000l);

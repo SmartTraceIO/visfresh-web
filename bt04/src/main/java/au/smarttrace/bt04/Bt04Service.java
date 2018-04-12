@@ -26,7 +26,6 @@ import au.smarttrace.db.SystemMessageDao;
  */
 @Component
 public class Bt04Service {
-    public static final double BATTERY_FULL = 50000.0;
     private static final String IMEI_PREFIX = "bt04-";
     private static final String IMEI_SUFFIX = "x";
 
@@ -89,7 +88,7 @@ public class Bt04Service {
             if (foundDevice) {
                 final DeviceMessage msg = new DeviceMessage();
                 msg.setImei(beaconImei);
-                msg.setBattery(convertToBatteryLevel(bs.getBattery()));
+                msg.setBattery((int) Math.round(bs.getBattery()));
                 // msg.setBeaconId(b.getSn());
                 msg.setTime(bs.getLastScannedTime());
                 msg.setTemperature(bs.getTemperature());
@@ -149,14 +148,6 @@ public class Bt04Service {
         //add prefix
         sb.insert(0, IMEI_PREFIX);
         return sb.toString();
-    }
-
-    /**
-     * @param battery in percents.
-     * @return compatible battery level.
-     */
-    private int convertToBatteryLevel(final double battery) {
-        return (int) Math.round(BATTERY_FULL / 100. * battery);
     }
     /**
      * @param msg device message.
