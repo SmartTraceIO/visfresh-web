@@ -58,7 +58,9 @@ public class PairedPhoneController extends AbstractController {
         final User user = getLoggedInUser();
 
         final PairedPhone p = dao.findOne(id);
-        checkCompanyAccess(user, p.getCompany());
+        if (p != null) {
+            checkCompanyAccess(user, p.getCompany());
+        }
 
         return createSuccessResponse(p == null ? null : createSerializer(user).toJson(p));
     }
