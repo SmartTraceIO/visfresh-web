@@ -31,4 +31,10 @@ public interface PairedPhoneDao extends DaoBase<PairedPhone, PairedPhone, Long> 
      * @return paired phones
      */
     List<PairedPhone> getPairedBeacons(String phone);
+    /**
+     * @param phone phone IMEI.
+     * @param beacon beacon ID.
+     * @return paired phone.
+     */
+    PairedPhone findOne(String phone, String beacon);
 }

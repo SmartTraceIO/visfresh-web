@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.PairedPhoneConstants;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.PairedPhoneDao;
@@ -54,10 +55,23 @@ public class PairedPhoneController extends AbstractController {
      */
     @RequestMapping(value = "/getPairedPhone", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getPairedPhone(final @RequestParam Long id) throws RestServiceException {
+    public JsonObject getPairedPhone(
+            final @RequestParam(required = false) Long id,
+            final @RequestParam(required = false) String phone,
+            final @RequestParam(required = false) String beacon
+            ) throws RestServiceException {
         final User user = getLoggedInUser();
 
-        final PairedPhone p = dao.findOne(id);
+        final PairedPhone p;
+        if (id != null) {
+            p = dao.findOne(id);
+        } else if (phone != null && beacon != null){
+            p = dao.findOne(phone, beacon);
+        } else {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "one id or phone with beacon should be specified");
+        }
+
         if (p != null) {
             checkCompanyAccess(user, p.getCompany());
         }

@@ -132,6 +132,13 @@ public class PairedPhoneDaoTest extends BaseCrudTest<PairedPhoneDao, PairedPhone
         assertEquals(1, dao.getPairedBeacons("imei2").size());
     }
     @Test
+    public void testFindOneByPhoneAndBeacon() {
+        createAndSavePairedPhone("imei1", "b1");
+        final PairedPhone p = createAndSavePairedPhone("imei2", "b2");
+
+        assertEquals(p.getId(), dao.findOne("imei2", "b2").getId());
+    }
+    @Test
     public void testGetPairedBeaconsIgnoreInactive() {
         final PairedPhone p = createAndSavePairedPhone("imei1", "b1");
         assertEquals(1, dao.getPairedBeacons("imei1").size());

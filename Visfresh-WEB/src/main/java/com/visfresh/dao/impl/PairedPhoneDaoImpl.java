@@ -138,6 +138,21 @@ public class PairedPhoneDaoImpl extends DaoImplBase<PairedPhone, PairedPhone, Lo
         return findAll(f, new Sorting(BEACONID), null);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.PairedPhoneDao#findOne(java.lang.String, java.lang.String)
+     */
+    @Override
+    public PairedPhone findOne(final String phone, final String beacon) {
+        final Filter f = new Filter();
+        f.addFilter(IMEI, phone);
+        f.addFilter(BEACONID, beacon);
+
+        final List<PairedPhone> pairs = findAll(f, null, null);
+        if (pairs.size() > 0) {
+            return pairs.get(0);
+        }
+        return null;
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
      */
     @Override

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,8 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.PairedPhone;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -127,6 +130,23 @@ public class PairedPhoneControllerTest extends AbstractRestServiceTest {
         createPairedPhone("imei2", "b4");
 
         assertEquals(2, client.getPairedBeacons("imei1").size());
+    }
+    @Test
+    public void testFindOneByPhoneAndBeacon() throws IOException, RestServiceException {
+        createPairedPhone("imei1", "b1");
+        final PairedPhone p = createPairedPhone("imei2", "b2");
+
+        assertEquals(p.getId(), client.getPairedPhone("imei2", "b2").getId());
+    }
+    @Test
+    public void testGetPairedPhoneWithoutParameters() {
+        try {
+            client.sendGetRequest(client.getPathWithToken("getPairedPhone"),
+                    new HashMap<>()).getAsJsonObject();
+            throw new AssertionFailedError("Exception should be thrown");
+        } catch (IOException | RestServiceException e) {
+            //correct behavior
+        }
     }
     @Test
     public void testSavePairedPhone() throws IOException, RestServiceException {

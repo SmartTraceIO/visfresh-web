@@ -118,4 +118,20 @@ public class PairedPhoneRestClient extends RestClient {
 
         sendGetRequest(getPathWithToken("deletePairedPhone"), params);
     }
+    /**
+     * @param phone
+     * @param beacon
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public PairedPhone getPairedPhone(final String phone, final String beacon) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("phone", phone);
+        params.put("beacon", beacon);
+
+        final JsonObject json = sendGetRequest(getPathWithToken("getPairedPhone"),
+                params).getAsJsonObject();
+        return serializer.parsePairedPhone(json);
+    }
 }
