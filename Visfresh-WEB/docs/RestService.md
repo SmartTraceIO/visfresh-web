@@ -140,6 +140,11 @@ List items is short representations of base entities, like as [Alert Profile](#m
 79. [Save Action Taken](#markdown-header-save-action-taken)  
 80. [Delete Action Taken](#markdown-header-delete-action-taken)  
 81. [Get Action Takens](#markdown-header-get-action-takens)  
+82. [Get Paired Phone](#markdown-header-get-paired-phone)  
+83. [Save Paired Phone](#markdown-header-save-paired-phone)  
+84. [Delete Paired Phone](#markdown-header-delete-paired-phone)  
+85. [Get Paired Phones](#markdown-get-paired-phones)  
+86. [Get Paired Beacons](#markdown-get-paired-beacons)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -691,6 +696,42 @@ Method *GET*, method name *getActionTakens*. Request parameters:
 1. shipment associated shipment  
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-get-action-takens-example)
+
+### Save Paired Phone ###
+Method *POST*, method name *savePairedPhone*. Request body JSON serialized ParedPhone.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-save-paired-phone-example)
+
+### Get Paired Phones ###
+Method *GET*, method name *getPairedPhones*. Request parameters:  
+1. pageIndex  
+2. pageSize  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-paired-phones-example)
+
+### Delete Paired Phone ###
+Method *GET*, method name *deletePairedPhone*. Request parameters:  
+1. id  
+2. beacon  
+3. phone  
+one from id or beacon and phone is required.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-delete-paired-phone-example)
+
+### Get Paired Phone ###
+Method *GET*, method name *getPairedPhone*. Request parameters:  
+1. id  
+2. beacon  
+3. phone  
+one from id or beacon and phone is required.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-paired-phone-example)
+
+### Get Paired Beacons ###
+Method *GET*, method name *getPairedBeacons*. Request parameters:  
+1. phone  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-beacons-phones-example)
 
 ## Objects
 ### Response message ###
@@ -4778,5 +4819,108 @@ Response:
     }
   ],
   "totalCount": 2
+}
+```
+### Save Paired Phone example ###
+**POST /vf/rest/savePairedPhone/${accessToken}**  
+**Request:**  
+```json
+{
+  "pairedPhoneID": 19,
+  "active": true,
+  "pairedPhoneIMEI": "imei",
+  "company": 15,
+  "description": "description",
+  "pairedBeaconID": "beacon"
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "id": 19
+  }
+}
+```
+### Get Paired Phones example ###
+**GET /vf/rest/getPairedPhones/${accessToken}?pageIndex=1&pageSize=100**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "pairedPhoneID": 20,
+      "active": true,
+      "pairedPhoneIMEI": "imei1",
+      "company": 16,
+      "description": null,
+      "pairedBeaconID": "b1"
+    },
+    {
+      "pairedPhoneID": 21,
+      "active": true,
+      "pairedPhoneIMEI": "imei1",
+      "company": 16,
+      "description": null,
+      "pairedBeaconID": "b2"
+    }
+  ],
+  "totalCount": 2
+}
+```
+### Get Paired Phone example ###
+**GET /vf/rest/getPairedPhone/${accessToken}?beacon=b2&phone=imei2**  
+**GET /vf/rest/getPairedPhone/${accessToken}?id=24**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "pairedPhoneID": 24,
+    "active": true,
+    "pairedPhoneIMEI": "imei2",
+    "company": 18,
+    "description": null,
+    "pairedBeaconID": "b2"
+  }
+}
+```
+### Delete Paired Phone example ###
+**GET /vf/rest/deletePairedPhone/${accessToken}?beacon=b2&phone=imei2**  
+**GET /vf/rest/deletePairedPhone/${accessToken}?id=26**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
+```
+### Get Paired Beacons example ###
+**GET /vf/rest/getPairedBeacons/${accessToken}?phone=imei1**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    "b1",
+    "b2"
+  ]
 }
 ```
