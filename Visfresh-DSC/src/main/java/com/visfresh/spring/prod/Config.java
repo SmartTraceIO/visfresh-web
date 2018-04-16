@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
-import com.visfresh.bt04.Bt04Service;
 import com.visfresh.dispatcher.AbstractDispatcher;
 import com.visfresh.mail.EmailSender;
 import com.visfresh.service.DeviceMessageService;
@@ -23,8 +22,7 @@ import com.visfresh.spring.jdbc.JdbcConfig;
 @ComponentScan(basePackageClasses = {
         EmailSender.class,
         AbstractDispatcher.class,
-        DeviceMessageService.class,
-        Bt04Service.class})
+        DeviceMessageService.class})
 @PropertySource("classpath:/application.properties")
 public class Config {
     /**
