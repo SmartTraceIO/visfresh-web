@@ -143,8 +143,8 @@ List items is short representations of base entities, like as [Alert Profile](#m
 82. [Get Paired Phone](#markdown-header-get-paired-phone)  
 83. [Save Paired Phone](#markdown-header-save-paired-phone)  
 84. [Delete Paired Phone](#markdown-header-delete-paired-phone)  
-85. [Get Paired Phones](#markdown-get-paired-phones)  
-86. [Get Paired Beacons](#markdown-get-paired-beacons)  
+85. [Get Paired Phones](#markdown-header-get-paired-phones)  
+86. [Get Paired Beacons](#markdown-header-get-paired-beacons)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -731,7 +731,7 @@ Response is [Standard JSON response](#markdown-header-response-message)
 Method *GET*, method name *getPairedBeacons*. Request parameters:  
 1. phone  
 Response is [Standard JSON response](#markdown-header-response-message)  
-[(example)](#markdown-header-get-beacons-phones-example)
+[(example)](#markdown-header-get-paired-beacons-example)
 
 ## Objects
 ### Response message ###
