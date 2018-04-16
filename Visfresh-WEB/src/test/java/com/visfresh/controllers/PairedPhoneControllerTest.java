@@ -204,6 +204,23 @@ public class PairedPhoneControllerTest extends AbstractRestServiceTest {
 
         assertNull(dao.findOne(p.getId()));
     }
+    @Test
+    public void testDeletePairedPhoneWithBeaconAndPhone() throws IOException, RestServiceException {
+        final PairedPhone p = createPairedPhone("leftimei", "leftbeacon");
+        client.deletePairedPhone("leftimei", "leftbeacon");
+
+        assertNull(dao.findOne(p.getId()));
+    }
+    @Test
+    public void testDeletePairedPhoneWithoutParameters() {
+        try {
+            client.sendGetRequest(client.getPathWithToken("deletePairedPhone"),
+                    new HashMap<>()).getAsJsonObject();
+            throw new AssertionFailedError("Exception should be thrown");
+        } catch (IOException | RestServiceException e) {
+            //correct behavior
+        }
+    }
     /**
      * @param imei
      * @param beacon

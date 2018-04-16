@@ -121,6 +121,19 @@ public class PairedPhoneRestClient extends RestClient {
     /**
      * @param phone
      * @param beacon
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deletePairedPhone(final String phone, final String beacon) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("phone", phone);
+        params.put("beacon", beacon);
+
+        sendGetRequest(getPathWithToken("deletePairedPhone"), params);
+    }
+    /**
+     * @param phone
+     * @param beacon
      * @return
      * @throws RestServiceException
      * @throws IOException

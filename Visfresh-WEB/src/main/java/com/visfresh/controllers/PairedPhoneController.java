@@ -170,20 +170,32 @@ public class PairedPhoneController extends AbstractController {
 
     @RequestMapping(value = "/deletePairedPhone", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
-    public JsonObject deletePairedPhone(final @RequestParam Long id) throws Exception {
-        try {
-            final User user = getLoggedInUser();
-            final PairedPhone deletedUser = dao.findOne(id);
-            checkCompanyAccess(user, deletedUser.getCompany());
+    public JsonObject deletePairedPhone(
+            final @RequestParam(required = false) Long id,
+            final @RequestParam(required = false) String phone,
+            final @RequestParam(required = false) String beacon
+            ) throws RestServiceException {
+        final User user = getLoggedInUser();
 
-            dao.delete(id);
+        final PairedPhone p;
+        if (id != null) {
+            p = dao.findOne(id);
+        } else if (phone != null && beacon != null){
+            p = dao.findOne(phone, beacon);
+        } else {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "one id or phone with beacon should be specified");
+        }
+
+        if (p != null) {
+            checkCompanyAccess(user, user.getCompanyId());
+            dao.delete(p.getId());
             return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete paired phone " + id, e);
-            throw e;
+        } else {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "PairedPhone not exists");
         }
     }
-
     /**
      * @param user
      * @return
