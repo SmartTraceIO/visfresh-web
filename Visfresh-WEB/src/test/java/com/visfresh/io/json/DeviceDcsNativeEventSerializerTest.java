@@ -38,6 +38,7 @@ public class DeviceDcsNativeEventSerializerTest extends AbstractSerializerTest {
         final double lat = 100.500;
         final double lon = 100.501;
         final String type = "Tracker";
+        final String gateway = "beacon-gateway";
 
         e.setBattery(battery);
         e.setDate(date);
@@ -45,6 +46,7 @@ public class DeviceDcsNativeEventSerializerTest extends AbstractSerializerTest {
         e.setImei(imei);
         e.setLocation(new Location(lat, lon));
         e.setType(type);
+        e.setGateway(gateway);
 
         final JsonElement json = serializer.toJson(e);
         e = serializer.parseDeviceDcsNativeEvent(json);
@@ -56,5 +58,6 @@ public class DeviceDcsNativeEventSerializerTest extends AbstractSerializerTest {
         assertEquals(lat, e.getLocation().getLatitude(), 0.00001);
         assertEquals(lon, e.getLocation().getLongitude(), 0.00001);
         assertEquals(type, e.getType());
+        assertEquals(gateway, e.getGateway());
     }
 }

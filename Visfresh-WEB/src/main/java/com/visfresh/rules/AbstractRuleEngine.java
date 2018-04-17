@@ -143,7 +143,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         final RuleContext context = new RuleContext(e, new SessionProvider(sessions));
         context.setDeviceState(state);
 
-        saveTrackerEvent(e);
+        saveTrackerEvent(e, event.getGateway());
         log.debug("Tracker event accepted: " + e);
 
         try {
@@ -458,10 +458,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     }
     /**
      * @param e tracker event.
+     * @param gateway beacon gateway
      * @return saved tracker event.
      */
-    protected TrackerEvent saveTrackerEvent(final TrackerEvent e) {
-        return trackerEventDao.save(e);
+    protected TrackerEvent saveTrackerEvent(final TrackerEvent e, final String gateway) {
+        return trackerEventDao.save(e, gateway);
     }
     /**
      * @param imei device IMEI.

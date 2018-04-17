@@ -40,6 +40,7 @@ public class DeviceDcsNativeEventSerializer extends AbstractJsonSerializer {
         final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
         e.setBattery(asInt(obj.get(TrackerEventConstants.PROPERTY_BATTERY)));
         e.setTemperature(asDouble(obj.get(TrackerEventConstants.PROPERTY_TEMPERATURE)));
+        e.setGateway(asString(obj.get(TrackerEventConstants.PROPERTY_GATEWAY)));
 
         //event date
         final SimpleDateFormat sdf = createUtcDateFormat();
@@ -80,6 +81,7 @@ public class DeviceDcsNativeEventSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.addProperty(TrackerEventConstants.PROPERTY_BATTERY, e.getBattery());
         obj.addProperty(TrackerEventConstants.PROPERTY_TEMPERATURE, e.getTemperature());
+        obj.addProperty(TrackerEventConstants.PROPERTY_GATEWAY, e.getGateway());
         obj.addProperty(TIME, sdf.format(e.getDate()));
         obj.addProperty(CREATED_ON, sdf.format(e.getCreatedOn()));
         obj.addProperty(TYPE, e.getType());

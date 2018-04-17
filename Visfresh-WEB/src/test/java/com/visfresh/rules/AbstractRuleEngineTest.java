@@ -331,7 +331,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
      * @see com.visfresh.rules.AbstractRuleEngine#saveTrackerEvent(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    protected TrackerEvent saveTrackerEvent(final TrackerEvent e) {
+    protected TrackerEvent saveTrackerEvent(final TrackerEvent e, String gateway) {
         savedTrackerEvents.add(e);
         return e;
     }

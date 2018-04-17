@@ -19,6 +19,7 @@ public class DeviceDcsNativeEvent {
     private Date createdOn = new Date();
     private double temperature;
     private int battery;
+    private String gateway;
 
     /**
      * Default constructor.
@@ -117,5 +118,17 @@ public class DeviceDcsNativeEvent {
      */
     public void setCreatedOn(final Date createdOn) {
         this.createdOn = createdOn;
+    }
+    /**
+     * @return the gateway
+     */
+    public String getGateway() {
+        return gateway;
+    }
+    /**
+     * @param gateway the gateway to set
+     */
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
     }
 }

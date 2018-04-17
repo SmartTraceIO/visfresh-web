@@ -10,9 +10,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -496,6 +498,19 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
                 new Date(startDate + 9 * dt), new Date(startDate + 21 * dt), null, new Page(2, 2)).size());
         assertEquals(0, dao.findForArrivedShipmentsInDateRanges(c1,
                 new Date(startDate + 9 * dt), new Date(startDate + 21 * dt), null, new Page(3, 2)).size());
+    }
+    @Test
+    public void testSaveWithGateway() {
+        final String gateway = "any-gateway";
+
+        final TrackerEvent e = createTestEntity();
+        dao.save(e, gateway);
+
+        final Set<Long> shipments = new HashSet<>();
+        shipments.add(e.getShipment().getId());
+
+        final TrackerEventDto e1 = dao.getEventPart(shipments, 0, 1000).get(0);
+        assertEquals(gateway, e1.getGateway());
     }
     /**
      * @param device device.

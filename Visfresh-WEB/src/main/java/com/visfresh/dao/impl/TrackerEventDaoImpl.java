@@ -88,10 +88,19 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
      */
     @Override
     public <S extends TrackerEvent> S save(final S event) {
+        return save(event, null);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#save(com.visfresh.entities.TrackerEvent, java.lang.String)
+     */
+    @Override
+    public <S extends TrackerEvent> S save(final S event, final String gateway) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
         final List<String> fields = getFields(false);
+        fields.add(GATEWAY);
+
         if (event.getId() == null) {
             //create on field is not updateable.
             event.setCreatedOn(new Date());
@@ -112,6 +121,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         paramMap.put(LATITUDE_FIELD, event.getLatitude());
         paramMap.put(LONGITUDE_FIELD, event.getLongitude());
         paramMap.put(DEVICE_FIELD, event.getDevice().getId());
+        paramMap.put(GATEWAY, gateway);
         paramMap.put(SHIPMENT_FIELD, event.getShipment() == null ? null : event.getShipment().getId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();

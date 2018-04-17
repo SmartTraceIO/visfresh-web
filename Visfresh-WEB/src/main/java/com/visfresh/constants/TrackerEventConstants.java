@@ -17,4 +17,5 @@ public interface TrackerEventConstants {
     String PROPERTY_CREATEDON = "createdOn";
     String PROPERTY_SHIPMENT = "shipment";
     String PROPERTY_TYPE = "type";
+    String PROPERTY_GATEWAY = "gateway";
 }
