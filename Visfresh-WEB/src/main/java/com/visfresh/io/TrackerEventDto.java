@@ -43,6 +43,7 @@ public class TrackerEventDto {
     private Long shipmentId;
     private Double latitude;
     private Double longitude;
+    private String gateway;
 
     /**
      * Default constructor.
@@ -170,6 +171,18 @@ public class TrackerEventDto {
      */
     public void setLongitude(final Double longitude) {
         this.longitude = longitude;
+    }
+    /**
+     * @return
+     */
+    public String getGateway() {
+        return gateway;
+    }
+    /**
+     * @param gateway the gateway to set
+     */
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

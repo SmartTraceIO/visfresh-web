@@ -375,7 +375,8 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         //get events of given tracker after the intersecting time
         cutEventsAfterDate(e1, e2.get(e2.size() - 1).getTime());
 
-        final boolean isSiblings = isSiblingsByDistance(e1, e2, MAX_DISTANCE_AVERAGE);
+        final boolean isSiblings = isSiblingsByGateway(e1, e2)
+                || isSiblingsByDistance(e1, e2, MAX_DISTANCE_AVERAGE);
 
         //check given tracker lives the sibling area
         return isSiblings
@@ -411,7 +412,51 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
 
     /**
      * @param e1 first list of events
-     * @param e2 secondd list of events
+     * @param e2 second list of events
+     * @return
+     */
+    private boolean isSiblingsByGateway(final List<TrackerEventDto> e1, final List<TrackerEventDto> e2) {
+        final Iterator<TrackerEventDto> iter1 = e1.iterator();
+        final Iterator<TrackerEventDto> iter2 = e2.iterator();
+
+        final Set<String> g1 = new HashSet<>();
+        final Set<String> g2 = new HashSet<>();
+        while (iter1.hasNext() && iter2.hasNext()) {
+            final TrackerEventDto n1 = iter1.next();
+            final TrackerEventDto n2 = iter2.next();
+
+            g1.add(n1.getGateway());
+            g2.add(n2.getGateway());
+
+            if (n1.getGateway() != null && g2.contains(n1.getGateway())) {
+                return true;
+            }
+            if (n2.getGateway() != null && g1.contains(n2.getGateway())) {
+                return true;
+            }
+        }
+
+        //process reminders
+        while (iter1.hasNext()) {
+            final TrackerEventDto n1 = iter1.next();
+            if (n1.getGateway() != null && g2.contains(n1.getGateway())) {
+                return true;
+            }
+        }
+
+        //process reminders
+        while (iter2.hasNext()) {
+            final TrackerEventDto n2 = iter2.next();
+            if (n2.getGateway() != null && g1.contains(n2.getGateway())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    /**
+     * @param e1 first list of events
+     * @param e2 second list of events
      * @param maxAvg max acceptable average distance.
      * @return
      */

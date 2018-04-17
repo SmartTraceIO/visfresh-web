@@ -58,6 +58,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
     protected static final String LONGITUDE_FIELD = "longitude";
     protected static final String DEVICE_FIELD = "device";
     protected static final String SHIPMENT_FIELD = "shipment";
+    private static final String GATEWAY = "gateway";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -249,6 +250,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
 
             dto.setShipmentId(((Number) row.get(SHIPMENT_FIELD)).longValue());
             dto.setDeviceImei((String) row.get(DEVICE_FIELD));
+            dto.setGateway((String) row.get(GATEWAY));
 
             events.get(dto.getShipmentId()).add(dto);
         }
@@ -601,6 +603,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
             e.setType(TrackerEventType.valueOf((String) row.get("type")));
             e.setShipmentId(DaoImplBase.dbLong(row.get("shipment")));
             e.setDeviceImei((String) row.get("device"));
+            e.setGateway((String) row.get(GATEWAY));
 
             events.add(e);
         }
