@@ -377,6 +377,11 @@ public class DeviceController extends AbstractController implements DeviceConsta
         //check logged in.
         final User user = getLoggedInUser();
         final Device device = dao.findByImei(imei);
+        if (device == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "device not found '" + imei + "'");
+        }
+
         checkCompanyAccess(user, device);
 
         //create result
