@@ -35,6 +35,7 @@ import com.visfresh.services.RestServiceException;
 @RestController("PairedPhone")
 @RequestMapping("/rest")
 public class PairedPhoneController extends AbstractController {
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PairedPhoneController.class);
 
     @Autowired
