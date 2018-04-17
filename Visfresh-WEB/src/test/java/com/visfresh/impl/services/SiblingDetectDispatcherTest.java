@@ -80,6 +80,37 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         assertFalse(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
     }
     @Test
+    public void testIsSiblingsByGateway() {
+        final Shipment master = createShipment(1l);
+        final Shipment notSibling = createShipment(3l);
+
+        //crete master event list
+        final List<TrackerEventDto> masterEvents = new LinkedList<>();
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
+
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(masterEvents, master, x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt);
+            addEvent(trackerEvents, notSibling,
+                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+                    t0 + dt * i + 60 * 1000l);
+        }
+
+        assertFalse(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
+
+        //add gateway to just one reading to each shipment
+        final String gateway = "beacon-gateway";
+        masterEvents.get(count / 2).setGateway(gateway);
+        getTrackeEvents(notSibling.getId()).get(count / 3).setGateway(gateway);
+
+        assertTrue(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
+    }
+    @Test
     public void testExcludeWithSmallPath() {
         final Shipment master = createShipment(1l);
         final Shipment sibling = createShipment(2l);
@@ -298,6 +329,32 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
 
         assertFalse(updateSiblings(master.getId(), master.getCompanyId()));
     }
+    @Test
+    public void testScheduleSiblingDetection() {
+        final Shipment s = createShipment(99l);
+        scheduleSiblingDetection(s, new Date());
+
+        final SystemMessage sm = messages.get(0);
+        assertEquals(GROUP_PREFIX + s.getId().toString(), sm.getGroup());
+        assertEquals(s.getCompanyId().toString(), sm.getMessageInfo());
+
+        //test not repeats the scheduling
+        scheduleSiblingDetection(s, new Date(System.currentTimeMillis() + 100000000l));
+        assertEquals(1, messages.size());
+    }
+    @Test
+    public void testCleanGroupLock() throws RetryableException {
+        final Shipment s = createShipment(99l);
+        scheduleSiblingDetection(s, new Date());
+        //add another (left) lock
+        groupLocks.put("abrakadabra-group", new Date());
+
+        assertEquals(2, groupLocks.size());
+        handle(messages.remove(0));
+
+        assertEquals(1, groupLocks.size());
+        assertTrue(groupLocks.containsKey("abrakadabra-group"));
+    }
 
     /**
      * @param events event list.
@@ -349,32 +406,6 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         }
 
         return addEvent(list, shipment, latitude, longitude, time);
-    }
-    @Test
-    public void testScheduleSiblingDetection() {
-        final Shipment s = createShipment(99l);
-        scheduleSiblingDetection(s, new Date());
-
-        final SystemMessage sm = messages.get(0);
-        assertEquals(GROUP_PREFIX + s.getId().toString(), sm.getGroup());
-        assertEquals(s.getCompanyId().toString(), sm.getMessageInfo());
-
-        //test not repeats the scheduling
-        scheduleSiblingDetection(s, new Date(System.currentTimeMillis() + 100000000l));
-        assertEquals(1, messages.size());
-    }
-    @Test
-    public void testCleanGroupLock() throws RetryableException {
-        final Shipment s = createShipment(99l);
-        scheduleSiblingDetection(s, new Date());
-        //add another (left) lock
-        groupLocks.put("abrakadabra-group", new Date());
-
-        assertEquals(2, groupLocks.size());
-        handle(messages.remove(0));
-
-        assertEquals(1, groupLocks.size());
-        assertTrue(groupLocks.containsKey("abrakadabra-group"));
     }
     /* (non-Javadoc)
      * @see com.visfresh.impl.services.SiblingDetectDispatcher#lockGroup(java.lang.String, java.util.Date)
