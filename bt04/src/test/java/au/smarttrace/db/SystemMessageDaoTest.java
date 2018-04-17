@@ -5,13 +5,17 @@ package au.smarttrace.db;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import au.smarttrace.DeviceMessage;
@@ -57,40 +61,55 @@ public class SystemMessageDaoTest extends TestCase {
         final Location location = new Location();
         location.setLatitude(100.500);
         location.setLongitude(100.500);
-        final int numberOfRetry = 4;
-        final Date retryOn = new Date(System.currentTimeMillis() + 10000000l);
+        final Date time = new Date(System.currentTimeMillis() + 10000000l);
         final double temperature = 36.6;
+        final String gateway = "beacon-gateway";
 
         //create device command
         final DeviceMessage m = new DeviceMessage();
         m.setBattery(battery);
         m.setImei(imei);
-        m.setNumberOfRetry(numberOfRetry);
-        m.setRetryOn(retryOn);
         m.setTemperature(temperature);
-        m.setTime(new Date());
+        m.setTime(time);
+        m.setGateway(gateway);
 
         SystemMessage sm = dao.sendSystemMessageFor(m, location);
         sm = dao.findOne(sm.getId());
 
-//        final Reader in = new StringReader(sm.getMessageInfo());
-//        final JsonObject e = new JsonParser().parse(in).getAsJsonObject();
-
         assertEquals(m.getImei(), sm.getGroup());
+
+        final Reader in = new StringReader(sm.getMessageInfo());
+        final JsonObject json = new JsonParser().parse(in).getAsJsonObject();
+
+        //test message
+        assertEquals(battery, json.get("battery").getAsInt());
+        assertEquals(imei, json.get("imei").getAsString());
+        assertEquals(temperature, json.get("temperature").getAsDouble(), 0.001);
+        assertTrue(Math.abs(time.getTime() - parseDate(json.get("time").getAsString()).getTime()) < 2000);
+        assertEquals(gateway, json.get("gateway").getAsString());
+    }
+    /**
+     * @param str
+     * @return
+     */
+    private Date parseDate(final String str) {
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            return sdf.parse(str);
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
     public void testSupportsNullLocations() {
         final int battery = 90;
         final String imei = "09098098";
-        final int numberOfRetry = 4;
-        final Date retryOn = new Date(System.currentTimeMillis() + 10000000l);
         final double temperature = 36.6;
 
         //create device command
         final DeviceMessage m = new DeviceMessage();
         m.setBattery(battery);
         m.setImei(imei);
-        m.setNumberOfRetry(numberOfRetry);
-        m.setRetryOn(retryOn);
         m.setTemperature(temperature);
         m.setTime(new Date());
 

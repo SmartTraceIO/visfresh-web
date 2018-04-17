@@ -92,6 +92,7 @@ public class Bt04Service {
                 // msg.setBeaconId(b.getSn());
                 msg.setTime(bs.getLastScannedTime());
                 msg.setTemperature(bs.getTemperature());
+                msg.setGateway(msgs.getImei());
 
                 Location loc = null;
                 if (msgs.getLatitude() != null && msgs.getLongitude() != null) {

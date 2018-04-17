@@ -31,13 +31,10 @@ public class DeviceMessage {
      */
     private double temperature;
     /**
-     * The number of retry.
+     * The IMEI of gateway phone.
      */
-    private int numberOfRetry;
-    /**
-     * The ready on date.
-     */
-    private Date retryOn = new Date();
+    private String gateway;
+
     private String message;
 
     /**
@@ -97,30 +94,6 @@ public class DeviceMessage {
         this.temperature = temperature;
     }
     /**
-     * @return the numberOfRetry
-     */
-    public int getNumberOfRetry() {
-        return numberOfRetry;
-    }
-    /**
-     * @param numberOfRetry the numberOfRetry to set
-     */
-    public void setNumberOfRetry(final int numberOfRetry) {
-        this.numberOfRetry = numberOfRetry;
-    }
-    /**
-     * @return the readyOn
-     */
-    public Date getRetryOn() {
-        return retryOn;
-    }
-    /**
-     * @param retryOn the readyOn to set
-     */
-    public void setRetryOn(final Date retryOn) {
-        this.retryOn = retryOn;
-    }
-    /**
      * @return the id
      */
     public long getId() {
@@ -131,6 +104,18 @@ public class DeviceMessage {
      */
     public void setId(final long id) {
         this.id = id;
+    }
+    /**
+     * @return the gateway
+     */
+    public String getGateway() {
+        return gateway;
+    }
+    /**
+     * @param gateway the gateway to set
+     */
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
     }
 
     /* (non-Javadoc)

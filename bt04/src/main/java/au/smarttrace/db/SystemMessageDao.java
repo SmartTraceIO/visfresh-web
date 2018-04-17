@@ -113,6 +113,7 @@ public class SystemMessageDao {
             obj.addProperty("longitude", loc.getLongitude());
         }
         obj.addProperty("imei", e.getImei());
+        obj.addProperty("gateway", e.getGateway());
 
         final SystemMessage sm = new SystemMessage();
         sm.setMessageInfo(obj.toString());
