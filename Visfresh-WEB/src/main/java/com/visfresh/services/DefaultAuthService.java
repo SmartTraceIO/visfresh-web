@@ -3,12 +3,9 @@
  */
 package com.visfresh.services;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,7 +46,7 @@ public class DefaultAuthService implements AuthService {
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 
     private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 14 * 24 * 60 * 60 * 1000l; //two weeks
-    public static final int USER_LOGIN_LIMIT = 1000;
+//    public static final int USER_LOGIN_LIMIT = 1000;
 
     private static final long TIMEOUT = 60000L;
 
@@ -110,18 +107,18 @@ public class DefaultAuthService implements AuthService {
      * @param email user email.
      */
     private void removeExpiredUsers(final String email) {
-        final List<RestSession> list = new LinkedList<>(sessionManager.getAllUserSessions(email));
-
-        if (list.size() > USER_LOGIN_LIMIT) {
-            //sort users and remove oldest
-            Collections.sort(list);
-            while (list.size() > USER_LOGIN_LIMIT) {
-                final RestSession toRemove = list.remove(0);
-                sessionManager.closeSession(toRemove);
-                log.debug("Old auth token for " + toRemove.getUser().getEmail()
-                        + " has removed according of max logged in users limit");
-            }
-        }
+//        final List<RestSession> list = new LinkedList<>(sessionManager.getAllUserSessions(email));
+//
+//        if (list.size() > USER_LOGIN_LIMIT) {
+//            //sort users and remove oldest
+//            Collections.sort(list);
+//            while (list.size() > USER_LOGIN_LIMIT) {
+//                final RestSession toRemove = list.remove(0);
+//                sessionManager.closeSession(toRemove);
+//                log.debug("Old auth token for " + toRemove.getUser().getEmail()
+//                        + " has removed according of max logged in users limit");
+//            }
+//        }
     }
 
     /**

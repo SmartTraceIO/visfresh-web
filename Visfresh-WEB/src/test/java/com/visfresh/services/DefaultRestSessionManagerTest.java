@@ -78,23 +78,23 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
         //test REST session has removed from DB.
         assertEquals(0, sessions.size());
     }
-    @Test
-    public void testRemoveRedundantSessions() {
-        final User u = createUser();
-
-        createSession(u, generateNewToken(u, "a"));
-        createSession(u, generateNewToken(u, "b"));
-        createSession(u, generateNewToken(u, "b"));
-
-        assertEquals(2, sessions.size());
-
-        createSession(u, generateNewToken(u, null));
-        assertEquals(3, sessions.size());
-
-        createSession(u, generateNewToken(u, null));
-        assertEquals(3, sessions.size());
-
-    }
+//    @Test
+//    public void testRemoveRedundantSessions() {
+//        final User u = createUser();
+//
+//        createSession(u, generateNewToken(u, "a"));
+//        createSession(u, generateNewToken(u, "b"));
+//        createSession(u, generateNewToken(u, "b"));
+//
+//        assertEquals(2, sessions.size());
+//
+//        createSession(u, generateNewToken(u, null));
+//        assertEquals(3, sessions.size());
+//
+//        createSession(u, generateNewToken(u, null));
+//        assertEquals(3, sessions.size());
+//
+//    }
     /**
      * @return
      */

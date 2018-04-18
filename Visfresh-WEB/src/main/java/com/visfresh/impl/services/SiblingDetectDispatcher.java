@@ -44,6 +44,35 @@ import com.visfresh.utils.StringUtils;
 @Component
 public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatcher
     implements SiblingDetectionService, SystemMessageHandler {
+
+    protected interface CalculationDirection {
+        /**
+         * @param e1 first event.
+         * @param e2 second event.
+         * @return true if e1 is before e2
+         */
+        boolean isBefore(TrackerEventDto e1, TrackerEventDto e2);
+    }
+
+    protected class LeftToRight implements CalculationDirection {
+        /* (non-Javadoc)
+         * @see com.visfresh.impl.services.SiblingDetectDispatcher.CalculationDirection#isBefore(com.visfresh.io.TrackerEventDto, com.visfresh.io.TrackerEventDto)
+         */
+        @Override
+        public boolean isBefore(final TrackerEventDto e1, final TrackerEventDto e2) {
+            return e1.getTime().before(e2.getTime());
+        }
+    }
+    protected class RightToLeft implements CalculationDirection {
+        /* (non-Javadoc)
+         * @see com.visfresh.impl.services.SiblingDetectDispatcher.CalculationDirection#isBefore(com.visfresh.io.TrackerEventDto, com.visfresh.io.TrackerEventDto)
+         */
+        @Override
+        public boolean isBefore(final TrackerEventDto e1, final TrackerEventDto e2) {
+            return e2.getTime().before(e1.getTime());
+        }
+    }
+
     protected static String GROUP_PREFIX = "shp-";
     /**
      * The logger.
@@ -68,6 +97,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      */
     protected String processorId;
     private static int numInstances;
+    protected CalculationDirection direction = new LeftToRight();
 
     /**
      * @param env spring environment.
@@ -367,13 +397,13 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         final List<TrackerEventDto> e2 = new LinkedList<>(originE2);
 
         //1. ignore events before first
-        removeEventsBeforeDate(e2, e1.get(0).getTime());
+        removeEventsBefore(e2, e1.get(0));
         if (e2.isEmpty()) {
             return false;
         }
 
         //get events of given tracker after the intersecting time
-        cutEventsAfterDate(e1, e2.get(e2.size() - 1).getTime());
+        cutEventsAfterDate(e1, e2.get(e2.size() - 1));
 
         final boolean isSiblings = isSiblingsByGateway(e1, e2)
                 || isSiblingsByDistance(e1, e2, MAX_DISTANCE_AVERAGE);
@@ -474,10 +504,10 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         while (iter1.hasNext()) {
             final TrackerEventDto e = iter1.next();
 
-            if (!e.getTime().before(before.getTime())) {
+            if (!direction.isBefore(e, before)) {
                 while (iter2.hasNext()) {
                     final TrackerEventDto after = iter2.next();
-                    if (!after.getTime().before(e.getTime())) {
+                    if (!direction.isBefore(after, e)) {
                         summ += getDistance(e, before, after);
                         count++;
 
@@ -489,7 +519,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
                         before = after;
                         break;
                     }
-                    if (!after.getTime().before(e.getTime())) {
+                    if (!direction.isBefore(after, e)) {
                         before = after;
                     }
                 }
@@ -504,14 +534,14 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
     }
 
     /**
-     * @param e
-     * @param startDate
+     * @param events events.
+     * @param e event.
      */
-    private void removeEventsBeforeDate(final List<TrackerEventDto> e,
-            final Date startDate) {
-        final Iterator<TrackerEventDto> iter = e.iterator();
+    private void removeEventsBefore(final List<TrackerEventDto> events,
+            final TrackerEventDto e) {
+        final Iterator<TrackerEventDto> iter = events.iterator();
         while (iter.hasNext()) {
-            if (iter.next().getTime().before(startDate)) {
+            if (direction.isBefore(iter.next(), e)) {
                 iter.remove();
             } else {
                 break;
@@ -521,18 +551,18 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
 
     /**
      * @param events
-     * @param time
+     * @param e
      * @return
      */
     private List<TrackerEventDto> cutEventsAfterDate(final List<TrackerEventDto> events,
-            final Date time) {
+            final TrackerEventDto e) {
         final List<TrackerEventDto> list = new LinkedList<>();
         final Iterator<TrackerEventDto> iter = events.iterator();
         while (iter.hasNext()) {
-            final TrackerEventDto e = iter.next();
-            if (e.getTime().after(time)) {
+            final TrackerEventDto event = iter.next();
+            if (direction.isBefore(e, event)) {
                 iter.remove();
-                list.add(e);
+                list.add(event);
             }
         }
 
