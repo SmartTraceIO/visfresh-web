@@ -89,7 +89,8 @@ public class PairedPhoneController extends AbstractController {
      * @throws RestServiceException
      */
     @RequestMapping(value = "/getPairedPhones", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser,
+        SpringRoles.NormalUser})
     public JsonObject getPairedPhones(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
@@ -124,14 +125,19 @@ public class PairedPhoneController extends AbstractController {
      * @throws RestServiceException
      */
     @RequestMapping(value = "/getPairedBeacons", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser,
+        SpringRoles.NormalUser})
     public JsonObject getPairedBeacons(final String phone) throws RestServiceException {
         final List<PairedPhone> paredPhones = dao.getPairedBeacons(phone);
 
         final JsonArray array = new JsonArray();
         for (final PairedPhone p : paredPhones) {
-            checkCompanyAccess(getLoggedInUser(), p.getCompany());
-            array.add(new JsonPrimitive(p.getBeaconId()));
+            try {
+                checkCompanyAccess(getLoggedInUser(), p.getCompany());
+                array.add(new JsonPrimitive(p.getBeaconId()));
+            } catch (final Exception e) {
+                // it is ok
+            }
         }
 
         return createSuccessResponse(array);
@@ -158,7 +164,8 @@ public class PairedPhoneController extends AbstractController {
      * @throws AuthenticationException
      */
     @RequestMapping(value = "/savePairedPhone", method = RequestMethod.POST)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser,
+        SpringRoles.NormalUser})
     public JsonObject savePairedPhone(final @RequestBody JsonObject req) throws RestServiceException {
         final User user = getLoggedInUser();
         final PairedPhone phone = createSerializer(user).parsePairedPhone(req);
@@ -170,7 +177,8 @@ public class PairedPhoneController extends AbstractController {
     }
 
     @RequestMapping(value = "/deletePairedPhone", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser,
+        SpringRoles.NormalUser})
     public JsonObject deletePairedPhone(
             final @RequestParam(required = false) Long id,
             final @RequestParam(required = false) String phone,

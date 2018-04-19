@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,7 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Role;
@@ -1089,6 +1092,10 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Not last event found for device '" + device + "'");
         }
+        if (!allowBt4Autostart(d)) {
+            throw new RestServiceException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Overhead 2 mins autostart limit for BT04 device '" + d.getImei() + "'");
+        }
 
         final Shipment s = autoStartService.autoStartNewShipment(d,
                 e.getLatitude(), e.getLongitude(), new Date());
@@ -1097,6 +1104,20 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
         return createIdResponse("shipmentId", s.getId());
     }
+    /**
+     * @param d
+     * @return
+     */
+    private boolean allowBt4Autostart(final Device d) {
+        if (d.getModel() != DeviceModel.BT04) {
+            return true;
+        }
+
+        final Shipment s = shipmentDao.findLastShipment(d.getImei());
+        return s == null
+                || System.currentTimeMillis() - s.getShipmentDate().getTime() > 2 * 60 * 1000l;
+    }
+
     @RequestMapping(value = "/getShipmentData", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public JsonObject getShipmentData(

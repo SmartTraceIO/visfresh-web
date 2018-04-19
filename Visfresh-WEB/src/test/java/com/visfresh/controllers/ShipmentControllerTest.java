@@ -33,6 +33,7 @@ import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.CorrectiveActionListDao;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
@@ -52,6 +53,7 @@ import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -1666,6 +1668,47 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
         assertEquals(1, items.size());
         assertEquals(ShipmentAuditAction.ManuallyCreatedFromAutostart, items.get(0).getAction());
+    }
+    @Test
+    public void testNotAllowBt4Autostart() throws IOException, RestServiceException {
+        final Device d = createDevice("123987230987", true);
+        d.setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(d);
+
+        //create last event for device
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(d);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+        e.setLatitude(50.50);
+        e.setLongitude(51.51);
+
+        trackerEventDao.save(e);
+
+        final Long id = shipmentClient.autoStartShipment(d.getImei());
+        assertNotNull(id);
+        final Shipment s = shipmentDao.findOne(id);
+        assertNotNull(s);
+
+        //test next autostart should be not allowed by BT04 limit
+        try {
+            shipmentClient.autoStartShipment(d.getImei());
+            throw new AssertionFailedError("Autostart for BT04 should be rejected by server");
+        } catch (IOException | RestServiceException exc) {
+            // correct
+        }
+
+        //correct the start date of previous shipment
+        s.getShipmentDate().setTime(System.currentTimeMillis() - 1 * 60 * 1000l);
+        try {
+            shipmentClient.autoStartShipment(d.getImei());
+            throw new AssertionFailedError("Autostart for BT04 should be rejected by server");
+        } catch (IOException | RestServiceException exc) {
+            // correct
+        }
+
+        //correct the start date of previous shipment
+        s.getShipmentDate().setTime(System.currentTimeMillis() - 2 * 61 * 1000l);
     }
     @Test
     public void testAutoStartShipmentWithBeacon() throws IOException, RestServiceException {
