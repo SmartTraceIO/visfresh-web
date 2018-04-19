@@ -89,6 +89,7 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         final ShipmentStatus status = ShipmentStatus.InProgress;
         final String goods = "ABC";
         final Boolean excludePriorShipments = Boolean.TRUE;
+        final String deviceSn = "device-serial-number";
         final Integer pageIndex = 10;
         final Integer pageSize = 200;
         final String sortColumn = "anyColumn";
@@ -108,6 +109,7 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         req.setStatus(status);
         req.setGoods(goods);
         req.setExcludePriorShipments(excludePriorShipments);
+        req.setDeviceSn(deviceSn);
         req.setPageIndex(pageIndex);
         req.setPageSize(pageSize);
         req.setSortColumn(sortColumn);
@@ -130,6 +132,7 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         assertEquals(status, req.getStatus());
         assertEquals(goods, req.getGoods());
         assertEquals(excludePriorShipments, req.getExcludePriorShipments());
+        assertEquals(deviceSn, req.getDeviceSn());
         assertEquals(pageIndex, req.getPageIndex());
         assertEquals(pageSize, req.getPageSize());
         assertEquals(sortColumn, req.getSortColumn());

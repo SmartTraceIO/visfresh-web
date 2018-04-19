@@ -1229,6 +1229,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "status": "InProgress",
   "goods": "JUnit",
   "excludePriorShipments": true,
+  "deviceSN": "904379",
   "pageIndex": 10,
   "pageSize": 200,
   "sortOrder": "asc",

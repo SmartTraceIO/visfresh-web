@@ -1452,6 +1452,17 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         req.setStatus(ShipmentStatus.Ended);
         assertEquals(0, shipmentClient.getShipments(req).size());
     }
+    @Test
+    public void testGetShipmentsFilteredByDeviceSn() throws RestServiceException, IOException {
+        final Device d1 = createDevice("20349790928347", true);
+        final Device d2 = createDevice("23598729043793", true);
+        createShipment(d1, true);
+        createShipment(d2, true);
+
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        req.setDeviceSn(d2.getSn());
+        assertEquals(1, shipmentClient.getShipments(req).size());
+    }
 
     @Test
     public void testFilteredByDateRanges() throws RestServiceException, IOException {

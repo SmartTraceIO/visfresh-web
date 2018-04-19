@@ -9,6 +9,7 @@ import java.util.TimeZone;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 
@@ -71,6 +72,7 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
         if (json.has("excludePriorShipments")) {
             req.setExcludePriorShipments(asBoolean(json.get("excludePriorShipments")));
         }
+        req.setDeviceSn(asString(json.get(ShipmentConstants.DEVICE_SN)));
 
         if (json.has("pageIndex")) {
             req.setPageIndex(asInt(json.get("pageIndex")));
@@ -136,6 +138,9 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
         }
         if (r.getExcludePriorShipments() != null) {
             obj.addProperty("excludePriorShipments", r.getExcludePriorShipments());
+        }
+        if (r.getDeviceSn() != null) {
+            obj.addProperty(ShipmentConstants.DEVICE_SN, r.getDeviceSn());
         }
         if (r.getPageIndex() != null) {
             obj.addProperty("pageIndex", r.getPageIndex());

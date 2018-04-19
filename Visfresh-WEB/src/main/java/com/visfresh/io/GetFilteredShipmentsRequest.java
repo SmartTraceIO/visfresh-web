@@ -31,6 +31,7 @@ public class GetFilteredShipmentsRequest {
     private Integer pageSize;
     private String sortOrder;
     private String sortColumn;
+    private String deviceSn;
 
     /**
      *
@@ -254,5 +255,17 @@ public class GetFilteredShipmentsRequest {
      */
     public void setExcludePriorShipments(final Boolean excludePriorShipments) {
         this.excludePriorShipments = excludePriorShipments;
+    }
+    /**
+     * @return device serial number.
+     */
+    public String getDeviceSn() {
+        return deviceSn;
+    }
+    /**
+     * @param deviceSn the deviceSn to set
+     */
+    public void setDeviceSn(final String deviceSn) {
+        this.deviceSn = deviceSn;
     }
 }
