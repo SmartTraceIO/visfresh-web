@@ -1641,14 +1641,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
             //ok
         }
 
-        //test not last reading found
-        try {
-            shipmentClient.autoStartShipment(d.getImei());
-            throw new AssertionFailedError("Not last reading found exception should be thrown");
-        } catch (final Exception e) {
-            //ok
-        }
-
         //create last event for device
         final TrackerEvent e = new TrackerEvent();
         e.setDevice(d);
@@ -1659,6 +1651,21 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         trackerEventDao.save(e);
 
+        final Long id = shipmentClient.autoStartShipment(d.getImei());
+        assertNotNull(id);
+        final Shipment s = shipmentDao.findOne(id);
+        assertNotNull(s);
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.ManuallyCreatedFromAutostart, items.get(0).getAction());
+    }
+    @Test
+    public void testAutoStartShipmentWithoutTrackerEvents() throws IOException, RestServiceException {
+        final Device d = createDevice("123987230987", true);
+
+        //test not last reading found
         final Long id = shipmentClient.autoStartShipment(d.getImei());
         assertNotNull(id);
         final Shipment s = shipmentDao.findOne(id);

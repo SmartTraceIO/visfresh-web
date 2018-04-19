@@ -1085,20 +1085,22 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Unable to found device with IMEI '" + device + "'");
         }
-
-        //get last reading
-        final ShortTrackerEvent e = trackerEventDao.getLastEvent(d);
-        if (e == null) {
-            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
-                    "Not last event found for device '" + device + "'");
-        }
         if (!allowBt4Autostart(d)) {
             throw new RestServiceException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Overhead 2 mins autostart limit for BT04 device '" + d.getImei() + "'");
         }
 
+        //get last reading
+        final ShortTrackerEvent e = trackerEventDao.getLastEvent(d);
+        Double latitude = null;
+        Double longitude = null;
+        if (e != null ) {
+            latitude = e.getLatitude();
+            longitude = e.getLongitude();
+        }
+
         final Shipment s = autoStartService.autoStartNewShipment(d,
-                e.getLatitude(), e.getLongitude(), new Date());
+                latitude, longitude, new Date());
         if (s != null) {
             auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
         }
