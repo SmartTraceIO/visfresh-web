@@ -3,7 +3,6 @@
  */
 package com.visfresh.impl.singleshipment;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,18 +82,12 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      * @return
      */
     private String loadQuery(final Long shipment, final Long company, final Set<Long> siblings) {
-        try {
-            final String str = StringUtils.getContent(
-                    MainShipmentDataBuilder.class.getResource("getMainData.sql"),
-                    "UTF-8");
-            String q = str.replace("1387", shipment.toString()).replace("123321", company.toString());
-            if (siblings.size() > 0) {
-                q += " or s.id in (" + StringUtils.combine(siblings, ",") + ")";
-            }
-            return q;
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
+        final String str = StringUtils.loadSql("getSingleShipmentMainData");
+        String q = str.replace("1387", shipment.toString()).replace("123321", company.toString());
+        if (siblings.size() > 0) {
+            q += " or s.id in (" + StringUtils.combine(siblings, ",") + ")";
         }
+        return q;
     }
 
     /* (non-Javadoc)

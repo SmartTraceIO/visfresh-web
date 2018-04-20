@@ -3,7 +3,6 @@
  */
 package com.visfresh.dao.impl;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +19,8 @@ import com.visfresh.utils.StringUtils;
  *
  */
 public final class ShipmetSelectAllSupport extends SelectAllSupport {
-    private static final String selectAll = loadTemplate("getShipments.sql");
-    private static final String allForCompany = loadTemplate("getCompanyShipments.sql");
+    private static final String selectAll = StringUtils.loadSql("getShipments");
+    private static final String allForCompany = StringUtils.loadSql("getCompanyShipments");
 
     /**
      * @param tableName
@@ -171,17 +170,6 @@ public final class ShipmetSelectAllSupport extends SelectAllSupport {
             //nothing in where clause
         } else {
             super.addFilterValue(property, value, params, filters);
-        }
-    }
-    /**
-     * @param resource resource to load.
-     * @return resource content as string.
-     */
-    private static String loadTemplate(final String resource) {
-        try {
-            return StringUtils.getContent(ShipmentDaoImpl.class.getResource(resource), "UTF-8");
-        } catch (final IOException e) {
-            throw new RuntimeException(resource);
         }
     }
 }

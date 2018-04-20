@@ -163,4 +163,17 @@ public final class StringUtils {
         }
         return sb.toString();
     }
+
+    /**
+     * @param name resource name without extension and path.
+     * @return
+     */
+    public static String loadSql(final String name) {
+        try {
+            return getContent(
+                    StringUtils.class.getClassLoader().getResource("sql/" + name + ".sql"), "UTF-8");
+        } catch (final IOException e) {
+            throw new RuntimeException("Failed to load sql resource " + name, e);
+        }
+    }
 }

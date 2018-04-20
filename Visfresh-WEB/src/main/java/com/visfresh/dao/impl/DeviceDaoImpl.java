@@ -71,6 +71,8 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     private final DeviceStateSerializer stateSerializer = new DeviceStateSerializer();
+    private static final String GET_DEVICES_SQL = StringUtils.loadSql("getDevices");
+
     /**
      * Default constructor.
      */
@@ -276,60 +278,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
     @Override
     public List<ListDeviceItem> getDevices(final Long company,
             final Sorting sorting, final Page page) {
-        String sql = "select\n"
-                + "d." + IMEI_FIELD + " as " + DeviceConstants.PROPERTY_IMEI + ",\n"
-                + "d." + NAME_FIELD + " as " + DeviceConstants.PROPERTY_NAME + ",\n"
-                + "d." + MODEL_FIELD + " as " + DeviceConstants.PROPERTY_MODEL + ",\n"
-                + "d." + DESCRIPTION_FIELD + " as " + DeviceConstants.PROPERTY_DESCRIPTION + ",\n"
-                + "d." + ACTIVE_FIELD + " as " + DeviceConstants.PROPERTY_ACTIVE + ",\n"
-                + "d." + COLOR_FIELD + " as " + DeviceConstants.PROPERTY_COLOR + ",\n"
-                + "aut." + AutoStartShipmentDaoImpl.ID_FIELD + " as "
-                + DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID + ",\n"
-                + "tpl." + ShipmentTemplateDaoImpl.NAME_FIELD + " as "
-                + DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME + ",\n"
-                + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
-                + DeviceConstants.PROPERTY_SN + ",\n"
-                //please attention, the field shipment number is used only for sorting
-                + "COALESCE(substring(sp." + ShipmentDaoImpl.DEVICE_FIELD + ", -7, 6), '999999999999999999') as "
-                + DeviceConstants.PROPERTY_SHIPMENT_NUMBER + ",\n"
-                + "sp.id as " + DeviceConstants.PROPERTY_LAST_SHIPMENT + ",\n"
-                + "lr.latitude as " + DeviceConstants.PROPERTY_LAST_READING_LAT + ",\n"
-                + "lr.longitude as " + DeviceConstants.PROPERTY_LAST_READING_LONG + ",\n"
-                + "lr.battery as " + DeviceConstants.PROPERTY_LAST_READING_BATTERY + ",\n"
-                + "lr.temperature as " + DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE + ",\n"
-                + "lr.time as " + DeviceConstants.PROPERTY_LAST_READING_TIME_ISO + ",\n"
-                + "sp.status as " + DeviceConstants.PROPERTY_SHIPMENT_STATUS + ",\n"
-                + "sp.tripcount as deviceTripCount\n"
-                + "from devices d\n"
-
-                + "left outer join (select s.* from "
-                + ShipmentDaoImpl.TABLE + " s "
-                + " join (select max(" + ShipmentDaoImpl.ID_FIELD+ ") as id from " + ShipmentDaoImpl.TABLE
-                + " group by " + ShipmentDaoImpl.DEVICE_FIELD + ") s1 on s1.id = s." + ShipmentDaoImpl.ID_FIELD
-                + ") sp on sp.device = d." + IMEI_FIELD + "\n"
-
-                + "left outer join (\n"
-                + "select\n"
-                + "te." + TrackerEventDaoImpl.TIME_FIELD + " as time,\n"
-                + "te." + TrackerEventDaoImpl.TEMPERATURE_FIELD + " as temperature,\n"
-                + "te." + TrackerEventDaoImpl.BATTERY_FIELD + " as battery,\n"
-                + "te." + TrackerEventDaoImpl.LATITUDE_FIELD + " as latitude,\n"
-                + "te." + TrackerEventDaoImpl.LONGITUDE_FIELD + " as longitude,\n"
-                + "te." + TrackerEventDaoImpl.DEVICE_FIELD + " as device,\n"
-                + "te." + TrackerEventDaoImpl.SHIPMENT_FIELD + " as shipment\n"
-                + "from " + TrackerEventDaoImpl.TABLE + " te\n"
-                + "join (select max(" + TrackerEventDaoImpl.ID_FIELD + ") as id from "
-                + TrackerEventDaoImpl.TABLE + " where not shipment is NULL"
-                + " group by " + TrackerEventDaoImpl.SHIPMENT_FIELD
-                + ") teid\n"
-                + "on teid.id = te." + TrackerEventDaoImpl.ID_FIELD + "\n"
-                + ") lr on lr.shipment = sp.id\n"
-
-                + "left outer join " + AutoStartShipmentDaoImpl.TABLE + " aut on aut."
-                + AutoStartShipmentDaoImpl.ID_FIELD + " = d." + AUTOSTART_TEMPLATE_FIELD + "\n"
-                + "left outer join " + ShipmentTemplateDaoImpl.TABLE + " tpl on tpl."
-                + ShipmentTemplateDaoImpl.ID_FIELD + " = aut." + AutoStartShipmentDaoImpl.TEMPLATE_FIELD + "\n"
-                + "where d." + COMPANY_FIELD + " = :company\n";
+        String sql = GET_DEVICES_SQL;
 
         if (sorting != null && sorting.getSortProperties().length > 0) {
             sql += "order by ";
