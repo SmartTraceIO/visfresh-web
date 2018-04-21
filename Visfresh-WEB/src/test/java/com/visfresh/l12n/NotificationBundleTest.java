@@ -17,12 +17,14 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserNotification;
 
 import junit.framework.AssertionFailedError;
 
@@ -111,12 +113,6 @@ public class NotificationBundleTest extends NotificationBundle {
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
-                //App
-                msg = getAppMessage(alert, trackerEvent, user.getLanguage(),
-                        user.getTimeZone(), user.getTemperatureUnits());
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
                 //cumulative
                 alert.setCumulative(true);
 
@@ -133,12 +129,6 @@ public class NotificationBundleTest extends NotificationBundle {
 
                 //SMS
                 msg = getSmsMessage(alert, trackerEvent, user.getLanguage(),
-                        user.getTimeZone(), user.getTemperatureUnits());
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                //App
-                msg = getAppMessage(alert, trackerEvent, user.getLanguage(),
                         user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
@@ -171,12 +161,6 @@ public class NotificationBundleTest extends NotificationBundle {
                         user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
-
-                //App
-                msg = getAppMessage(alert, trackerEvent, user.getLanguage(),
-                        user.getTimeZone(), user.getTemperatureUnits());
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
             }
         }
 
@@ -202,18 +186,91 @@ public class NotificationBundleTest extends NotificationBundle {
                 user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
+    }
+
+    @Test
+    public void testAppMessageBundles() {
+        for (final AlertType type : AlertType.values()) {
+            if (type.isTemperatureAlert()) {
+                //Temperature alerts
+                final UserNotification n = createNotification();
+
+                n.setType(NotificationType.Alert);
+                n.setAlertType(type);
+
+                //not cumulative
+                n.setAlertCumulative(false);
+                n.setAlertMinutes(10);
+                n.setTemperature(33.);
+
+                //App
+                String msg = getAppMessage(n, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
+                assertNotNull(msg);
+                assertPlaceholdersResolved(n, msg);
+
+                //cumulative
+                n.setAlertCumulative(true);
+
+                //App
+                msg = getAppMessage(n, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
+                assertNotNull(msg);
+                assertPlaceholdersResolved(n, msg);
+            }
+        }
+
+        //Other alerts
+        for (final AlertType type : AlertType.values()) {
+            if (!type.isTemperatureAlert()) {
+                final UserNotification n = createNotification();
+                n.setType(NotificationType.Alert);
+
+                //App
+                final String msg = getAppMessage(n, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
+                assertNotNull(msg);
+                assertPlaceholdersResolved(n, msg);
+            }
+        }
+
+        //Arrival
+        final UserNotification n = createNotification();
+        n.setType(NotificationType.Arrival);
 
         //App
-        msg = getAppMessage(arrival, trackerEvent, user.getLanguage(),
+        final String msg = getAppMessage(n, user.getLanguage(),
                 user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
-        assertPlaceholdersResolved(arrival, msg);
+        assertPlaceholdersResolved(n, msg);
     }
+
+    /**
+     * @return
+     */
+    private UserNotification createNotification() {
+        final UserNotification n = new UserNotification();
+        n.setIssueDate(new Date());
+        n.setDevice(shipment.getDevice().getImei());
+        n.setShipmentId(shipment.getId());
+        n.setShipmentDescription(shipment.getShipmentDescription());
+        n.setShipmentTripCount(shipment.getTripCount());
+        if(shipment.getShippedFrom() != null) {
+            n.setShippedFrom(shipment.getShippedFrom().getName());
+        }
+        if(shipment.getShippedTo() != null) {
+            n.setShippedTo(shipment.getShippedTo().getName());
+        }
+        return n;
+    }
+
     @Test
     public void testGetLinkToShipment() {
-        final String link = getLinkToShipment(shipment);
+        final UserNotification n = createNotification();
+
+        final String link = getLinkToShipment(n);
         assertNotNull(link);
-        assertPlaceholdersResolved(null, link);
+        assertPlaceholdersResolved((UserNotification) null, link);
     }
     /**
      * @param issue notification issue.
@@ -223,6 +280,16 @@ public class NotificationBundleTest extends NotificationBundle {
         if (msg.contains("{")) {
             throw new AssertionFailedError("Not all placeholders resolved for message '"
                     + msg +"' of " + createBundleKey(issue));
+        }
+    }
+    /**
+     * @param n notification issue.
+     * @param msg message.
+     */
+    private void assertPlaceholdersResolved(final UserNotification n, final String msg) {
+        if (msg.contains("{")) {
+            throw new AssertionFailedError("Not all placeholders resolved for message '"
+                    + msg +"' of " + createBundleKey(n));
         }
     }
 

@@ -10,6 +10,7 @@ import java.util.Set;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserNotification;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -26,7 +27,7 @@ public interface NotificationDao extends
      * @param page page.
      * @return
      */
-    List<Notification> findForUser(User user, boolean excludeLight, Sorting sorting, Filter filter, Page page);
+    List<UserNotification> findForUser(User user, boolean excludeLight, Sorting sorting, Filter filter, Page page);
     /**
      * @param user the user.
      * @param ids notification IDs.

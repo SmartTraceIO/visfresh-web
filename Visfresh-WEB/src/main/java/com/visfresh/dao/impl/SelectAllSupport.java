@@ -142,6 +142,20 @@ public class SelectAllSupport {
      */
     protected void buildSelectAll(final String selectAll, final Sorting sorting, final Page page, final Filter filter) {
         final Map<String, Object> params = new HashMap<String, Object>();
+        final String q = addSortAndFilter(selectAll, sorting, page, filter, params);
+        this.params = params;
+        this.query = q;
+    }
+    /**
+     * @param sql
+     * @param sorting
+     * @param page
+     * @param filter
+     * @param params
+     * @return
+     */
+    public String addSortAndFilter(final String sql, final Sorting sorting, final Page page, final Filter filter,
+            final Map<String, Object> params) {
         final List<String> filters = new LinkedList<String>();
         final List<String> sorts = new LinkedList<String>();
 
@@ -151,11 +165,10 @@ public class SelectAllSupport {
         if (sorting != null) {
             addSortsForFindAll(sorts, params, sorting);
         }
-
-        this.params = params;
-        this.query = selectAll + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
+        final String q = sql + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
                 + ((page.getPageNumber() - 1) * page.getPageSize())
                 + "," + page.getPageSize());
+        return q;
     }
     /**
      * @param filter
