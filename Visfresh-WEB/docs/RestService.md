@@ -145,6 +145,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 84. [Delete Paired Phone](#markdown-header-delete-paired-phone)  
 85. [Get Paired Phones](#markdown-header-get-paired-phones)  
 86. [Get Paired Beacons](#markdown-header-get-paired-beacons)  
+87. [Ping](#markdown-header-ping)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -732,6 +733,11 @@ Method *GET*, method name *getPairedBeacons*. Request parameters:
 1. phone  
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-get-paired-beacons-example)
+
+### Ping ###
+Method *GET*, method name *ping*. Not request parameters.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-ping-example)
 
 ## Objects
 ### Response message ###
@@ -4923,5 +4929,17 @@ Response:
     "b1",
     "b2"
   ]
+}
+```
+### Ping example ###
+**GET /vf/rest/ping/${accessToken}**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
 }
 ```

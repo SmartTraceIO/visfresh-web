@@ -173,7 +173,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         dao.save(n3);
 
         //check result
-        final List<UserNotification> list = dao.findForUser(u, false, null, null, null);
+        final List<UserNotification> list = dao.findForUser(u, false, new Sorting("id"), null, null);
         assertEquals(2, list.size());
         assertEquals(n2.getId(), list.get(0).getId());
 

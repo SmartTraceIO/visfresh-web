@@ -104,6 +104,9 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Notification,
                 sorting, page, filter, params);
 
         String sql = GET_USER_NOTIFICATIONS_SQL;
+
+        //add criterias to
+
         final int indexOfWhere = scriptReminder.indexOf("where");
         if (indexOfWhere < 0) {
             sql = sql + " " + scriptReminder;
