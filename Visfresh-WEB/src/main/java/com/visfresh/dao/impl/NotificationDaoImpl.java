@@ -25,10 +25,10 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.AppUserNotification;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserNotification;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -95,63 +95,79 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Notification,
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)
      */
     @Override
-    public List<UserNotification> findForUser(final User user, final boolean excludeLight, final Sorting sorting, final Filter filter, final Page page) {
+    public List<AppUserNotification> findForUser(final User user, final boolean excludeLight, final Sorting sorting, final Filter filter, final Page page) {
         final Map<String, Object> params = new HashMap<>();
         params.put("user", user.getId());
         params.put("notUseAlertFilter", !excludeLight);
 
-        final String scriptReminder = getSelectAllSupport().addSortAndFilter("",
-                sorting, page, filter, params);
-
         String sql = GET_USER_NOTIFICATIONS_SQL;
-        final int indexOfWhere = scriptReminder.indexOf("where");
-        if (indexOfWhere < 0) {
-            sql = sql + " " + scriptReminder;
-        } else {
-            sql = sql + " and " + scriptReminder.substring(indexOfWhere + "where ".length());
+
+        final String where = getSelectAllSupport().addSortAndFilter("",
+                null, null, filter, params);
+        // add criterias to
+        // -- %insert-criterias%
+        if (where.length() > 0) {
+            sql = sql.replace("-- %insert-criterias%", where);
+        }
+        if (excludeLight) {
+            //-- %insert-slert-criterias%
+            sql = sql.replace("-- %insert-slert-criterias%", " and not al.type in ('LightOff', 'LightOn')\n");
         }
 
-        final List<UserNotification> notifications = new LinkedList<>();
+        // add sortings
+        final String order = getSelectAllSupport().addSortAndFilter("",
+                sorting, page, null, params);
+        if (order.length() > 0) {
+            sql += " " + order;
+        }
+
+        final List<AppUserNotification> notifications = new LinkedList<>();
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
         for (final Map<String, Object> row : rows) {
-            final UserNotification n = new UserNotification();
-            notifications.add(n);
-
-            n.setId(dbLong(row.get("id")));
-            n.setType(NotificationType.valueOf((String) row.get("type")));
-            n.setRead(dbBoolean(row.get("isread")));
-            n.setHidden(dbBoolean(row.get("hidden")));
-
-            n.setIssueId(dbLong(row.get("issue")));
-            n.setIssueDate((Date) row.get("issueDate"));
-
-            n.setDevice((String) row.get("device"));
-            n.setShipmentId(dbLong(row.get("shipmentId")));
-            n.setShipmentTripCount(dbInteger(row.get("shipmentTripCount")));
-            n.setShipmentDescription((String) row.get("shipmentDescription"));
-
-            n.setTrackerEventId(dbLong(row.get("trackerEventId")));
-            n.setEventTime((Date) row.get("eventTime"));
-            n.setTemperature(dbDouble(row.get("temperature")));
-
-            if (row.get("alertType") != null) {
-                n.setAlertType(AlertType.valueOf((String) row.get("alertType")));
-            }
-            n.setAlertMinutes(dbInteger(row.get("alertMinutes")));
-            n.setAlertCumulative(Boolean.TRUE.equals(row.get("alertCumulative")));
-
-            n.setAlertRuleTimeOutMinutes(dbInteger(row.get("alertRuleTimeOutMinutes")));
-            n.setAlertRuleTemperature(dbDouble(row.get("alertRuleTemperature")));
-
-            if (row.get("numberOfMettersOfArrival") != null) {
-                n.setNumberOfMettersOfArrival(dbInteger(row.get("numberOfMettersOfArrival")));
-            }
-
-            n.setShippedFrom((String) row.get("shippedFrom"));
-            n.setShippedTo((String) row.get("shippedTo"));
+            notifications.add(createUserNotification(row));
         }
 
         return notifications;
+    }
+    /**
+     * @param notifications
+     * @param row
+     */
+    protected AppUserNotification createUserNotification(final Map<String, Object> row) {
+        final AppUserNotification n = new AppUserNotification();
+
+        n.setId(dbLong(row.get("id")));
+        n.setType(NotificationType.valueOf((String) row.get("type")));
+        n.setRead(dbBoolean(row.get("isread")));
+        n.setHidden(dbBoolean(row.get("hidden")));
+
+        n.setIssueId(dbLong(row.get("issue")));
+        n.setIssueDate((Date) row.get("issueDate"));
+
+        n.setDevice((String) row.get("device"));
+        n.setShipmentId(dbLong(row.get("shipmentId")));
+        n.setShipmentTripCount(dbInteger(row.get("shipmentTripCount")));
+        n.setShipmentDescription((String) row.get("shipmentDescription"));
+
+        n.setTrackerEventId(dbLong(row.get("trackerEventId")));
+        n.setEventTime((Date) row.get("eventTime"));
+        n.setTemperature(dbDouble(row.get("temperature")));
+        n.setReadingTemperature(dbDouble(row.get("readingTemperature")));
+
+        if (row.get("alertType") != null) {
+            n.setAlertType(AlertType.valueOf((String) row.get("alertType")));
+        }
+        n.setAlertMinutes(dbInteger(row.get("alertMinutes")));
+        n.setAlertCumulative(Boolean.TRUE.equals(dbBoolean(row.get("alertCumulative"))));
+
+        n.setAlertRuleTimeOutMinutes(dbInteger(row.get("alertRuleTimeOutMinutes")));
+        n.setAlertRuleTemperature(dbDouble(row.get("alertRuleTemperature")));
+
+        if (row.get("numberOfMettersOfArrival") != null) {
+            n.setNumberOfMettersOfArrival(dbInteger(row.get("numberOfMettersOfArrival")));
+        }
+
+        return n;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#getEntityCount(com.visfresh.entities.User, com.visfresh.dao.Filter)

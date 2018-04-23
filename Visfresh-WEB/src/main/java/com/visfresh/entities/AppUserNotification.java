@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class UserNotification {
+public class AppUserNotification {
     /**
      * Notification ID.
      */
@@ -51,8 +51,6 @@ public class UserNotification {
      */
     private AlertType alertType;
     private int shipmentTripCount;
-    private String shippedFrom;
-    private String shippedTo;
     private String shipmentDescription;
     private Date eventTime;
     private Integer alertMinutes;
@@ -61,11 +59,13 @@ public class UserNotification {
     private Double alertRuleTemperature;
     private int numberOfMettersOfArrival;
     private boolean alertCumulative;
+    private Double readingTemperature;
+
 
     /**
      * Default constructor.
      */
-    public UserNotification() {
+    public AppUserNotification() {
         super();
     }
 
@@ -202,30 +202,6 @@ public class UserNotification {
         this.shipmentTripCount = count;
     }
     /**
-     * @return start shipment location name.
-     */
-    public String getShippedFrom() {
-        return shippedFrom;
-    }
-    /**
-     * @return end shipment location name.
-     */
-    public String getShippedTo() {
-        return shippedTo;
-    }
-    /**
-     * @param shippedFrom the shippedFrom to set
-     */
-    public void setShippedFrom(final String shippedFrom) {
-        this.shippedFrom = shippedFrom;
-    }
-    /**
-     * @param shippedTo the shippedTo to set
-     */
-    public void setShippedTo(final String shippedTo) {
-        this.shippedTo = shippedTo;
-    }
-    /**
      * @return shipment description.
      */
     public String getShipmentDescription() {
@@ -320,5 +296,17 @@ public class UserNotification {
      */
     public void setAlertCumulative(final boolean alertCumulative) {
         this.alertCumulative = alertCumulative;
+    }
+    /**
+     * @return the readingTemperature
+     */
+    public Double getReadingTemperature() {
+        return readingTemperature;
+    }
+    /**
+     * @param readingTemperature the readingTemperature to set
+     */
+    public void setReadingTemperature(final Double readingTemperature) {
+        this.readingTemperature = readingTemperature;
     }
 }

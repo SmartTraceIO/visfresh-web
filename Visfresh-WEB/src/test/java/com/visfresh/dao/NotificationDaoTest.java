@@ -21,6 +21,7 @@ import com.visfresh.constants.NotificationConstants;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.AppUserNotification;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -32,7 +33,6 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserNotification;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -173,7 +173,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         dao.save(n3);
 
         //check result
-        final List<UserNotification> list = dao.findForUser(u, false, null, null, null);
+        final List<AppUserNotification> list = dao.findForUser(u, false, new Sorting("id"), null, null);
         assertEquals(2, list.size());
         assertEquals(n2.getId(), list.get(0).getId());
 
@@ -185,7 +185,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         final User u = createUser();
         final Shipment s = arrival.getShipment();
         final AlertType alertType = AlertType.LightOn;
-        final double temperature = 15.;
+        final double readingTemperature = 15.;
         final Date eventTime = new Date(System.currentTimeMillis() - 293487908l);
         final Date issueDate = new Date(System.currentTimeMillis() - 2039845732l);
         final boolean hidden = true;
@@ -196,7 +196,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         e.setType(TrackerEventType.AUT);
         e.setLatitude(10.);
         e.setLongitude(10.);
-        e.setTemperature(temperature);
+        e.setTemperature(readingTemperature);
         e.setTime(eventTime);
         e.setDevice(s.getDevice());
         e.setShipment(e.getShipment());
@@ -219,7 +219,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         dao.save(n);
 
         //check result
-        final UserNotification un = dao.findForUser(u, false, null, null, null).get(0);
+        final AppUserNotification un = dao.findForUser(u, false, null, null, null).get(0);
+        assertEquals(NotificationType.Alert, n.getType());
         assertEquals(-1, un.getAlertMinutes().intValue()); //-1 default value
         assertNull(un.getAlertRuleTimeOutMinutes());
         assertEquals(alertType, un.getAlertType());
@@ -232,9 +233,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertEquals(s.getShipmentDescription(), un.getShipmentDescription());
         assertEquals(s.getId(), un.getShipmentId());
         assertEquals(s.getTripCount(), un.getShipmentTripCount());
-        assertEquals(s.getShippedFrom().getName(), un.getShippedFrom());
-        assertEquals(s.getShippedTo().getName(), un.getShippedTo());
         assertEquals(-1., un.getTemperature().doubleValue(), 0.01); // default -1
+        assertEquals(readingTemperature, un.getReadingTemperature().doubleValue(), 0.01);
         assertEquals(e.getId(), un.getTrackerEventId());
         assertEquals(n.getType(), un.getType());
         assertFalse(un.isAlertCumulative());
@@ -254,13 +254,14 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         final int alertMinuts = 55;
         final int ruleTimeOut = 47;
         final boolean cumulative = true;
+        final double readingTemperature = 13.;
 
         //create tracker event
         final TrackerEvent e = new TrackerEvent();
         e.setType(TrackerEventType.AUT);
         e.setLatitude(10.);
         e.setLongitude(10.);
-        e.setTemperature(temperature);
+        e.setTemperature(readingTemperature);
         e.setTime(eventTime);
         e.setDevice(s.getDevice());
         e.setShipment(e.getShipment());
@@ -295,7 +296,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         dao.save(n);
 
         //check result
-        final UserNotification un = dao.findForUser(u, false, null, null, null).get(0);
+        final AppUserNotification un = dao.findForUser(u, false, null, null, null).get(0);
+        assertEquals(NotificationType.Alert, n.getType());
         assertEquals(alertMinuts, un.getAlertMinutes().intValue());
         assertEquals(ruleTimeOut, un.getAlertRuleTimeOutMinutes().intValue());
         assertEquals(alertType, un.getAlertType());
@@ -308,9 +310,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertEquals(s.getShipmentDescription(), un.getShipmentDescription());
         assertEquals(s.getId(), un.getShipmentId());
         assertEquals(s.getTripCount(), un.getShipmentTripCount());
-        assertEquals(s.getShippedFrom().getName(), un.getShippedFrom());
-        assertEquals(s.getShippedTo().getName(), un.getShippedTo());
-        assertEquals(e.getTemperature(), un.getTemperature().doubleValue(), 0.01);
+        assertEquals(temperature, un.getTemperature().doubleValue(), 0.01);
+        assertEquals(readingTemperature, un.getReadingTemperature().doubleValue(), 0.01);
         assertEquals(e.getId(), un.getTrackerEventId());
         assertEquals(n.getType(), un.getType());
         assertEquals(cumulative, un.isAlertCumulative());
@@ -355,7 +356,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         dao.save(n);
 
         //check result
-        final UserNotification un = dao.findForUser(u, false, null, null, null).get(0);
+        final AppUserNotification un = dao.findForUser(u, false, null, null, null).get(0);
+        assertEquals(NotificationType.Arrival, n.getType());
         assertNull(un.getAlertMinutes());
         assertNull(un.getAlertRuleTimeOutMinutes());
         assertNull(un.getAlertType());
@@ -368,8 +370,6 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertEquals(s.getShipmentDescription(), un.getShipmentDescription());
         assertEquals(s.getId(), un.getShipmentId());
         assertEquals(s.getTripCount(), un.getShipmentTripCount());
-        assertEquals(s.getShippedFrom().getName(), un.getShippedFrom());
-        assertEquals(s.getShippedTo().getName(), un.getShippedTo());
         assertNull(un.getTemperature());
         assertEquals(e.getId(), un.getTrackerEventId());
         assertEquals(n.getType(), un.getType());
@@ -422,7 +422,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         dao.save(n);
 
         //check result
-        final UserNotification un = dao.findForUser(u, false, null, null, null).get(0);
+        final AppUserNotification un = dao.findForUser(u, false, null, null, null).get(0);
         assertEquals(alertMinuts, un.getAlertMinutes().intValue());
         assertNull(un.getAlertRuleTimeOutMinutes());
         assertEquals(alertType, un.getAlertType());
@@ -435,8 +435,6 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertEquals(s.getShipmentDescription(), un.getShipmentDescription());
         assertEquals(s.getId(), un.getShipmentId());
         assertEquals(s.getTripCount(), un.getShipmentTripCount());
-        assertEquals(s.getShippedFrom().getName(), un.getShippedFrom());
-        assertEquals(s.getShippedTo().getName(), un.getShippedTo());
         assertEquals(e.getTemperature(), un.getTemperature().doubleValue(), 0.01);
         assertEquals(e.getId(), un.getTrackerEventId());
         assertEquals(n.getType(), un.getType());
@@ -500,8 +498,6 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     }
     @Test
     public void testGetForIssues() {
-        final User u = createUser();
-
         final Alert a1 = createAlert();
         final Alert a2 = createAlert();
         final Alert a3 = createAlert();

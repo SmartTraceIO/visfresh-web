@@ -69,6 +69,23 @@ public class AuthenticationControllerTest extends AbstractRestServiceTest {
         assertNotNull(token);
     }
     @Test
+    public void testPing() throws Exception {
+        final String token = client.getAuthToken();
+
+        //test not session
+        client.setAuthToken("abrakadabra");
+        try {
+            sendPing();
+            throw new AssertionFailedError("Authenticatio exception should be thrown");
+        } catch (final Exception e) {
+            //OK
+        }
+
+        client.setAuthToken(token);
+        sendPing();
+    }
+
+    @Test
     public void testCaseInsensitiveLogin() throws RestServiceException, IOException {
         final User user = new User();
         user.setEmail("a-" + (++lastLong) + "@b.c");
@@ -299,5 +316,13 @@ public class AuthenticationControllerTest extends AbstractRestServiceTest {
         }
 
         return params.get("token");
+    }
+    /**
+     * @throws RestServiceException
+     * @throws IOException
+     *
+     */
+    private void sendPing() throws IOException, RestServiceException {
+        client.sendGetRequest(client.getPathWithToken("ping"), new HashMap<String, String>());
     }
 }

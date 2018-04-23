@@ -55,6 +55,14 @@ public class AuthenticationController extends AbstractController {
     /**
      * @param authToken authentication token.
      */
+    @RequestMapping(value = "/ping", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject checkSession() {
+        return createSuccessResponse(null);
+    }
+    /**
+     * @param authToken authentication token.
+     */
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject logout() {
