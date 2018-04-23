@@ -22,6 +22,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
+import com.visfresh.impl.siblingdetect.SiblingDetector;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.services.RetryableException;
 import com.visfresh.utils.LocationUtils;
@@ -52,187 +53,6 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
     }
 
     @Test
-    public void testIsSiblings() {
-        final Shipment master = createShipment(1l);
-        final Shipment sibling = createShipment(2l);
-        final Shipment notSibling = createShipment(3l);
-
-        //crete master event list
-        final List<TrackerEventDto> masterEvents = new LinkedList<>();
-        final double x0 = 10.;
-        final double y0 = 10.;
-        final long t0 = System.currentTimeMillis() - 1000000l;
-        final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
-
-        //intersected time
-        final int count = (int) Math.round(minPath / 0.01) + 1;
-        for (int i = 0; i < count; i++) {
-            addEvent(masterEvents, master, x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt);
-            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
-                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
-            addEvent(trackerEvents, notSibling,
-                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
-                    t0 + dt * i + 60 * 1000l);
-        }
-
-        assertTrue(isSiblings(getTrackeEvents(sibling.getId()), masterEvents));
-        assertFalse(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
-    }
-    @Test
-    public void testIsSiblingsByGateway() {
-        final Shipment master = createShipment(1l);
-        final Shipment notSibling = createShipment(3l);
-
-        //crete master event list
-        final List<TrackerEventDto> masterEvents = new LinkedList<>();
-        final double x0 = 10.;
-        final double y0 = 10.;
-        final long t0 = System.currentTimeMillis() - 1000000l;
-        final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
-
-        //intersected time
-        final int count = (int) Math.round(minPath / 0.01) + 1;
-        for (int i = 0; i < count; i++) {
-            addEvent(masterEvents, master, x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt);
-            addEvent(trackerEvents, notSibling,
-                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
-                    t0 + dt * i + 60 * 1000l);
-        }
-
-        assertFalse(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
-
-        //add gateway to just one reading to each shipment
-        final String gateway = "beacon-gateway";
-        masterEvents.get(count / 2).setGateway(gateway);
-        getTrackeEvents(notSibling.getId()).get(count / 3).setGateway(gateway);
-
-        assertTrue(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
-    }
-    @Test
-    public void testExcludeWithSmallPath() {
-        final Shipment master = createShipment(1l);
-        final Shipment sibling = createShipment(2l);
-        final Shipment notSibling = createShipment(3l);
-
-        //crete master event list
-        final List<TrackerEventDto> masterEvents = new LinkedList<>();
-        final double x0 = 10.;
-        final double y0 = 10.;
-        final long t0 = System.currentTimeMillis() - 1000000l;
-        final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH / 10);
-
-        //intersected time
-        final int count = (int) Math.round(minPath / 0.01);
-        for (int i = 0; i < count; i++) {
-            addEvent(masterEvents, master, x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt);
-            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
-                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
-            addEvent(trackerEvents, notSibling,
-                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
-                    t0 + dt * i + 60 * 1000l);
-        }
-
-        assertFalse(isSiblings(getTrackeEvents(sibling.getId()), masterEvents));
-        assertFalse(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
-    }
-    @Test
-    public void testNotIntersectingByTime() {
-        final Shipment s1 = createShipment(1l);
-        final Shipment s2 = createShipment(2l);
-
-        //crete master event list
-        final List<TrackerEventDto> e2 = new LinkedList<>();
-        final List<TrackerEventDto> e1 = new LinkedList<>();
-        final double x0 = 10.;
-        final double y0 = 10.;
-        final long t0 = System.currentTimeMillis() - 1000000l;
-        final long dt = 10 * 60 * 1000l;
-
-        //add tracker events for master shipment
-        addEvent(e1, s1, x0, y0, t0);
-        addEvent(e1, s1, x0, y0, t0);
-        addEvent(e1, s1, x0, y0, t0);
-
-        //add tracker events for given shipment
-        addEvent(e2, s2, x0, y0, t0 + dt);
-        addEvent(e2, s2, x0, y0, t0 + dt);
-        addEvent(e2, s2, x0, y0, t0 + dt);
-
-        assertFalse(isSiblings(e1, e2));
-        assertFalse(isSiblings(e2, e1));
-    }
-    @Test
-    public void testIsTimeNotIntersecting() {
-        final double lat = 60;
-        final double dlon = LocationUtils.getLongitudeDiff(
-                lat, MAX_DISTANCE_AVERAGE) / 2.;
-        final long min10 = 10 * 60 * 1000l;
-
-        long t = 100 * min10;
-        double lon = 10.;
-
-        final List<TrackerEventDto> l1 = new LinkedList<>();
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-        final List<TrackerEventDto> l2 = new LinkedList<>();
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-        assertFalse(isSiblings(l1, l2));
-        assertFalse(isSiblings(l2, l1));
-    }
-    @Test
-    public void testIsTimeIntersecting() {
-        final double lat = 60;
-        final double dlon = LocationUtils.getLongitudeDiff(
-                lat, MAX_DISTANCE_AVERAGE) / 5.;
-        final double minPath = LocationUtils.getLongitudeDiff(lat, MIN_PATH);
-        final long min10 = 10 * 60 * 1000l;
-
-        long t = 100 * min10;
-        double lon = 10.;
-
-        final List<TrackerEventDto> l1 = new LinkedList<>();
-        final List<TrackerEventDto> l2 = new LinkedList<>();
-
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-        //intersected time
-        final int count = (int) Math.round(minPath / dlon) + 1;
-        for (int i = 0; i < count; i++) {
-            l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-            l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        }
-
-        //l1 stopped l2 continued
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-        assertTrue(isSiblings(l1, l2));
-    }
-
-    @Test
     public void testIncludeOldSiblings() {
         final Shipment master = createShipment(11l);
         final Shipment sibling = createShipment(12l);
@@ -245,7 +65,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -279,7 +99,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -315,7 +135,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;

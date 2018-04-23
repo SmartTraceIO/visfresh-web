@@ -10,6 +10,8 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.impl.siblingdetect.LeftToRight;
+import com.visfresh.impl.siblingdetect.SiblingDetector;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.tools.SingleShipmentUtils;
@@ -36,7 +38,7 @@ public final class DetectingSiblingsTool {
         final List<TrackerEventDto> e2 = loadEvents("s1.json");
         final List<TrackerEventDto> e1 = loadEvents("s2.json");
 
-        final boolean isSiblings = new SiblingDetectDispatcher(){}.isSiblings(e1, e2);
+        final boolean isSiblings = new SiblingDetector(new LeftToRight()).isSiblings(e1, e2);
         System.out.println("Is siblings: " + isSiblings);
     }
 
