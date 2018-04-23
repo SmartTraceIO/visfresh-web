@@ -112,7 +112,6 @@ public class SystemMessageDao {
             obj.addProperty("longitude", loc.getLongitude());
         }
         obj.addProperty("imei", e.getImei());
-        obj.addProperty("beacon", e.getBeaconId());
 
         final SystemMessage sm = new SystemMessage();
         sm.setMessageInfo(obj.toString());

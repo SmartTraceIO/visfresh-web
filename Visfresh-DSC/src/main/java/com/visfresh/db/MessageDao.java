@@ -39,7 +39,6 @@ public class MessageDao {
     public static final String LONGITUDE_FIELD = "longitude";
     public static final String LATITUDE_FIELD = "latitude";
     public static final String PROCESSOR_FIELD = "processor";
-    public static final Object BEACON_FIELD = "beacon";
 
     //tables
     public static final String TABLE = "devicemsg";
@@ -168,9 +167,8 @@ public class MessageDao {
             + ", " + NUMRETRY_FIELD
             + ", " + RETRYON_FIELD
             + ", " + STATIONS_FIELD
-            + ", " + BEACON_FIELD
             + ") "
-            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations, :beacon)"
+            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations)"
             , new MapSqlParameterSource(params), holder);
 
         msg.setId(holder.getKey().longValue());
@@ -196,8 +194,6 @@ public class MessageDao {
         map.put("numretry", msg.getNumberOfRetry());
         //the ready time.
         map.put("readyon", msg.getRetryOn());
-        //beacon id.
-        map.put("beacon", msg.getBeaconId());
 
         return map;
     }
