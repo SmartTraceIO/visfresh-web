@@ -17,6 +17,7 @@ import java.util.TimeZone;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AppUserNotification;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
@@ -26,7 +27,6 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.UserNotification;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -75,7 +75,7 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event.
      * @return message.
      */
-    public String getAppMessage(final UserNotification n, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
+    public String getAppMessage(final AppUserNotification n, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("App." + createBundleKey(n));
         return StringUtils.getMessage(str, createReplacementMap(n, lang, tz, tu));
     }
@@ -83,7 +83,7 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param issue notification issue alert/arrival
      * @return bundle key.
      */
-    protected String createBundleKey(final UserNotification n) {
+    protected String createBundleKey(final AppUserNotification n) {
         String key = "";
         if (n.getAlertType() != null) {
             key = n.getAlertType().toString();
@@ -102,7 +102,7 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event.
      * @return message.
      */
-    public String getLinkToShipment(final UserNotification n) {
+    public String getLinkToShipment(final AppUserNotification n) {
         final String str = getBundle().getString("LinkToShipment");
         final Map<String, String> map = new HashMap<String, String>();
         map.put("shipmentId", n.getShipmentId().toString());
@@ -176,7 +176,7 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event.
      * @return map of replacements.
      */
-    protected Map<String, String> createReplacementMap(final UserNotification n,
+    protected Map<String, String> createReplacementMap(final AppUserNotification n,
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final Date issueDate = n.getIssueDate();
 
@@ -195,12 +195,6 @@ public class NotificationBundle extends NotificationIssueBundle {
 
         //${tripCount} trip count for given device of shipment.
         map.put("tripCount", Integer.toString(n.getShipmentTripCount()));
-        //${shippedFrom}      location shipped from
-        map.put("shippedFrom", n.getShippedFrom() == null
-                ? "" : n.getShippedFrom());
-        //${shippedTo}        location shipped to
-        map.put("shippedTo", n.getShippedTo() == null
-                ? "" : n.getShippedTo());
         //${shipmentDescription}  the shipment desc
         map.put("shipmentDescription", n.getShipmentDescription() == null
                 ? "" : n.getShipmentDescription());
@@ -214,21 +208,21 @@ public class NotificationBundle extends NotificationIssueBundle {
             //${temperature}
             //${readingTemperature}  the temperature in user's temperature scale (C/F) at time of alert
             final String t = LocalizationUtils.getTemperatureString(
-                    n.getTemperature(), tu);
+                    n.getReadingTemperature(), tu);
             map.put("readingTemperature", t);
-            map.put("temperature", t);
         } else {
             map.put("readingTime", "?");
             map.put("readingDate", "?");
             map.put("readingTemperature", "?");
-            map.put("temperature", "?");
         }
 
+        map.put("temperature", "?");
         if (n.getAlertType() != null) {
 
             //for temperature alerts:
             //${type} alert type
             map.put("type", n.getAlertType().name());
+            map.put("temperature", n.getTemperature().toString());
 
             if (n.getAlertType().isTemperatureAlert()) {
                 final String period = Integer.toString(n.getAlertMinutes());

@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.AppUserNotification;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -24,7 +25,6 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserNotification;
 
 import junit.framework.AssertionFailedError;
 
@@ -193,7 +193,7 @@ public class NotificationBundleTest extends NotificationBundle {
         for (final AlertType type : AlertType.values()) {
             if (type.isTemperatureAlert()) {
                 //Temperature alerts
-                final UserNotification n = createNotification();
+                final AppUserNotification n = createNotification();
 
                 n.setType(NotificationType.Alert);
                 n.setAlertType(type);
@@ -223,7 +223,7 @@ public class NotificationBundleTest extends NotificationBundle {
         //Other alerts
         for (final AlertType type : AlertType.values()) {
             if (!type.isTemperatureAlert()) {
-                final UserNotification n = createNotification();
+                final AppUserNotification n = createNotification();
                 n.setType(NotificationType.Alert);
 
                 //App
@@ -235,7 +235,7 @@ public class NotificationBundleTest extends NotificationBundle {
         }
 
         //Arrival
-        final UserNotification n = createNotification();
+        final AppUserNotification n = createNotification();
         n.setType(NotificationType.Arrival);
 
         //App
@@ -248,29 +248,23 @@ public class NotificationBundleTest extends NotificationBundle {
     /**
      * @return
      */
-    private UserNotification createNotification() {
-        final UserNotification n = new UserNotification();
+    private AppUserNotification createNotification() {
+        final AppUserNotification n = new AppUserNotification();
         n.setIssueDate(new Date());
         n.setDevice(shipment.getDevice().getImei());
         n.setShipmentId(shipment.getId());
         n.setShipmentDescription(shipment.getShipmentDescription());
         n.setShipmentTripCount(shipment.getTripCount());
-        if(shipment.getShippedFrom() != null) {
-            n.setShippedFrom(shipment.getShippedFrom().getName());
-        }
-        if(shipment.getShippedTo() != null) {
-            n.setShippedTo(shipment.getShippedTo().getName());
-        }
         return n;
     }
 
     @Test
     public void testGetLinkToShipment() {
-        final UserNotification n = createNotification();
+        final AppUserNotification n = createNotification();
 
         final String link = getLinkToShipment(n);
         assertNotNull(link);
-        assertPlaceholdersResolved((UserNotification) null, link);
+        assertPlaceholdersResolved((AppUserNotification) null, link);
     }
     /**
      * @param issue notification issue.
@@ -286,7 +280,7 @@ public class NotificationBundleTest extends NotificationBundle {
      * @param n notification issue.
      * @param msg message.
      */
-    private void assertPlaceholdersResolved(final UserNotification n, final String msg) {
+    private void assertPlaceholdersResolved(final AppUserNotification n, final String msg) {
         if (msg.contains("{")) {
             throw new AssertionFailedError("Not all placeholders resolved for message '"
                     + msg +"' of " + createBundleKey(n));

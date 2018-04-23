@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,10 +27,10 @@ import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.impl.NotificationDaoImpl;
+import com.visfresh.entities.AppUserNotification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserNotification;
 import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
 import com.visfresh.l12n.NotificationBundle;
@@ -42,6 +44,9 @@ import com.visfresh.utils.DateTimeUtils;
 @RestController("Notification")
 @RequestMapping("/rest")
 public class NotificationController extends AbstractController implements NotificationConstants {
+    @SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(NotificationController.class);
+
     @Autowired
     private NotificationDao dao;
     @Autowired
@@ -78,7 +83,7 @@ public class NotificationController extends AbstractController implements Notifi
             filter.addFilter(PROPERTY_CLOSED, Boolean.FALSE);
         }
 
-        final List<UserNotification> ns = dao.findForUser(user,
+        final List<AppUserNotification> ns = dao.findForUser(user,
                 true,
                 new Sorting(false, getDefaultSortOrder()),
                 filter,
@@ -89,7 +94,7 @@ public class NotificationController extends AbstractController implements Notifi
         final DateFormat isoFormat = DateTimeUtils.createDateFormat(
                 "yyyy-MM-dd'T'HH:mm", user.getLanguage(), user.getTimeZone());
 
-        for (final UserNotification t : ns) {
+        for (final AppUserNotification t : ns) {
             array.add(ser.toJson(createNotificationItem(t, user, isoFormat)));
         }
 
@@ -115,7 +120,7 @@ public class NotificationController extends AbstractController implements Notifi
      * @param user user.
      * @return notification item.
      */
-    private NotificationItem createNotificationItem(final UserNotification n, final User user,
+    private NotificationItem createNotificationItem(final AppUserNotification n, final User user,
             final DateFormat dateFormatter) {
         final NotificationItem item = new NotificationItem();
         item.setAlertId(n.getIssueId());

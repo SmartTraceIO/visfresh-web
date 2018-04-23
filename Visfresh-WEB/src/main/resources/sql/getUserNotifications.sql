@@ -1,5 +1,11 @@
-select
-notifications.*,
+(
+select 
+notifications.id as id,
+notifications.type as type,
+notifications.issue as issue,
+notifications.user as user,
+notifications.isread as isread,
+notifications.hidden as hidden,
 
 al.date as issueDate,
 
@@ -10,6 +16,7 @@ s.description as shipmentDescription,
 
 e.id as trackerEventId,
 e.time as eventTime,
+e.temperature as readingTemperature,
 
 al.type as alertType,
 al.minutes as alertMinutes,
@@ -19,24 +26,28 @@ al.temperature as temperature,
 rule.timeout as alertRuleTimeOutMinutes,
 rule.temp as alertRuleTemperature,
 
-NULL as numberOfMettersOfArrival,
-
-lfrom.name as shippedFrom,
-lto.name as shippedTo
+NULL as numberOfMettersOfArrival
 
 from notifications
-join alerts al on notifications.user = :user and notifications.issue = al.id
+join alerts al on notifications.user = :user and notifications.type = 'Alert'
+   and notifications.issue = al.id
+   -- %insert-slert-criterias%
 left outer join temperaturerules rule on al.rule = rule.id
 join shipments s on s.id = al.shipment
-left outer join locationprofiles lfrom on lfrom.id = s.shippedfrom
-left outer join locationprofiles lto on lto.id = s.shippedto
 left outer join trackerevents e on al.event = e.id
--- arrival criterias
+-- %insert-criterias%
+)
 
 union
 
+(
 select
-notifications.*,
+notifications.id as id,
+notifications.type as type,
+notifications.issue as issue,
+notifications.user as user,
+notifications.isread as isread,
+notifications.hidden as hidden,
 
 arr.date as issueDate,
 
@@ -47,6 +58,7 @@ s.description as shipmentDescription,
 
 e.id as trackerEventId,
 e.time as eventTime,
+e.temperature as readingTemperature,
 
 NULL as alertType,
 NULL as alertMinutes,
@@ -56,15 +68,12 @@ NULL as temperature,
 NULL as alertRuleTimeOutMinutes,
 NULL as alertRuleTemperature,
 
-arr.nummeters as numberOfMettersOfArrival,
-
-lfrom.name as shippedFrom,
-lto.name as shippedTo
+arr.nummeters as numberOfMettersOfArrival
 
 from notifications
-join arrivals arr on notifications.user = :user and notifications.issue = arr.id
+join arrivals arr on notifications.user = :user and notifications.type = 'Arrival'
+   and notifications.issue = arr.id
 join shipments s on s.id = arr.shipment
-left outer join locationprofiles lfrom on lfrom.id = s.shippedfrom
-left outer join locationprofiles lto on lto.id = s.shippedto
 left outer join trackerevents e on arr.event = e.id
--- arrival criterias
+-- %insert-criterias%
+)
