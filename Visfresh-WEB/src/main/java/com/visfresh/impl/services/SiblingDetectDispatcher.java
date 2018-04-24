@@ -203,54 +203,93 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
 
         final List<ShipmentSiblingInfo> shipments = new LinkedList<>(findActiveShipments(companyId));
 
-        //detect siblings.
+        //create shipment siblings map.
         final Map<Long, Set<Long>> siblingMap = new HashMap<>();
         //initialize sibling map
         for (final ShipmentSiblingInfo s : shipments) {
             siblingMap.put(s.getId(), new HashSet<Long>(s.getSiblings()));
         }
 
+        ShipmentSiblingInfo master = null;
         //remove self
         final Iterator<ShipmentSiblingInfo> iter = shipments.iterator();
         while (iter.hasNext()) {
             final ShipmentSiblingInfo next = iter.next();
             if (masterId.equals(next.getId())) {
+                master = next;
                 iter.remove();
                 break;
             }
         }
 
-        if (!shipments.isEmpty()) {
-            //fetch master
-            final ShipmentSiblingInfo master = findShipment(masterId);
-            siblingMap.put(master.getId(), new HashSet<Long>(master.getSiblings()));
-
-            //get shipments for group
-            findSiblings(master, shipments, siblingMap);
-
-            final Set<Long> newSiblings = getNewSiblings(
-                    master.getSiblings(), siblingMap.get(master.getId()));
-            if (!newSiblings.isEmpty()) {
-                log.debug("Uplate siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
-                + ") for shipment " + master.getId());
-                updateSiblingInfo(master, siblingMap.get(master.getId()));
-
-                //update sibling info also for new found siblings
-                for (final Long id : newSiblings) {
-                    final ShipmentSiblingInfo sibling = EntityUtils.getEntity(shipments, id);
-                    final Set<Long> set = new HashSet<>(siblingMap.get(id));
-                    set.add(master.getId());
-
-                    log.debug("Sibling info has updated also for new found sibling " + id);
-                    updateSiblingInfo(sibling, set);
-                }
-                return true;
-            } else {
-                log.debug("Sibling list is not changed for shipment " + master.getId());
-            }
+        if (master == null) {
+            log.warn("Master shipment " + masterId
+                    + " not found or inactive at given moment");
+            return false;
         }
 
-        log.debug("End search of siblings for shipment " + masterId);
+        final Set<Long> oldSiblings = new HashSet<>(master.getSiblings());
+
+        boolean updated = false;
+        if (!shipments.isEmpty()) {
+            updated = searchNewSiblings(master, shipments, siblingMap);
+        }
+        if (!oldSiblings.isEmpty()) {
+            final boolean u = unsiblify(master, oldSiblings, shipments, siblingMap);
+            updated = updated || u;
+        }
+
+        if (updated) {
+            log.debug("Siblng list not changed for shipment " + masterId);
+        }
+        return updated;
+    }
+    /**
+     * @param master
+     * @param oldSiblings
+     * @param shipments
+     * @param siblingMap
+     * @return
+     */
+    private boolean unsiblify(final ShipmentSiblingInfo master, final Set<Long> oldSiblings, final List<ShipmentSiblingInfo> shipments,
+            final Map<Long, Set<Long>> siblingMap) {
+        // TODO implement.
+        return false;
+    }
+    /**
+     * @param master
+     * @param shipments
+     * @param siblingMap
+     * @return
+     */
+    private boolean searchNewSiblings(final ShipmentSiblingInfo master,
+            final List<ShipmentSiblingInfo> shipments,
+            final Map<Long, Set<Long>> siblingMap) {
+        //get shipments for group
+        findSiblings(master, shipments, siblingMap);
+
+        final Set<Long> newSiblings = getNewSiblings(
+                master.getSiblings(), siblingMap.get(master.getId()));
+        if (!newSiblings.isEmpty()) {
+            log.debug("Uplate siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
+            + ") for shipment " + master.getId());
+            updateSiblingInfo(master, siblingMap.get(master.getId()));
+
+            //update sibling info also for new found siblings
+            for (final Long id : newSiblings) {
+                final ShipmentSiblingInfo sibling = EntityUtils.getEntity(shipments, id);
+                final Set<Long> set = new HashSet<>(siblingMap.get(id));
+                set.add(master.getId());
+
+                log.debug("Sibling info has updated also for new found sibling " + id);
+                updateSiblingInfo(sibling, set);
+            }
+
+            return true;
+        } else {
+            log.debug("New siblings not found for shipment " + master.getId());
+        }
+
         return false;
     }
     /**
@@ -266,7 +305,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param originShipments
      * @param siblingMap
      */
-    protected void findSiblings(final ShipmentSiblingInfo master, final List<ShipmentSiblingInfo> originShipments,
+    private void findSiblings(final ShipmentSiblingInfo master, final List<ShipmentSiblingInfo> originShipments,
             final Map<Long, Set<Long>> siblingMap) {
         final List<ShipmentSiblingInfo> shipments = new LinkedList<>(originShipments);
 
@@ -301,13 +340,13 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         return detector.isSiblings(masterEvents, events);
     }
     /**
-     * @param master
+     * @param shipment
      * @param set
      */
-    protected void updateSiblingInfo(final ShipmentSiblingInfo master, final Set<Long> set) {
-        master.getSiblings().clear();
-        master.getSiblings().addAll(set);
-        shipmentDao.updateSiblingInfo(master.getId(), set);
+    protected void updateSiblingInfo(final ShipmentSiblingInfo shipment, final Set<Long> set) {
+        shipment.getSiblings().clear();
+        shipment.getSiblings().addAll(set);
+        shipmentDao.updateSiblingInfo(shipment.getId(), set);
     }
     private Set<Long> getNewSiblings(
             final Set<Long> oldSiblings, final Set<Long> newSiblings) {

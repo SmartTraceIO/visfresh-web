@@ -19,11 +19,11 @@ import com.visfresh.utils.LocationUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class SiglingDetectorTest {
+public class SiblingDetectorTest {
     /**
      * Default constructor.
      */
-    public SiglingDetectorTest() {
+    public SiblingDetectorTest() {
         super();
     }
 
