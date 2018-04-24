@@ -37,12 +37,12 @@
 		</filter>
 	</appender>
 
-	<logger name="com.visfresh.services.AbstractSystemMessageDispatcher">
-		<level value="ERROR" />
-		<appender-ref ref="email" />
-	</logger>
 	<logger name="com.visfresh">
 		<level value="DEBUG"/>
 		<appender-ref ref="file"/>
+	</logger>
+	<logger name="com.visfresh.services.AbstractSystemMessageDispatcher">
+		<level value="DEBUG"/>
+		<appender-ref ref="email" />
 	</logger>
 </log4j:configuration>

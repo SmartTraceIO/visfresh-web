@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -60,6 +62,7 @@ public abstract class AbstractSystemMessageDispatcher {
 
     @Autowired
     protected SystemMessageDao messageDao;
+    private final List<Thread> threads = new LinkedList<>();
 
     private int numThreads;
 
@@ -81,13 +84,18 @@ public abstract class AbstractSystemMessageDispatcher {
          */
         @Override
         public void run() {
+            final Thread t = Thread.currentThread();
+            synchronized (threads) {
+                threads.add(t);
+            }
+
             while (!isStoped.get()) {
                 try {
                     final int numProcessed = processMessages(id);
                     if (numProcessed == 0 && getInactiveTimeOut() > 0){
-                        synchronized (isStoped) {
+                        synchronized (threads) {
                             if (!isStoped.get()) {
-                                isStoped.wait(getInactiveTimeOut());
+                                threads.wait(getInactiveTimeOut());
                             }
                         }
                     }
@@ -106,6 +114,10 @@ public abstract class AbstractSystemMessageDispatcher {
             }
 
             log.debug("Dispatcher " + id + " has stopped");
+            synchronized (threads) {
+                threads.remove(t);
+                threads.notifyAll();
+            }
         }
     };
     /**
@@ -280,9 +292,18 @@ public abstract class AbstractSystemMessageDispatcher {
      * Stops the dispatcher.
      */
     public void stop() {
-        synchronized (isStoped) {
+        synchronized (threads) {
             isStoped.set(true);
-            isStoped.notifyAll();
+            threads.notifyAll();
+
+            while (!threads.isEmpty()) {
+                log.debug("Dispatcher " + getProcessorId()
+                    + " has stopping and waiting for " + threads.size() + " threads");
+                try {
+                    threads.wait();
+                } catch (final InterruptedException e) {
+                }
+            }
         }
     }
     /**
@@ -290,7 +311,7 @@ public abstract class AbstractSystemMessageDispatcher {
      */
     public void start() {
         stop();
-        synchronized (isStoped) {
+        synchronized (threads) {
             isStoped.set(false);
             for (int i = 0; i < getNumThreads(); i++) {
                 final String id = getProcessorId() + "-" + i;

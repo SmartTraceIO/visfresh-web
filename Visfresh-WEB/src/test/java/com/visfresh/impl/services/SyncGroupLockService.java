@@ -18,19 +18,11 @@ public class SyncGroupLockService extends GroupLockServiceImpl {
     public SyncGroupLockService(final Environment env) {
         super(env);
     }
-
     /* (non-Javadoc)
-     * @see com.visfresh.impl.services.GroupLockServiceImpl#init()
+     * @see com.visfresh.impl.services.GroupLockServiceImpl#unlockOlds()
      */
     @Override
-    public void init() {
-        // TODO Auto-generated method stub
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.impl.services.GroupLockServiceImpl#shutdown()
-     */
-    @Override
-    public void shutdown() {
-        // TODO Auto-generated method stub
+    public void unlockOlds() {
+        // disable scheduled invocation.
     }
 }

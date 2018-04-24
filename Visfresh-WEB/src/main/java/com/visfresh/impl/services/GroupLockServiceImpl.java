@@ -4,16 +4,12 @@
 package com.visfresh.impl.services;
 
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.GroupLockDao;
@@ -33,8 +29,6 @@ public class GroupLockServiceImpl implements GroupLockService {
     private GroupLockDao dao;
     private final String instanceId;
 
-    private final Timer timer = new Timer("Unlock old lockings");
-
     /**
      * Default constructor.
      */
@@ -44,30 +38,17 @@ public class GroupLockServiceImpl implements GroupLockService {
         instanceId = env.getProperty("instance.id");
     }
 
-    @PostConstruct
-    public void init() {
-        timer.schedule(new TimerTask() {
-
-            @Override
-            public void run() {
-                unlockOlds();
-
-            }
-        }, TIME_OUT, TIME_OUT);
-    }
     /**
      *
      */
-    protected void unlockOlds() {
+    @Scheduled(fixedDelay = TIME_OUT)
+    public void unlockOlds() {
+        log.debug("Started schedule for unlock older looked devices");
         final int unlocked = dao.unlockOlder(new Date());
         if (unlocked > 0) {
             log.debug(unlocked + " locks have unlocked by device lock service");
         }
-    }
-
-    @PreDestroy
-    public void shutdown() {
-        timer.cancel();
+        log.debug("Finished schedule for unlock older looked devices");
     }
 
     /* (non-Javadoc)
