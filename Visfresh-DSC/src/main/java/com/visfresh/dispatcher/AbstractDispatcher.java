@@ -4,6 +4,8 @@
 package com.visfresh.dispatcher;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -54,7 +56,7 @@ public abstract class AbstractDispatcher {
     /**
      * Thread for asynchronous launch
      */
-    private Thread thread;
+    private final List<Thread> threads = new LinkedList<>();
     private final AtomicBoolean isStoped = new AtomicBoolean(false);
 
     /**
@@ -68,31 +70,50 @@ public abstract class AbstractDispatcher {
     }
 
     public void start() {
-        thread = new Thread() {
-            /* (non-Javadoc)
+        new Thread("processor-" + getProcessorId()) {
+            /*
+             * (non-Javadoc)
+             *
              * @see java.lang.Thread#run()
              */
             @Override
             public void run() {
-                while (!isStoped()) {
-                    try {
-                        final int numProcessed = processMessages();
-                        if (numProcessed == 0 && getInactiveTimeOut() > 0){
-                            sleep(getInactiveTimeOut());
-                        }
-                    } catch (final InterruptedException e) {
-                        log.warn("Dispatcher " + getProcessorId() + " thread is interrupted");
-                        isStoped.set(true);
-                    } catch (final Throwable e) {
-                        log.error("Global exception during dispatch of messaegs", e);
+                runDispatcherCycle();
+            }
+        }.start();
+    }
+
+    /**
+    *
+    */
+    protected void runDispatcherCycle() {
+        synchronized (threads) {
+            threads.add(Thread.currentThread());
+        }
+
+        while (!isStoped()) {
+            try {
+                final int numProcessed = processMessages();
+                if (numProcessed == 0 && getInactiveTimeOut() > 0) {
+                    synchronized (threads) {
+                        threads.wait(getInactiveTimeOut());
                     }
                 }
-
-                log.debug("Dispatcher " + getProcessorId() + " has stopped");
+            } catch (final InterruptedException e) {
+                log.warn("Dispatcher " + getProcessorId() + " thread is interrupted");
+                break;
+            } catch (final Throwable e) {
+                log.error("Global exception during dispatch of messaegs", e);
             }
-        };
-        thread.start();
+        }
+
+        log.debug("Dispatcher " + getProcessorId() + " has stopped");
+        synchronized (threads) {
+            threads.remove(Thread.currentThread());
+            threads.notifyAll();
+        }
     }
+
     /**
      * @return the inactiveTimeOut
      */
@@ -100,7 +121,8 @@ public abstract class AbstractDispatcher {
         return inactiveTimeOut;
     }
     /**
-     * @param inactiveTimeOut the inactiveTimeOut to set
+     * @param inactiveTimeOut
+     *            the inactiveTimeOut to set
      */
     public void setInactiveTimeOut(final long inactiveTimeOut) {
         this.inactiveTimeOut = inactiveTimeOut;
@@ -125,7 +147,8 @@ public abstract class AbstractDispatcher {
         return batchLimit;
     }
     /**
-     * @param limit the limit to set
+     * @param limit
+     *            the limit to set
      */
     public void setBatchLimit(final int limit) {
         this.batchLimit = limit;
@@ -137,7 +160,8 @@ public abstract class AbstractDispatcher {
         return retryLimit;
     }
     /**
-     * @param retryLimit the retryLimit to set
+     * @param retryLimit
+     *            the retryLimit to set
      */
     public void setRetryLimit(final int retryLimit) {
         this.retryLimit = retryLimit;
@@ -149,7 +173,8 @@ public abstract class AbstractDispatcher {
         return retryTimeOut;
     }
     /**
-     * @param retryTimeOut the retryTimeOut to set
+     * @param retryTimeOut
+     *            the retryTimeOut to set
      */
     public void setRetryTimeOut(final long retryTimeOut) {
         this.retryTimeOut = retryTimeOut;
@@ -161,8 +186,10 @@ public abstract class AbstractDispatcher {
     public abstract int processMessages();
 
     /**
-     * @param msg the message.
-     * @param e the exception.
+     * @param msg
+     *            the message.
+     * @param e
+     *            the exception.
      */
     protected void handleError(final DeviceMessage msg, final Throwable e) {
         if (e instanceof RetryableException && ((RetryableException) e).canRetry()) {
@@ -170,7 +197,8 @@ public abstract class AbstractDispatcher {
             final int retryLimit = re.getNumberOfRetry() > -1 ? re.getNumberOfRetry() : getRetryLimit();
 
             if (msg.getNumberOfRetry() < retryLimit) {
-                log.error("Retryable exception has occured for message " + msg + ", will retry later", e);
+                log.error("Retryable exception has occured for message " + msg
+                        + ", will retry later", e);
                 msg.setRetryOn(new Date(msg.getRetryOn().getTime() + getRetryTimeOut()));
                 msg.setNumberOfRetry(msg.getNumberOfRetry() + 1);
                 saveForRetry(msg);
@@ -179,7 +207,8 @@ public abstract class AbstractDispatcher {
                 stopProcessingByError(msg, e);
             }
         } else {
-            log.error("Not retryable exception has occured for message " + msg.getId() + ", will deleted", e);
+            log.error("Not retryable exception has occured for message " + msg.getId()
+                + ", will deleted", e);
             stopProcessingByError(msg, e);
         }
     }
@@ -198,15 +227,30 @@ public abstract class AbstractDispatcher {
     protected void stopProcessingByError(final DeviceMessage msg, final Throwable error) {
         dao.delete(msg);
     }
+
     /**
      * @param msg the message.
      */
     protected void handleSuccess(final DeviceMessage msg) {
-        log.debug("The message " + msg.getId() + " successfully processed by " + getProcessorId() + ", deleting it");
+        log.debug("The message " + msg.getId() + " successfully processed by "
+                + getProcessorId() + ", deleting it");
         dao.delete(msg);
     }
+
     public void stop() {
         isStoped.set(true);
+
+        synchronized (threads) {
+            threads.notifyAll();
+            while (!threads.isEmpty()) {
+                log.debug("Dispatcher " + getProcessorId()
+                    + " has stopping and waiting for " + threads.size() + " threads");
+                try {
+                    threads.wait();
+                } catch (final InterruptedException e) {
+                }
+            }
+        }
     }
 
     /**
