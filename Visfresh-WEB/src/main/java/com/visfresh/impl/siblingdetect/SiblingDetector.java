@@ -25,7 +25,7 @@ public class SiblingDetector {
     public static final double MAX_DISTANCE_AVERAGE = 3000; //meters
 
     private final CalculationDirection direction;
-    private int minPathMeters = MIN_PATH;
+//    private int minPathMeters = MIN_PATH;
     private double maxDistanceAverage = MAX_DISTANCE_AVERAGE;
 
     /**
@@ -60,10 +60,11 @@ public class SiblingDetector {
         final boolean isSiblings = isSiblingsByGateway(e1, e2)
                 || isSiblingsByDistance(e1, e2, getMaxDistanceAverage());
 
-        //check given tracker lives the sibling area
-        return isSiblings
-                && isPathNotLessThen(e1, getMinPathMeters())
-                && isPathNotLessThen(e2, getMinPathMeters());
+//        //check given tracker lives the sibling area
+//        return isSiblings
+//                && isPathNotLessThen(e1, getMinPathMeters())
+//                && isPathNotLessThen(e2, getMinPathMeters());
+        return isSiblings;
     }
     /**
      * @param e1 first list of events
@@ -227,31 +228,31 @@ public class SiblingDetector {
         return list;
     }
 
-    /**
-     * @param events
-     * @param minPath
-     * @return
-     */
-    private boolean isPathNotLessThen(final List<TrackerEventDto> events, final int minPath) {
-        if (events.size() == 0) {
-            return false;
-        }
-
-        final LinkedList<TrackerEventDto> list = new LinkedList<>(events);
-        TrackerEventDto e;
-        while (list.size() > 0) {
-            e = list.remove(0);
-
-            final Iterator<TrackerEventDto> iter = list.descendingIterator();
-            while (iter.hasNext()) {
-                if (getDistance(e, iter.next()) >= minPath) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+//    /**
+//     * @param events
+//     * @param minPath
+//     * @return
+//     */
+//    private boolean isPathNotLessThen(final List<TrackerEventDto> events, final int minPath) {
+//        if (events.size() == 0) {
+//            return false;
+//        }
+//
+//        final LinkedList<TrackerEventDto> list = new LinkedList<>(events);
+//        TrackerEventDto e;
+//        while (list.size() > 0) {
+//            e = list.remove(0);
+//
+//            final Iterator<TrackerEventDto> iter = list.descendingIterator();
+//            while (iter.hasNext()) {
+//                if (getDistance(e, iter.next()) >= minPath) {
+//                    return true;
+//                }
+//            }
+//        }
+//
+//        return false;
+//    }
     /**
      * @param e1 first tracker event.
      * @param e2 second tracker event.
@@ -273,24 +274,24 @@ public class SiblingDetector {
             final double lat2, final double lon2) {
         return LocationUtils.getDistanceMeters(lat1, lon1, lat2, lon2);
     }
-    /**
-     * @return the minPathMeters
-     */
-    public int getMinPathMeters() {
-        return minPathMeters;
-    }
+//    /**
+//     * @return the minPathMeters
+//     */
+//    public int getMinPathMeters() {
+//        return minPathMeters;
+//    }
     /**
      * @return the maxDistanceAverage
      */
     public double getMaxDistanceAverage() {
         return maxDistanceAverage;
     }
-    /**
-     * @param minPathMeters the minPathMeters to set
-     */
-    public void setMinPathMeters(final int minPathMeters) {
-        this.minPathMeters = minPathMeters;
-    }
+//    /**
+//     * @param minPathMeters the minPathMeters to set
+//     */
+//    public void setMinPathMeters(final int minPathMeters) {
+//        this.minPathMeters = minPathMeters;
+//    }
     /**
      * @param maxDistanceAverage the maxDistanceAverage to set
      */

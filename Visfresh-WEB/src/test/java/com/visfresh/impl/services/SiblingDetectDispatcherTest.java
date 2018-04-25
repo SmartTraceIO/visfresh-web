@@ -175,6 +175,95 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         assertEquals(1, groupLocks.size());
         assertTrue(groupLocks.containsKey("abrakadabra-group"));
     }
+    @Test
+    public void testUnsiblify() {
+        final Shipment master = createShipment(1l);
+        final Shipment sibling = createShipment(2l);
+        final Shipment notSibling = createShipment(3l);
+
+        //set all as siblings
+        setAsSiblings(master, sibling, notSibling);
+
+        //crete master event list
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
+
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+                    t0 + i * dt);
+            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+            addEvent(trackerEvents, notSibling,
+                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+                    t0 + dt * i + 60 * 1000l);
+        }
+
+        assertTrue(updateSiblings(master.getId(), master.getCompanyId()));
+
+        assertTrue(master.getSiblings().contains(sibling.getId()));
+        assertFalse(master.getSiblings().contains(notSibling.getId()));
+
+        assertTrue(sibling.getSiblings().contains(master.getId()));
+        assertFalse(notSibling.getSiblings().contains(master.getId()));
+
+        //check sibling count
+        assertEquals(1, master.getSiblingCount());
+        assertEquals(1, notSibling.getSiblingCount());
+    }
+    @Test
+    public void testUnsiblifyInactiveSibling() {
+        final Shipment master = createShipment(1l);
+        final Shipment notSibling = createShipment(3l);
+        notSibling.setStatus(ShipmentStatus.Ended);
+
+        //set all as siblings
+        setAsSiblings(master, notSibling);
+
+        //crete master event list
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
+
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+                    t0 + i * dt);
+            addEvent(trackerEvents, notSibling,
+                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+                    t0 + dt * i + 60 * 1000l);
+        }
+
+        assertTrue(updateSiblings(master.getId(), master.getCompanyId()));
+
+        assertFalse(master.getSiblings().contains(notSibling.getId()));
+        assertFalse(notSibling.getSiblings().contains(master.getId()));
+
+        //check sibling count
+        assertEquals(0, master.getSiblingCount());
+        assertEquals(0, notSibling.getSiblingCount());
+    }
+
+    /**
+     * @param s
+     */
+    private void setAsSiblings(final Shipment... s) {
+        for (final Shipment s1 : s) {
+            for (final Shipment s2 : s) {
+                if (!s1.getId().equals(s2.getId())) {
+                    s1.getSiblings().add(s2.getId());
+                }
+            }
+            s1.setSiblingCount(s.length - 1);
+        }
+    }
 
     /**
      * @param events event list.
@@ -273,7 +362,6 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
     protected void updateSiblingInfo(final ShipmentSiblingInfo info, final Set<Long> set) {
         for (final Shipment s : shipments) {
             if (s.getId().equals(info.getId())) {
-                s.setSiblingCount(set.size());
                 s.getSiblings().clear();
                 s.getSiblings().addAll(set);
                 s.setSiblingCount(set.size());

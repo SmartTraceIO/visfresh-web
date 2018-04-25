@@ -239,7 +239,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
             updated = updated || u;
         }
 
-        if (updated) {
+        if (!updated) {
             log.debug("Siblng list not changed for shipment " + masterId);
         }
         return updated;
@@ -253,6 +253,42 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      */
     private boolean unsiblify(final ShipmentSiblingInfo master, final Set<Long> oldSiblings, final List<ShipmentSiblingInfo> shipments,
             final Map<Long, Set<Long>> siblingMap) {
+        if (!oldSiblings.isEmpty()) {
+            log.debug("Search stopped to be siblings in ("
+                    + StringUtils.combine(master.getSiblings(), ",")
+                    + ") for shipment " + master.getId());
+            final List<TrackerEventDto> masterEvents = getTrackeEvents(master.getId());
+
+            int numUnsiblified = 0;
+            for (final Long id : master.getSiblings()) {
+                //get shipment indo
+                ShipmentSiblingInfo sibling = EntityUtils.getEntity(shipments, id);
+                if (sibling == null) {
+                    sibling = findShipment(id);
+                }
+
+                if (!siblingMap.containsKey(sibling.getId())) {
+                    siblingMap.put(id, sibling.getSiblings());
+                }
+
+                //check is sibling
+                final List<TrackerEventDto> events = getTrackeEvents(sibling.getId());
+                if (!isSiblings(masterEvents, events)) {
+                    siblingMap.get(master.getId()).remove(sibling.getId());
+                    siblingMap.get(sibling.getId()).remove(master.getId());
+                    updateSiblingInfo(sibling, siblingMap.get(sibling.getId()));
+
+                    numUnsiblified++;
+                }
+            }
+
+            if (numUnsiblified > 0) {
+                updateSiblingInfo(master, siblingMap.get(master.getId()));
+                log.debug("Unsiblified " + numUnsiblified + " siblings from shipment "
+                        + master.getId());
+                return true;
+            }
+        }
         // TODO implement.
         return false;
     }
@@ -271,9 +307,10 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         final Set<Long> newSiblings = getNewSiblings(
                 master.getSiblings(), siblingMap.get(master.getId()));
         if (!newSiblings.isEmpty()) {
-            log.debug("Uplate siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
-            + ") for shipment " + master.getId());
-            updateSiblingInfo(master, siblingMap.get(master.getId()));
+            log.debug("Search new siblings for ("
+                + StringUtils.combine(siblingMap.get(master.getId()), ",")
+                + ") of shipment " + master.getId());
+                updateSiblingInfo(master, siblingMap.get(master.getId()));
 
             //update sibling info also for new found siblings
             for (final Long id : newSiblings) {

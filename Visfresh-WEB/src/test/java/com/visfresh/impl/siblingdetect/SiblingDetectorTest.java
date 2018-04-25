@@ -88,34 +88,34 @@ public class SiblingDetectorTest {
 
         assertTrue(detector.isSiblings(siblingEvents, masterEvents));
     }
-    @Test
-    public void testExcludeWithSmallPathLeftToRight() {
-        final SiblingDetector detector = new SiblingDetector(new LeftToRight());
-
-        //crete master event list
-        final List<TrackerEventDto> masterEvents = new LinkedList<>();
-        final List<TrackerEventDto> siblingEvents = new LinkedList<>();
-        final List<TrackerEventDto> notSiblingEvents = new LinkedList<>();
-
-        final double x0 = 10.;
-        final double y0 = 10.;
-        final long t0 = System.currentTimeMillis() - 1000000l;
-        final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH / 10);
-
-        //intersected time
-        final int count = (int) Math.round(minPath / 0.01);
-        for (int i = 0; i < count; i++) {
-            masterEvents.add(createTrackerEvent(x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt));
-            siblingEvents.add(createTrackerEvent(x0 + 0.01 * i + 0.005,
-                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l));
-            notSiblingEvents.add(createTrackerEvent(x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
-                    t0 + dt * i + 60 * 1000l));
-        }
-
-        assertFalse(detector.isSiblings(siblingEvents, masterEvents));
-        assertFalse(detector.isSiblings(notSiblingEvents, masterEvents));
-    }
+//    @Test
+//    public void testExcludeWithSmallPathLeftToRight() {
+//        final SiblingDetector detector = new SiblingDetector(new LeftToRight());
+//
+//        //crete master event list
+//        final List<TrackerEventDto> masterEvents = new LinkedList<>();
+//        final List<TrackerEventDto> siblingEvents = new LinkedList<>();
+//        final List<TrackerEventDto> notSiblingEvents = new LinkedList<>();
+//
+//        final double x0 = 10.;
+//        final double y0 = 10.;
+//        final long t0 = System.currentTimeMillis() - 1000000l;
+//        final long dt = 10 * 60 * 1000l;
+//        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH / 10);
+//
+//        //intersected time
+//        final int count = (int) Math.round(minPath / 0.01);
+//        for (int i = 0; i < count; i++) {
+//            masterEvents.add(createTrackerEvent(x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt));
+//            siblingEvents.add(createTrackerEvent(x0 + 0.01 * i + 0.005,
+//                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l));
+//            notSiblingEvents.add(createTrackerEvent(x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+//                    t0 + dt * i + 60 * 1000l));
+//        }
+//
+//        assertFalse(detector.isSiblings(siblingEvents, masterEvents));
+//        assertFalse(detector.isSiblings(notSiblingEvents, masterEvents));
+//    }
     @Test
     public void testNotIntersectingByTimeLeftToRight() {
         final SiblingDetector detector = new SiblingDetector(new LeftToRight());
@@ -274,34 +274,34 @@ public class SiblingDetectorTest {
 
         assertTrue(detector.isSiblings(siblingEvents, masterEvents));
     }
-    @Test
-    public void testExcludeWithSmallPathRightToLeft() {
-        final SiblingDetector detector = new SiblingDetector(new RightToLeft());
-
-        //crete master event list
-        final List<TrackerEventDto> masterEvents = new LinkedList<>();
-        final List<TrackerEventDto> siblingEvents = new LinkedList<>();
-        final List<TrackerEventDto> notSiblingEvents = new LinkedList<>();
-
-        final double x0 = 10.;
-        final double y0 = 10.;
-        final long t0 = System.currentTimeMillis() - 1000000l;
-        final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH / 10);
-
-        //intersected time
-        final int count = (int) Math.round(minPath / 0.01);
-        for (int i = 0; i < count; i++) {
-            masterEvents.add(createTrackerEvent(x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt));
-            siblingEvents.add(createTrackerEvent(x0 + 0.01 * i + 0.005,
-                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l));
-            notSiblingEvents.add(createTrackerEvent(x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
-                    t0 + dt * i + 60 * 1000l));
-        }
-
-        assertFalse(detector.isSiblings(siblingEvents, masterEvents));
-        assertFalse(detector.isSiblings(notSiblingEvents, masterEvents));
-    }
+//    @Test
+//    public void testExcludeWithSmallPathRightToLeft() {
+//        final SiblingDetector detector = new SiblingDetector(new RightToLeft());
+//
+//        //crete master event list
+//        final List<TrackerEventDto> masterEvents = new LinkedList<>();
+//        final List<TrackerEventDto> siblingEvents = new LinkedList<>();
+//        final List<TrackerEventDto> notSiblingEvents = new LinkedList<>();
+//
+//        final double x0 = 10.;
+//        final double y0 = 10.;
+//        final long t0 = System.currentTimeMillis() - 1000000l;
+//        final long dt = 10 * 60 * 1000l;
+//        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH / 10);
+//
+//        //intersected time
+//        final int count = (int) Math.round(minPath / 0.01);
+//        for (int i = 0; i < count; i++) {
+//            masterEvents.add(createTrackerEvent(x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt));
+//            siblingEvents.add(createTrackerEvent(x0 + 0.01 * i + 0.005,
+//                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l));
+//            notSiblingEvents.add(createTrackerEvent(x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+//                    t0 + dt * i + 60 * 1000l));
+//        }
+//
+//        assertFalse(detector.isSiblings(siblingEvents, masterEvents));
+//        assertFalse(detector.isSiblings(notSiblingEvents, masterEvents));
+//    }
     @Test
     public void testNotIntersectingByTimeRightToLeft() {
         final SiblingDetector detector = new SiblingDetector(new RightToLeft());
