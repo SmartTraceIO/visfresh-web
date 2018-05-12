@@ -34,7 +34,7 @@ public class AbstractAssyncSystemMessageDispatcherTest extends AbstractAssyncSys
      * @see com.visfresh.services.AbstractAssyncSystemMessageDispatcher#getProcessorId()
      */
     @Override
-    protected String getProcessorId() {
+    protected String getBaseProcessorId() {
         return helper.getProcessorId();
     }
     /* (non-Javadoc)
@@ -76,7 +76,7 @@ public class AbstractAssyncSystemMessageDispatcherTest extends AbstractAssyncSys
         saveMessage(helper.createMessage(new Date(time + 2 * 100000l)));
         saveMessage(helper.createMessage(new Date(time + 3 * 100000l)));
 
-        assertEquals(3, processMessages(getProcessorId()));
+        assertEquals(3, processMessages(getBaseProcessorId()));
         assertEquals(0, helper.getMessages().size());
     }
     @Test
@@ -89,7 +89,7 @@ public class AbstractAssyncSystemMessageDispatcherTest extends AbstractAssyncSys
         saveMessage(helper.createMessage(new Date(time + 3 * 100000l)));
 
         helper.setError(new RetryableException());
-        assertEquals(3, processMessages(getProcessorId()));
+        assertEquals(3, processMessages(getBaseProcessorId()));
         assertEquals(3, helper.getMessages().size());
     }
 }

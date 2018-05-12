@@ -20,9 +20,9 @@ import com.visfresh.services.AbstractAssyncSystemMessageDispatcher;
 @Component
 public class ArrivalReportDispatcher extends AbstractAssyncSystemMessageDispatcher {
     /**
-     * Processor ID.
+     * Processor alias.
      */
-    protected String processorId;
+    private final String dispatcherAlias;
 
     /**
      * @param env spring environment.
@@ -30,7 +30,7 @@ public class ArrivalReportDispatcher extends AbstractAssyncSystemMessageDispatch
     @Autowired
     public ArrivalReportDispatcher(final Environment env) {
         super(SystemMessageType.ArrivalReport);
-        processorId = buildInstanceId(env, "arrivalreport.dispatcher.id", "arrivalrpt");
+        dispatcherAlias= env.getProperty("arrivalreport.dispatcher.id", "arrivalrpt");
         setBatchLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.retryLimit", "5")));
         //number of threads should be hardcoded to 1
@@ -43,8 +43,8 @@ public class ArrivalReportDispatcher extends AbstractAssyncSystemMessageDispatch
      * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()
      */
     @Override
-    protected String getProcessorId() {
-        return processorId;
+    protected String getBaseProcessorId() {
+        return getInstanceId() + "." + dispatcherAlias;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#stop()

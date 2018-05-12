@@ -20,18 +20,15 @@ import com.visfresh.services.SystemMessageHandler;
  */
 @Component
 public class EmailMessageDispatcher extends AbstractAssyncSystemMessageDispatcher {
-    /**
-     * Processor ID.
-     */
-    protected String processorId;
 
+    private String dispatcherAlias;
     /**
      * @param env spring environment.
      */
     @Autowired
     public EmailMessageDispatcher(final Environment env) {
         super(SystemMessageType.Email);
-        processorId = buildInstanceId(env, "email.dispatcher.baseProcessorId", "email");
+        dispatcherAlias = env.getProperty("email.dispatcher.baseProcessorId", "email");
 
         setBatchLimit(Integer.parseInt(env.getProperty("email.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("email.dispatcher.retryLimit", "3")));
@@ -50,8 +47,8 @@ public class EmailMessageDispatcher extends AbstractAssyncSystemMessageDispatche
      * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()
      */
     @Override
-    protected String getProcessorId() {
-        return processorId;
+    protected String getBaseProcessorId() {
+        return getInstanceId() + "." + dispatcherAlias;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#stop()

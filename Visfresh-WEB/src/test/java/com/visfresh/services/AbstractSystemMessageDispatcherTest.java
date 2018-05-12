@@ -38,13 +38,6 @@ public class AbstractSystemMessageDispatcherTest extends AbstractSystemMessageDi
         return "Processes";
     }
     /* (non-Javadoc)
-     * @see com.visfresh.services.AbstractAssyncSystemMessageDispatcher#getProcessorId()
-     */
-    @Override
-    protected String getProcessorId() {
-        return helper.getProcessorId();
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#saveMessage(com.visfresh.entities.SystemMessage)
      */
     @Override
@@ -57,13 +50,6 @@ public class AbstractSystemMessageDispatcherTest extends AbstractSystemMessageDi
     @Override
     protected void deleteMessage(final SystemMessage msg) {
         helper.deleteMessage(msg);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.AbstractSystemMessageDispatcher#processMessages(java.lang.String)
-     */
-    @Override
-    protected int processMessages(final String processorId) {
-        return 0;
     }
     @Test
     public void testHandleSuccess() {
@@ -156,5 +142,12 @@ public class AbstractSystemMessageDispatcherTest extends AbstractSystemMessageDi
 
         //check message not removed
         assertNotNull(helper.getMessages().get(msg.getId()));
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#createWorker(int)
+     */
+    @Override
+    protected Worker createWorker(final int number) {
+        return null;
     }
 }

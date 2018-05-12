@@ -17,13 +17,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.MySqlUtilsDao;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.init.instance.Instance;
 import com.visfresh.utils.ExceptionUtils;
 
 /**
@@ -62,6 +62,9 @@ public abstract class AbstractSystemMessageDispatcher {
 
     @Autowired
     protected SystemMessageDao messageDao;
+    @Autowired
+    private Instance instance;
+
     private final List<Thread> threads = new LinkedList<>();
 
     private int numThreads;
@@ -69,16 +72,32 @@ public abstract class AbstractSystemMessageDispatcher {
     @Autowired
     private MySqlUtilsDao mysqlUtilsDao;
 
-    private class Dispathcer extends Thread {
-        private String id;
-
-        /**
-         * @param id dispatcher ID.
-         */
-        public Dispathcer(final String id) {
+    protected abstract class Worker extends Thread {
+        public Worker() {
             super();
-            this.id = id;
         }
+        public Worker(final Runnable target, final String name) {
+            super(target, name);
+        }
+        public Worker(final Runnable target) {
+            super(target);
+        }
+        public Worker(final String name) {
+            super(name);
+        }
+        public Worker(final ThreadGroup group, final Runnable target, final String name, final long stackSize) {
+            super(group, target, name, stackSize);
+        }
+        public Worker(final ThreadGroup group, final Runnable target, final String name) {
+            super(group, target, name);
+        }
+        public Worker(final ThreadGroup group, final Runnable target) {
+            super(group, target);
+        }
+        public Worker(final ThreadGroup group, final String name) {
+            super(group, name);
+        }
+
         /* (non-Javadoc)
          * @see java.lang.Thread#run()
          */
@@ -91,7 +110,7 @@ public abstract class AbstractSystemMessageDispatcher {
 
             while (!isStoped.get()) {
                 try {
-                    final int numProcessed = processMessages(id);
+                    final int numProcessed = processMessages();
                     if (numProcessed == 0 && getInactiveTimeOut() > 0){
                         synchronized (threads) {
                             if (!isStoped.get()) {
@@ -100,25 +119,30 @@ public abstract class AbstractSystemMessageDispatcher {
                         }
                     }
                 } catch (final InterruptedException e) {
-                    log.warn("Dispatcher " + id + " thread is interrupted");
+                    log.warn("Worker thread " + t.getName() + " is interrupted");
                     isStoped.set(true);
                 } catch (final Throwable e) {
                     log.error("Global exception during dispatch of messaegs", e);
                     try {
                         Thread.sleep(10000L);
                     } catch (final InterruptedException ine) {
-                        log.warn("Dispatcher " + id + " thread is interrupted");
+                        log.warn("Worker thread " + t.getName() + " is interrupted");
                         isStoped.set(true);
                     }
                 }
             }
 
-            log.debug("Dispatcher " + id + " has stopped");
+            log.debug("Dispatcher thread " + t.getName() + " has finished");
             synchronized (threads) {
                 threads.remove(t);
                 threads.notifyAll();
             }
         }
+
+        /**
+         * @return number of processed messages.
+         */
+        protected abstract int processMessages();
     };
     /**
      * @param t message type.
@@ -132,12 +156,10 @@ public abstract class AbstractSystemMessageDispatcher {
         setNumThreads(1);
         setInactiveTimeOut(3000);
     }
-    protected String buildInstanceId(final Environment env,
-            final String idPartName, final String idPartDefaultValue) {
-        final String instanceId = env.getProperty("instance.id");
-        return instanceId + "." + env.getProperty(idPartName, idPartDefaultValue);
-    }
 
+    protected String getInstanceId() {
+        return instance.getId();
+    }
     /**
      * @param parseInt
      */
@@ -162,10 +184,6 @@ public abstract class AbstractSystemMessageDispatcher {
     public void setInactiveTimeOut(final long inactiveTimeOut) {
         this.inactiveTimeOut = inactiveTimeOut;
     }
-    /**
-     * @return the processorId
-     */
-    protected abstract String getProcessorId();
     /**
      * @return the limit
      */
@@ -202,12 +220,6 @@ public abstract class AbstractSystemMessageDispatcher {
     public void setRetryTimeOut(final long retryTimeOut) {
         this.retryTimeOut = retryTimeOut;
     }
-
-    /**
-     * @param processorId
-     * @return
-     */
-    protected abstract int processMessages(final String processorId);
 
     /**
      * @param msg the message.
@@ -283,8 +295,8 @@ public abstract class AbstractSystemMessageDispatcher {
      * @param msg the message.
      */
     protected void handleSuccess(final SystemMessage msg) {
-        log.debug("The message " + msg.getId() + " successfully processed by " + getProcessorId()
-                + ", will not dispatched next");
+        log.debug("The " + msg.getType() + " message " + msg.getId()
+            + " successfully processed, will not dispatched next");
         deleteMessage(msg);
     }
 
@@ -297,7 +309,7 @@ public abstract class AbstractSystemMessageDispatcher {
             threads.notifyAll();
 
             while (!threads.isEmpty()) {
-                log.debug("Dispatcher " + getProcessorId()
+                log.debug("Dispatcher " + getClass().getName()
                     + " has stopping and waiting for " + threads.size() + " threads");
                 try {
                     threads.wait();
@@ -314,12 +326,17 @@ public abstract class AbstractSystemMessageDispatcher {
         synchronized (threads) {
             isStoped.set(false);
             for (int i = 0; i < getNumThreads(); i++) {
-                final String id = getProcessorId() + "-" + i;
-                final Dispathcer d = new Dispathcer(id);
-                d.start();
+                final Worker d = createWorker(i);
+                final Thread t = new Thread(d, "worker-" + d.getId());
+                t.start();
             }
         }
     }
+    /**
+     * @param number worker number.
+     * @return worker.
+     */
+    protected abstract Worker createWorker(final int number);
     /**
      * @param type message type.
      * @param h message handler.

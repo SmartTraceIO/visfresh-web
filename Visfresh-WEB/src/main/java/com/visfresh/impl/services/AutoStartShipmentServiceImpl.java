@@ -308,6 +308,16 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             profiles.add(auto.getTemplate().getShippedFrom());
         }
 
+        return getSortedMatchedStartLocations(profiles, latitude, longitude);
+    }
+    /**
+     * @param profiles
+     * @param latitude
+     * @param longitude
+     * @return
+     */
+    protected List<LocationProfile> getSortedMatchedStartLocations(final List<LocationProfile> profiles,
+            final Double latitude, final Double longitude) {
         //find best location
         LocationProfile best = null;
         int minDistance = Integer.MAX_VALUE;

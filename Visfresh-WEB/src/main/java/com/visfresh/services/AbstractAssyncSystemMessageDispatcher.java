@@ -27,19 +27,17 @@ public abstract class AbstractAssyncSystemMessageDispatcher extends AbstractSyst
     /**
      * @return the processorId
      */
-    @Override
-    protected abstract String getProcessorId();
+    protected abstract String getBaseProcessorId();
 
     /**
      * @param processorId
      * @return
      */
-    @Override
     protected int processMessages(final String processorId) {
         int count = 0;
 
         if (!isStoped.get() && !messageHandlers.isEmpty()) {
-            Date readyOn = new Date(System.currentTimeMillis() + 1000l);
+            final Date readyOn = new Date(System.currentTimeMillis() + 1000l);
             final List<SystemMessage> messages = selectMessagesForProcess(processorId, readyOn);
 
             for (final SystemMessage msg : messages) {
@@ -61,12 +59,29 @@ public abstract class AbstractAssyncSystemMessageDispatcher extends AbstractSyst
         return count;
     }
 
+    /* (non-Javadoc)
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#createWorker(int)
+     */
+    @Override
+    protected Worker createWorker(final int number) {
+        final String id = getBaseProcessorId() + "-" + number;
+        return new Worker(id) {
+            /* (non-Javadoc)
+             * @see com.visfresh.services.AbstractSystemMessageDispatcher.Worker#processMessages()
+             */
+            @Override
+            protected int processMessages() {
+                return AbstractAssyncSystemMessageDispatcher.this.processMessages(id);
+            }
+        };
+    }
+
     /**
      * @param processorId
      * @param readyOn
      * @return
      */
-    protected List<SystemMessage> selectMessagesForProcess(final String processorId, Date readyOn) {
+    protected List<SystemMessage> selectMessagesForProcess(final String processorId, final Date readyOn) {
         return getMessageDao().selectMessagesForProcessing(
                 messageTypes, processorId, getBatchLimit(), readyOn);
     }

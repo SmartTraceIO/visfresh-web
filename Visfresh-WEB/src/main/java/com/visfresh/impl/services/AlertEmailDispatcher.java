@@ -19,10 +19,7 @@ import com.visfresh.services.AbstractAssyncSystemMessageDispatcher;
  */
 @Component
 public class AlertEmailDispatcher extends AbstractAssyncSystemMessageDispatcher {
-    /**
-     * Processor ID.
-     */
-    protected String processorId;
+    private final String dispatcherAlias;
 
     /**
      * @param env spring environment.
@@ -30,21 +27,21 @@ public class AlertEmailDispatcher extends AbstractAssyncSystemMessageDispatcher 
     @Autowired
     public AlertEmailDispatcher(final Environment env) {
         super(SystemMessageType.AlertEmail);
-        processorId = buildInstanceId(env, "alertemail.dispatcher.id", "alertemail");
         setBatchLimit(Integer.parseInt(env.getProperty("alert.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("alert.dispatcher.retryLimit", "5")));
         //number of threads should be hardcoded to 1
         //setNumThreads(Integer.parseInt(env.getProperty("main.dispatcher.numThreads", "1")));
         setNumThreads(1);
         setInactiveTimeOut(Long.parseLong(env.getProperty("alert.dispatcher.retryLimit", "3000")));
+        dispatcherAlias = env.getProperty("alertemail.dispatcher.id", "alertemail");
     }
 
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()
      */
     @Override
-    protected String getProcessorId() {
-        return processorId;
+    protected String getBaseProcessorId() {
+        return getInstanceId() + "." + dispatcherAlias;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#stop()

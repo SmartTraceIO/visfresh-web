@@ -33,13 +33,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
         super();
         this.deviceLocker = lockService;
         setSystemMessageHandler(SystemMessageType.Tracker, helper);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.AbstractAssyncSystemMessageDispatcher#getProcessorId()
-     */
-    @Override
-    protected String getProcessorId() {
-        return helper.getProcessorId();
+        processorId = "junit-events";
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#saveMessage(com.visfresh.entities.SystemMessage)
@@ -76,8 +70,9 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
     @Override
     protected String lockFreeDevice(final Date readyOn) {
         for (final SystemMessage msg : this.helper.getMessages().values()) {
-            if (!lockService.getLocks().containsKey(msg.getGroup()) && !msg.getRetryOn().after(readyOn)) {
-                lockService.lockGroup(msg.getGroup(), getProcessorId());
+            if (!lockService.getLocks().containsKey(msg.getGroup())
+                    && !msg.getRetryOn().after(readyOn)) {
+                lockService.lockGroup(msg.getGroup(), processorId);
                 return msg.getGroup();
             }
         }
@@ -93,7 +88,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
         saveMessage(helper.createMessage(new Date(time + 3 * 100000l)));
 
         //process and check result.
-        assertEquals(3, processMessages(getProcessorId()));
+        assertEquals(3, processMessages());
         assertEquals(0, helper.getMessages().size());
 
         //check unlock device
@@ -111,7 +106,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
         lockFreeDevice(new Date());
 
         //process and check result.
-        assertEquals(0, processMessages(getProcessorId()));
+        assertEquals(0, processMessages());
         assertEquals(3, helper.getMessages().size());
     }
     @Test
@@ -129,7 +124,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
         setRetryTimeOut(timeOut);
         helper.setError(new RetryableException());
 
-        processMessages(processorId);
+        processMessages();
 
         assertEquals(3, helper.getMessages().size());
         assertEquals(1, lockService.getLocks().size());
@@ -161,9 +156,9 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
         final String device = helper.getGroup();
 
         assertEquals(2, getMessagesForGoup(readyOn, device).size());
-        assertEquals(2, processMessages(processorId));
+        assertEquals(2, processMessages());
         //not secondary process the messages because lock not removed
-        assertEquals(0, processMessages(processorId));
+        assertEquals(0, processMessages());
     }
     @Test
     public void testRetryableExceptionNotRetry() {
@@ -180,7 +175,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
 
         helper.setError(e);
 
-        processMessages(processorId);
+        processMessages();
 
         //check message has removed immediately
         assertEquals(0, helper.getMessages().size());
@@ -197,7 +192,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
         saveMessage(helper.createMessage(new Date(time + 3 * 100000l)));
 
         helper.setError(new RuntimeException());
-        processMessages(getProcessorId());
+        processMessages();
 
         //check message has removed immediately
         assertEquals(0, helper.getMessages().size());
@@ -211,7 +206,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
         saveMessage(helper.createMessage(new Date(time + 3 * 100000l)));
 
         helper.setError(new RuntimeException(new SQLException("Test exception")));
-        processMessages(getProcessorId());
+        processMessages();
 
         //check message has removed immediately
         assertEquals(3, helper.getMessages().size());

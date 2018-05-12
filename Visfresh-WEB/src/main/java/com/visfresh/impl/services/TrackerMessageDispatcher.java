@@ -33,15 +33,12 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
      */
     private static final Logger log = LoggerFactory.getLogger(TrackerMessageDispatcher.class);
 
-    /**
-     * Processor ID.
-     */
-    protected String processorId;
     @Autowired
     protected GroupLockService deviceLocker;
     @Autowired
     private SystemMessageDao systemMessageDao;
     private final ThreadLocal<Date> unLockTime = new ThreadLocal<Date>();
+    protected String processorId;
 
     /**
      * @param env spring environment.
@@ -49,7 +46,6 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
     @Autowired
     public TrackerMessageDispatcher(final Environment env) {
         this();
-        processorId = env.getProperty("tracker.dispatcher.baseProcessorId", "tracker-dispatcher");
         //batch limit should be hardcoded for given version
         setBatchLimit(Integer.parseInt(env.getProperty("tracker.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("tracker.dispatcher.retryLimit", "5")));
@@ -59,18 +55,13 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
     }
     protected TrackerMessageDispatcher() {
         super(SystemMessageType.Tracker);
-        processorId = "tracker-dispatcher";
         setBatchLimit(15);
         setRetryLimit(5);
         setNumThreads(0);
         setInactiveTimeOut(3000);
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.services.AbstractSystemMessageDispatcher#processMessages(java.lang.String)
-     */
-    @Override
-    protected int processMessages(final String processorId) {
+    protected int processMessages() {
         int count = 0;
 
         final Date readyOn = new Date(System.currentTimeMillis());
@@ -132,14 +123,14 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
      * @param device
      */
     protected void unlockDevice(final String device) {
-        deviceLocker.unlock(device, getProcessorId());
+        deviceLocker.unlock(device, processorId);
     }
     /**
      * @param device device.
      * @param unlockOn unlock date.
      */
     protected void setUnlockTime(final String device, final Date unlockOn) {
-        deviceLocker.setUnlockOn(device, getProcessorId(), unlockOn);
+        deviceLocker.setUnlockOn(device, processorId, unlockOn);
     }
 
     /**
@@ -147,9 +138,10 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
      * @return device IMEI.
      */
     protected String lockFreeDevice(final Date readyOn) {
-        final List<String> devices = systemMessageDao.getNotLockedDevicesWithReadyMessages(readyOn, 10);
+        final List<String> devices = systemMessageDao.getNotLockedDevicesWithReadyMessages(
+                readyOn, 10);
         for (final String device : devices) {
-            if (deviceLocker.lockGroup(device, getProcessorId())) {
+            if (deviceLocker.lockGroup(device, processorId)) {
                 return device;
             }
         }
@@ -173,11 +165,17 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
         super.setSystemMessageHandler(SystemMessageType.Tracker, h);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#createWorker(int)
      */
     @Override
-    protected String getProcessorId() {
-        return processorId;
+    protected Worker createWorker(final int number) {
+        return new Worker("trackerevents-" + number) {
+
+            @Override
+            protected int processMessages() {
+                return TrackerMessageDispatcher.this.processMessages();
+            }
+        };
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#stop()
@@ -193,6 +191,7 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
     @Override
     @PostConstruct
     public void start() {
+        this.processorId = getInstanceId() + ".trke";
         super.start();
     }
 }

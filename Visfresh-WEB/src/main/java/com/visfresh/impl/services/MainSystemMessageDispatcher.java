@@ -22,7 +22,7 @@ public class MainSystemMessageDispatcher extends AbstractAssyncSystemMessageDisp
     /**
      * Processor ID.
      */
-    protected String processorId;
+    protected String dispatcherAlias;
 
     /**
      * @param env spring environment.
@@ -30,7 +30,7 @@ public class MainSystemMessageDispatcher extends AbstractAssyncSystemMessageDisp
     @Autowired
     public MainSystemMessageDispatcher(final Environment env) {
         super(SystemMessageType.ShutdownShipment, SystemMessageType.DeviceCommand);
-        processorId = buildInstanceId(env, "main.dispatcher.baseProcessorId", "main");
+        dispatcherAlias = env.getProperty("main.dispatcher.baseProcessorId", "main");
         setBatchLimit(Integer.parseInt(env.getProperty("main.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("main.dispatcher.retryLimit", "5")));
         //number of threads should be hardcoded to 1
@@ -43,8 +43,8 @@ public class MainSystemMessageDispatcher extends AbstractAssyncSystemMessageDisp
      * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()
      */
     @Override
-    protected String getProcessorId() {
-        return processorId;
+    protected String getBaseProcessorId() {
+        return getInstanceId() + "." + dispatcherAlias;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#stop()

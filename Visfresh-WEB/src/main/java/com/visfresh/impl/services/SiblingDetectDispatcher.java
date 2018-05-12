@@ -62,8 +62,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
     /**
      * Processor ID.
      */
-    protected String processorId;
-    private static int numInstances;
+    protected String dispatcherAlias;
     private SiblingDetector detector = new SiblingDetector(new RightToLeft());
 
     /**
@@ -72,7 +71,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
     @Autowired
     public SiblingDetectDispatcher(final Environment env) {
         super(SystemMessageType.Siblings);
-        processorId = buildInstanceId(env, "siblings.dispatcher.id", "siblings") + "-" + (numInstances++);
+        dispatcherAlias = env.getProperty("siblings.dispatcher.id", "siblings");
         setBatchLimit(Integer.parseInt(env.getProperty("siblings.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("siblings.dispatcher.retryLimit", "1")));
         setNumThreads(Integer.parseInt(env.getProperty("main.dispatcher.numThreads", "2")));
@@ -89,10 +88,9 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()
      */
     @Override
-    protected String getProcessorId() {
-        return processorId;
+    protected String getBaseProcessorId() {
+        return getInstanceId() + "." + dispatcherAlias;
     }
-
     @Scheduled(fixedDelay = 15000l)
     public void processScheduledSiblingDetections() {
         if (isIgnoreSchedulings()) {
@@ -100,7 +98,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         }
 
         int processed;
-        while ((processed = processMessages(getProcessorId())) > 0) {
+        while ((processed = processMessages(getBaseProcessorId())) > 0) {
             log.debug("Processed " + processed + " sibling detection schedules");
         }
     }
@@ -289,7 +287,6 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
                 return true;
             }
         }
-        // TODO implement.
         return false;
     }
     /**
