@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
-import com.visfresh.services.AbstractSystemMessageDispatcher;
 import com.visfresh.services.GroupLockService;
 import com.visfresh.services.SystemMessageHandler;
 

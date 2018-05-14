@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.controllers.svcimpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

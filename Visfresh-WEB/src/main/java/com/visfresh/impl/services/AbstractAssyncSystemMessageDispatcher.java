@@ -1,12 +1,10 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.impl.services;
 
 import java.util.Date;
 import java.util.List;
-
-import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
@@ -15,7 +13,6 @@ import com.visfresh.entities.SystemMessageType;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Component
 public abstract class AbstractAssyncSystemMessageDispatcher extends AbstractSystemMessageDispatcher {
     /**
      * @param t message type.

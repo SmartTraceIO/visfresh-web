@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.visfresh.dao.impl.DaoImplBase;
+
 /**
  * Base JPA configuration for test and production environment.
  *
@@ -17,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
-@ComponentScan(basePackageClasses = {JdbcConfig.class})
+@ComponentScan(basePackageClasses = {JdbcConfig.class, DaoImplBase.class})
 public class JdbcConfig {
 
     /**

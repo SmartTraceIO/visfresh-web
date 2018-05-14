@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.controllers.svcimpl;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +23,12 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
+import com.visfresh.services.AuthService;
+import com.visfresh.services.AuthToken;
+import com.visfresh.services.EmailService;
+import com.visfresh.services.PasswordResetRequest;
+import com.visfresh.services.RestServiceException;
+import com.visfresh.services.RestSessionManager;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.Messages;
 

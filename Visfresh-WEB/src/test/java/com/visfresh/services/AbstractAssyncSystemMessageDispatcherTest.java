@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.impl.services.AbstractAssyncSystemMessageDispatcher;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

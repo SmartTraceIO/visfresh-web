@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.controllers.svcimpl;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,6 +25,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.visfresh.services.TimeZoneService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

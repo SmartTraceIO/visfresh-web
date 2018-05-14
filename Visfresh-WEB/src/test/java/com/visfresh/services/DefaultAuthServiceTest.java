@@ -17,6 +17,7 @@ import javax.mail.MessagingException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.controllers.svcimpl.DefaultAuthService;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
 import com.visfresh.impl.services.DefaultRestSessionManager;

@@ -52,11 +52,7 @@
 		</init-param>
 	</servlet>
 
-    <!-- ====================================================================== 
-     === Servlet-mapping definitions
-     -->
-
-    <!-- Visfresh Spring -->
+	<!-- SmartTrace Spring -->
 	<servlet-mapping>
 		<servlet-name>SpringDispatcher</servlet-name>
 		<url-pattern>/vf/*</url-pattern>
@@ -65,13 +61,4 @@
 		<servlet-name>SpringDispatcher</servlet-name>
 		<url-pattern>/shipment.do</url-pattern>
 	</servlet-mapping>
-    <!-- ====================================================================== -->
-    <!--
-     *** To change the login session timeout value:
-     *** !) In the file "$CATALINA_HOME/conf/web.xml", set the "session-timeout" value 
-     ***    to the number of minutes to maintain the session:
-     ***     <session-config>
-     ***         <session-timeout>240</session-timeout>
-     ***     </session-config>
-     -->
 </web-app>

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.impl.services;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -24,6 +24,8 @@ import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.init.instance.Instance;
+import com.visfresh.services.RetryableException;
+import com.visfresh.services.SystemMessageHandler;
 import com.visfresh.utils.ExceptionUtils;
 
 /**

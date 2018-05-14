@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.init.prod;
+package com.visfresh.init.backend;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -9,21 +9,20 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.visfresh.init.BackendConfig;
-import com.visfresh.init.rest.WebConfig;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
-@Import({WebConfig.class, BackendConfig.class})
+@Import(BackendConfig.class)
 @EnableScheduling
 @PropertySource("classpath:/app.properties")
-public class ProductionConfig {
+public class BackendOnlyConfig {
     /**
      * Default constructor.
      */
-    public ProductionConfig() {
+    public BackendOnlyConfig() {
         super();
     }
 }

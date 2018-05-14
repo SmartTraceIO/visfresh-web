@@ -15,6 +15,8 @@ import junit.framework.AssertionFailedError;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import com.visfresh.controllers.svcimpl.DefaultTimeZoneService;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
