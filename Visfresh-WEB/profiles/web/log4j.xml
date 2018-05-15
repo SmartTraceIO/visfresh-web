@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM
+	"http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+	debug="false">
+
+	<appender name="file" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${user.home}/logs/web-${instance}.log" />
+		<param name="MaxFileSize" value="50MB" />
+		<param name="MaxBackupIndex" value="10" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%c{1}] %m%n" />
+		</layout>
+	</appender>
+	<appender name="email" class="org.apache.log4j.net.SMTPAppender">
+		<param name="bufferSize" value="512" />
+		<param name="SMTPHost" value="smtp.mail.yahoo.com" />
+		<param name="SMTPPort" value="465" />
+		<param name="SMTPProtocol" value="smtps"/>
+		<param name="from" value="smarttraceapi@yahoo.com" />
+		<param name="to" value="vyacheslav.soldatov@inbox.ru,james@smartTrace.com.au,hoaivubk@gmail.com" />
+		<param name="subject" value="WebApp error" />
+		<param name="SMTPUsername" value="smarttraceapi@yahoo.com" />
+		<param name="SMTPPassword" value="govisfresh20151217" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%c{1}] %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="error" />
+			<param name="LevelMax" value="fatal" />
+		</filter>
+	</appender>
+
+	<logger name="com.visfresh">
+		<level value="DEBUG"/>
+		<appender-ref ref="file"/>
+	</logger>
+	<logger name="com.visfresh.services.AbstractSystemMessageDispatcher">
+		<level value="DEBUG"/>
+		<appender-ref ref="email" />
+	</logger>
+</log4j:configuration>

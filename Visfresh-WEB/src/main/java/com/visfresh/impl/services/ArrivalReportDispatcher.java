@@ -32,9 +32,7 @@ public class ArrivalReportDispatcher extends AbstractAssyncSystemMessageDispatch
         dispatcherAlias= env.getProperty("arrivalreport.dispatcher.id", "arrivalrpt");
         setBatchLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.retryLimit", "5")));
-        //number of threads should be hardcoded to 1
-        //setNumThreads(Integer.parseInt(env.getProperty("main.dispatcher.numThreads", "1")));
-        setNumThreads(1);
+        setNumThreads(Integer.parseInt(env.getProperty("arrival.dispatcher.numThreads", "1")));
         setInactiveTimeOut(Long.parseLong(env.getProperty("arrival.dispatcher.retryLimit", "3000")));
     }
 

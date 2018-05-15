@@ -186,9 +186,39 @@
 				<version>2.6</version>
 				<goals><goal>package</goal></goals>
 				<configuration>
-					<warName>web</warName>
+					<webXml>${webXml}</webXml>
+					<warName>${instance}</warName>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				<instance>web</instance>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>web</id>
+
+			<properties>
+				<webXml>profiles/web/web.xml.tpl</webXml>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>backend</id>
+
+			<properties>
+				<webXml>profiles/backend/web.xml.tpl</webXml>
+			</properties>
+		</profile>
+	</profiles>
 </project>

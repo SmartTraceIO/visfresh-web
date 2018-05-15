@@ -28,9 +28,7 @@ public class AlertEmailDispatcher extends AbstractAssyncSystemMessageDispatcher 
         super(SystemMessageType.AlertEmail);
         setBatchLimit(Integer.parseInt(env.getProperty("alert.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("alert.dispatcher.retryLimit", "5")));
-        //number of threads should be hardcoded to 1
-        //setNumThreads(Integer.parseInt(env.getProperty("main.dispatcher.numThreads", "1")));
-        setNumThreads(1);
+        setNumThreads(Integer.parseInt(env.getProperty("alert.dispatcher.numThreads", "1")));
         setInactiveTimeOut(Long.parseLong(env.getProperty("alert.dispatcher.retryLimit", "3000")));
         dispatcherAlias = env.getProperty("alertemail.dispatcher.id", "alertemail");
     }

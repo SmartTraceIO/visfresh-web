@@ -73,7 +73,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         dispatcherAlias = env.getProperty("siblings.dispatcher.id", "siblings");
         setBatchLimit(Integer.parseInt(env.getProperty("siblings.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("siblings.dispatcher.retryLimit", "1")));
-        setNumThreads(Integer.parseInt(env.getProperty("main.dispatcher.numThreads", "2")));
+        setNumThreads(Integer.parseInt(env.getProperty("siblings.dispatcher.numThreads", "2")));
         setInactiveTimeOut(Long.parseLong(env.getProperty("siblings.dispatcher.retryTimeOut", "3000")));
     }
     /**
