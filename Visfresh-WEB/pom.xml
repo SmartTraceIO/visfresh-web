@@ -181,13 +181,20 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.6</version>
 				<goals><goal>package</goal></goals>
 				<configuration>
-					<webXml>${webXml}</webXml>
 					<warName>${instance}</warName>
+					<webResources>
+						<webResource>
+							<!-- if exists will added. For default not exists -->
+							<directory>profiles/${profileType}</directory>
+							<filtering>true</filtering>
+						</webResource>
+					</webResources>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -200,24 +207,24 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				<!-- For provide correct default WAR file name -->
 				<instance>web</instance>
+				<profileType>default</profileType>
 			</properties>
 		</profile>
 
+		<!-- WEB profile without dispatchers -->
 		<profile>
 			<id>web</id>
-
 			<properties>
-				<webXml>profiles/web/web.xml.tpl</webXml>
+				<profileType>web</profileType>
 			</properties>
 		</profile>
-
+		<!-- Only dispatchers without servlets -->
 		<profile>
 			<id>backend</id>
-
 			<properties>
-				<webXml>profiles/backend/web.xml.tpl</webXml>
+				<profileType>backend</profileType>
 			</properties>
 		</profile>
 	</profiles>
