@@ -188,11 +188,14 @@
 				<goals><goal>package</goal></goals>
 				<configuration>
 					<warName>${instance}</warName>
+					<outputDirectory>build</outputDirectory>
 					<webResources>
 						<webResource>
 							<!-- if exists will added. For default not exists -->
 							<directory>profiles/${profileType}</directory>
 							<filtering>true</filtering>
+							<!-- Exclude empty file of default profile -->
+							<exclude>WEB-INF/notdelete</exclude>
 						</webResource>
 					</webResources>
 				</configuration>
@@ -205,6 +208,9 @@
 			<id>default</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>!instance</name>
+				</property>
 			</activation>
 			<properties>
 				<!-- For provide correct default WAR file name -->
