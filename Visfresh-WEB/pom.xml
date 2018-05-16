@@ -198,6 +198,7 @@
 							<exclude>WEB-INF/notdelete</exclude>
 						</webResource>
 					</webResources>
+					<escapeString>\</escapeString>
 				</configuration>
 			</plugin>
 		</plugins>
