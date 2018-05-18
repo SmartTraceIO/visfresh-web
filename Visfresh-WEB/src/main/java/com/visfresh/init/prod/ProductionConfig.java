@@ -18,7 +18,7 @@ import com.visfresh.init.rest.WebConfig;
 @Configuration
 @Import({WebConfig.class, BackendConfig.class})
 @EnableScheduling
-@PropertySource("classpath:/app.properties")
+@PropertySource({"classpath:/app.common.properties", "classpath:/app.properties"})
 public class ProductionConfig {
     /**
      * Default constructor.
