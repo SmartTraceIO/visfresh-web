@@ -22,7 +22,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
-import com.visfresh.impl.siblingdetect.SiblingDetector;
+import com.visfresh.impl.siblingdetect.CalculationDirection;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.services.RetryableException;
 import com.visfresh.utils.LocationUtils;
@@ -32,6 +32,7 @@ import com.visfresh.utils.LocationUtils;
  *
  */
 public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
+    private static final double MIN_PATH = 5000.; //meters
     private final List<Shipment> shipments = new LinkedList<>();
     private final Map<Long, List<TrackerEventDto>> trackerEvents = new HashMap<>();
     private Company company;
@@ -65,7 +66,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -99,7 +100,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -135,7 +136,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -189,7 +190,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -229,7 +230,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationUtils.getLongitudeDiff(y0, SiblingDetector.MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -372,7 +373,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getEventsFromDb(com.visfresh.entities.Shipment)
      */
     @Override
-    protected List<TrackerEventDto> getLocationsFromDb(final Long shipment) {
+    protected List<TrackerEventDto> getLocationsFromDb(final Long shipment, final CalculationDirection direction) {
         final List<TrackerEventDto> events = trackerEvents.get(shipment);
         if (events == null) {
             return new LinkedList<>();
