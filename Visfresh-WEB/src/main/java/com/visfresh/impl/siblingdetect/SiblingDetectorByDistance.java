@@ -12,7 +12,7 @@ import com.visfresh.utils.LocationUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class SiblingDetectorByDistance extends StateFullSiblingDetector {
+public class SiblingDetectorByDistance extends StatefullSiblingDetector {
     public static final double MAX_DISTANCE_AVERAGE = 3000; //meters
     private double maxDistanceAverage = MAX_DISTANCE_AVERAGE;
 
@@ -66,13 +66,11 @@ public class SiblingDetectorByDistance extends StateFullSiblingDetector {
             final double avg = summ / count;
             final double d = Math.sqrt((summ2 - 2 * avg * summ
                     + count * avg * avg) / (count - 1));
-            //TODO finish this
-            if (d < 0.0001) {
-                if (avg > getMaxDistanceAverage()) {
-                    setState(State.NotSiblings);
-                } else {
-                    setState(State.Siblings);
-                }
+
+            if (avg - d > getMaxDistanceAverage()) {
+                setState(State.NotSiblings);
+            } else if (avg + d < getMaxDistanceAverage()) {
+                setState(State.Siblings);
             }
         }
     }
@@ -161,10 +159,15 @@ public class SiblingDetectorByDistance extends StateFullSiblingDetector {
      */
     @Override
     protected void doFinish() {
-        if (count > 0 && summ / count < getMaxDistanceAverage()) {
-            setState(State.Siblings);
+        if (count > 0) {
+            final double avg = summ / count;
+            if(avg < getMaxDistanceAverage()) {
+                setState(State.Siblings);
+            } else {
+                setState(State.NotSiblings);
+            }
         } else {
-            setState(State.NotSiblings);
+            setState(State.Undefined);
         }
 
         count = 0;

@@ -3,10 +3,11 @@
  */
 package com.visfresh.impl.siblingdetect;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.visfresh.impl.siblingdetect.StateFullSiblingDetector.State;
+import com.visfresh.impl.siblingdetect.StatefullSiblingDetector.State;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.utils.PushBackIterator;
 
@@ -32,15 +33,16 @@ public class SiblingDetector {
      * @param originE2
      * @return true if siblings.
      */
-    public boolean isSiblings(final List<TrackerEventDto> originE1, final List<TrackerEventDto> originE2) {
-        if (originE1.isEmpty() || originE2.isEmpty()) {
-            return false;
+    public State detectSiblingsState(
+            final Iterator<TrackerEventDto> originE1, final Iterator<TrackerEventDto> originE2) {
+        if (!originE1.hasNext() || !originE2.hasNext()) {
+            return State.Undefined;
         }
 
-        final List<StateFullSiblingDetector> detectors = createDetecters(direction);
+        final List<StatefullSiblingDetector> detectors = createDetecters(direction);
 
-        final PushBackIterator<TrackerEventDto> iterE1 = new PushBackIterator<>(originE1.iterator());
-        final PushBackIterator<TrackerEventDto> iterE2 = new PushBackIterator<>(originE2.iterator());
+        final PushBackIterator<TrackerEventDto> iterE1 = new PushBackIterator<>(originE1);
+        final PushBackIterator<TrackerEventDto> iterE2 = new PushBackIterator<>(originE2);
 
         while (iterE1.hasNext() || iterE2.hasNext()) {
             State state;
@@ -61,19 +63,20 @@ public class SiblingDetector {
                 }
             }
 
-            if (state == State.Siblings) {
-                return true;
-            } else if (state == State.NotSiblings) {
-                return false;
-            } //else continue
+            if (state != State.Undefined) {
+                return state;
+            }
         }
 
         //finish detection
-        for (final StateFullSiblingDetector d : detectors) {
+        for (final StatefullSiblingDetector d : detectors) {
             d.finish();
+            if (d.getState() != State.Undefined) {
+                return d.getState();
+            }
         }
 
-        return oneDetectsState(detectors, StateFullSiblingDetector.State.Siblings);
+        return State.Undefined;
     }
     /**
      * @param detectors list of detectors.
@@ -81,40 +84,26 @@ public class SiblingDetector {
      * @param e2
      * @return
      */
-    private State runNextCheckSiblings(final List<StateFullSiblingDetector> detectors,
+    private State runNextCheckSiblings(final List<StatefullSiblingDetector> detectors,
             final TrackerEventDto e1, final TrackerEventDto e2) {
-        for (final StateFullSiblingDetector d : detectors) {
+        for (final StatefullSiblingDetector d : detectors) {
             final State s = d.next(e1, e2);
-            if (s != State.Checking) {
+            if (s != State.Undefined) {
                 //first found determined state should stop of processing
                 return s;
             }
         }
-        return State.Checking;
+        return State.Undefined;
     }
     /**
      * @param d
      * @return
      */
-    protected List<StateFullSiblingDetector> createDetecters(final CalculationDirection d) {
-        final List<StateFullSiblingDetector> list = new LinkedList<>();
+    protected List<StatefullSiblingDetector> createDetecters(final CalculationDirection d) {
+        final List<StatefullSiblingDetector> list = new LinkedList<>();
         list.add(new SiblingDetectorByGateway());
         list.add(new SiblingDetectorByDistance(direction));
         return list;
-    }
-    /**
-     * @param detectors
-     * @param state
-     * @return
-     */
-    private boolean oneDetectsState(final List<StateFullSiblingDetector> detectors,
-            final State state) {
-        for (final StateFullSiblingDetector d : detectors) {
-            if (d.getState() == state) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

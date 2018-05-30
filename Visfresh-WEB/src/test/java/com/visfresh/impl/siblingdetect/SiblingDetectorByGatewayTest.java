@@ -6,7 +6,6 @@ package com.visfresh.impl.siblingdetect;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,14 +51,14 @@ public class SiblingDetectorByGatewayTest {
                     t0 + dt * i + 60 * 1000l));
         }
 
-        assertFalse(isSiblings(detector, siblingEvents, masterEvents));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, siblingEvents, masterEvents));
 
         //add gateway to just one reading to each shipment
         final String gateway = "beacon-gateway";
         masterEvents.get(count / 2).setGateway(gateway);
         siblingEvents.get(count / 3).setGateway(gateway);
 
-        assertTrue(isSiblings(detector, siblingEvents, masterEvents));
+        assertTrue(SiblingDetectorTest.isSiblings(detector, siblingEvents, masterEvents));
     }
     @Test
     public void testIsSiblingsByGatewayRightToLeft() {
@@ -84,31 +83,14 @@ public class SiblingDetectorByGatewayTest {
                     t0 + dt * i + 60 * 1000l));
         }
 
-        assertFalse(isSiblings(detector, siblingEvents, masterEvents));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, siblingEvents, masterEvents));
 
         //add gateway to just one reading to each shipment
         final String gateway = "beacon-gateway";
         masterEvents.get(count / 2).setGateway(gateway);
         siblingEvents.get(count / 3).setGateway(gateway);
 
-        assertTrue(isSiblings(detector, siblingEvents, masterEvents));
-    }
-    /**
-     * @param detector
-     * @param e1Origin
-     * @param e2Origin
-     * @return
-     */
-    private boolean isSiblings(final SiblingDetector detector, final List<TrackerEventDto> e1Origin,
-            final List<TrackerEventDto> e2Origin) {
-        final List<TrackerEventDto> e1 = new LinkedList<>(e1Origin);
-        final List<TrackerEventDto> e2 = new LinkedList<>(e2Origin);
-
-        if (detector.getDirection() == CalculationDirection.RightToLeft) {
-            Collections.reverse(e1);
-            Collections.reverse(e2);
-        }
-        return detector.isSiblings(e1, e2);
+        assertTrue(SiblingDetectorTest.isSiblings(detector, siblingEvents, masterEvents));
     }
     /**
      * @param direction
@@ -120,8 +102,8 @@ public class SiblingDetectorByGatewayTest {
              * @see com.visfresh.impl.siblingdetect.SiblingDetector#createDetecters(com.visfresh.impl.siblingdetect.CalculationDirection)
              */
             @Override
-            protected final List<StateFullSiblingDetector> createDetecters(final CalculationDirection d) {
-                final List<StateFullSiblingDetector> list = new LinkedList<>();
+            protected final List<StatefullSiblingDetector> createDetecters(final CalculationDirection d) {
+                final List<StatefullSiblingDetector> list = new LinkedList<>();
                 list.add(new SiblingDetectorByGateway());
                 return list;
             }

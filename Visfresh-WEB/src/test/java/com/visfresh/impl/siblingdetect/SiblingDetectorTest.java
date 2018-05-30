@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-import com.visfresh.impl.siblingdetect.StateFullSiblingDetector.State;
+import com.visfresh.impl.siblingdetect.StatefullSiblingDetector.State;
 import com.visfresh.io.TrackerEventDto;
 
 /**
@@ -23,7 +23,7 @@ import com.visfresh.io.TrackerEventDto;
  *
  */
 public class SiblingDetectorTest {
-    final List<StateFullSiblingDetector> detectors = new LinkedList<>();
+    final List<StatefullSiblingDetector> detectors = new LinkedList<>();
     private long id = 1;
 
     /**
@@ -103,7 +103,7 @@ public class SiblingDetectorTest {
     public void testOrder() {
         final List<TrackerEventDto> events = new LinkedList<>();
 
-        final StateFullSiblingDetector detector = createEventsCatch(events);
+        final StatefullSiblingDetector detector = createEventsCatch(events);
         detectors.add(detector);
 
         long startTime = System.currentTimeMillis() - 100000000l;
@@ -177,27 +177,10 @@ public class SiblingDetectorTest {
         assertEquals(e4.getId(), events.get(3).getId());
     }
     /**
-     * @param detector
-     * @param e1Origin
-     * @param e2Origin
-     * @return
-     */
-    private boolean isSiblings(final SiblingDetector detector, final List<TrackerEventDto> e1Origin,
-            final List<TrackerEventDto> e2Origin) {
-        final List<TrackerEventDto> e1 = new LinkedList<>(e1Origin);
-        final List<TrackerEventDto> e2 = new LinkedList<>(e2Origin);
-
-        if (detector.getDirection() == CalculationDirection.RightToLeft) {
-            Collections.reverse(e1);
-            Collections.reverse(e2);
-        }
-        return detector.isSiblings(e1, e2);
-    }
-    /**
      * @param numInvokes
      * @return
      */
-    private StateFullSiblingDetector createInvokesCounter(final AtomicInteger numInvokes) {
+    private StatefullSiblingDetector createInvokesCounter(final AtomicInteger numInvokes) {
         return createInvokesCounter(numInvokes, new LinkedList<>());
     }
     /**
@@ -205,15 +188,15 @@ public class SiblingDetectorTest {
      * @param states
      * @return
      */
-    protected StateFullSiblingDetector createInvokesCounter(final AtomicInteger numInvokes, final List<State> states) {
-        return new StateFullSiblingDetector() {
+    protected StatefullSiblingDetector createInvokesCounter(final AtomicInteger numInvokes, final List<State> states) {
+        return new StatefullSiblingDetector() {
             @Override
             protected void doNext(final TrackerEventDto e1, final TrackerEventDto e2) {
                 numInvokes.addAndGet(1);
                 if (states.size() > 0) {
                     setState(states.remove(0));
                 } else {
-                    setState(State.Checking);
+                    setState(State.Undefined);
                 }
             }
         };
@@ -222,8 +205,8 @@ public class SiblingDetectorTest {
      * @param events
      * @return
      */
-    protected StateFullSiblingDetector createEventsCatch(final List<TrackerEventDto> events) {
-        return new StateFullSiblingDetector() {
+    protected StatefullSiblingDetector createEventsCatch(final List<TrackerEventDto> events) {
+        return new StatefullSiblingDetector() {
             @Override
             protected void doNext(final TrackerEventDto e1, final TrackerEventDto e2) {
                 if (e1 != null) {
@@ -262,9 +245,43 @@ public class SiblingDetectorTest {
              * @see com.visfresh.impl.siblingdetect.SiblingDetector#createDetecters(com.visfresh.impl.siblingdetect.CalculationDirection)
              */
             @Override
-            protected final List<StateFullSiblingDetector> createDetecters(final CalculationDirection d) {
+            protected final List<StatefullSiblingDetector> createDetecters(final CalculationDirection d) {
                 return detectors;
             }
         };
+    }
+    /**
+     * @param detector
+     * @param e1Origin
+     * @param e2Origin
+     * @return
+     */
+    public static boolean isSiblings(final SiblingDetector detector, final List<TrackerEventDto> e1Origin,
+            final List<TrackerEventDto> e2Origin) {
+        final List<TrackerEventDto> e1 = new LinkedList<>(e1Origin);
+        final List<TrackerEventDto> e2 = new LinkedList<>(e2Origin);
+
+        if (detector.getDirection() == CalculationDirection.RightToLeft) {
+            Collections.reverse(e1);
+            Collections.reverse(e2);
+        }
+        return detector.detectSiblingsState(e1.iterator(), e2.iterator()) == State.Siblings;
+    }
+    /**
+     * @param detector
+     * @param e1Origin
+     * @param e2Origin
+     * @return
+     */
+    public static boolean isNotSiblings(final SiblingDetector detector, final List<TrackerEventDto> e1Origin,
+            final List<TrackerEventDto> e2Origin) {
+        final List<TrackerEventDto> e1 = new LinkedList<>(e1Origin);
+        final List<TrackerEventDto> e2 = new LinkedList<>(e2Origin);
+
+        if (detector.getDirection() == CalculationDirection.RightToLeft) {
+            Collections.reverse(e1);
+            Collections.reverse(e2);
+        }
+        return detector.detectSiblingsState(e1.iterator(), e2.iterator()) == State.NotSiblings;
     }
 }

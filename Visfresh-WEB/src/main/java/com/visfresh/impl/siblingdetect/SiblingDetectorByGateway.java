@@ -12,7 +12,7 @@ import com.visfresh.io.TrackerEventDto;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class SiblingDetectorByGateway extends StateFullSiblingDetector {
+public class SiblingDetectorByGateway extends StatefullSiblingDetector {
     private final Set<String> g1 = new HashSet<>();
     private final Set<String> g2 = new HashSet<>();
 

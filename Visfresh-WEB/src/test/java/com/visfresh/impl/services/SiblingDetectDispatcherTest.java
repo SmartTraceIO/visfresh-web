@@ -7,8 +7,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -195,10 +197,10 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
         for (int i = 0; i < count; i++) {
-            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
-                    t0 + i * dt);
+            final long t = t0 + i * dt;
+            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i, t);
             addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
-                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+                    y0 + 0.01 * i + 0.005, t + 60 * 1000l);
             addEvent(trackerEvents, notSibling,
                     x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
                     t0 + dt * i + 60 * 1000l);
@@ -370,15 +372,21 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         }
     }
     /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getEventsFromDb(com.visfresh.entities.Shipment)
+     * @see com.visfresh.impl.services.SiblingDetectDispatcher#getTrackeEvents(java.lang.Long, com.visfresh.impl.siblingdetect.CalculationDirection)
      */
     @Override
-    protected List<TrackerEventDto> getLocationsFromDb(final Long shipment, final CalculationDirection direction) {
-        final List<TrackerEventDto> events = trackerEvents.get(shipment);
+    protected Iterator<TrackerEventDto> getTrackeEvents(final Long shipment,
+            final CalculationDirection direction) {
+        List<TrackerEventDto> events = trackerEvents.get(shipment);
         if (events == null) {
-            return new LinkedList<>();
+            events =  new LinkedList<>();
         }
-        return new LinkedList<TrackerEventDto>(events);
+
+        events = new LinkedList<>(events);
+        if (direction == CalculationDirection.RightToLeft) {
+            Collections.reverse(events);
+        }
+        return events.iterator();
     }
     /* (non-Javadoc)
      * @see com.visfresh.impl.services.SiblingDetectDispatcher#findShipment(java.lang.Long)
@@ -392,7 +400,6 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         }
         return null;
     }
-
     /**
      * @param id shipment ID.
      * @return

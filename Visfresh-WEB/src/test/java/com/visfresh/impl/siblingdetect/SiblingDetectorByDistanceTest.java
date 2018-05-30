@@ -6,7 +6,6 @@ package com.visfresh.impl.siblingdetect;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,8 +55,8 @@ public class SiblingDetectorByDistanceTest {
                     t0 + dt * i + 60 * 1000l));
         }
 
-        assertTrue(isSiblings(detector, masterEvents, siblingEvents));
-        assertFalse(isSiblings(detector, masterEvents, notSiblingEvents));
+        assertTrue(SiblingDetectorTest.isSiblings(detector, masterEvents, siblingEvents));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, masterEvents, notSiblingEvents));
     }
     @Test
     public void testNotIntersectingByTimeLeftToRight() {
@@ -81,8 +80,8 @@ public class SiblingDetectorByDistanceTest {
         e2.add(createTrackerEvent(x0, y0, t0 + dt));
         e2.add(createTrackerEvent(x0, y0, t0 + dt));
 
-        assertFalse(isSiblings(detector, e2, e1));
-        assertFalse(isSiblings(detector, e1, e2));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, e2, e1));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, e1, e2));
     }
     @Test
     public void testIsTimeNotIntersectingLeftToRight() {
@@ -108,8 +107,8 @@ public class SiblingDetectorByDistanceTest {
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
 
-        assertFalse(isSiblings(detector, l2, l1));
-        assertFalse(isSiblings(detector, l1, l2));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, l2, l1));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, l1, l2));
     }
     @Test
     public void testIsTimeIntersectingLeftToRight() {
@@ -153,7 +152,7 @@ public class SiblingDetectorByDistanceTest {
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
 
-        assertTrue(isSiblings(detector, l2, l1));
+        assertTrue(SiblingDetectorTest.isSiblings(detector, l2, l1));
     }
 
     //Right to Left
@@ -182,8 +181,8 @@ public class SiblingDetectorByDistanceTest {
                     t0 + dt * i + 60 * 1000l));
         }
 
-        assertTrue(isSiblings(detector, masterEvents, siblingEvents));
-        assertFalse(isSiblings(detector, masterEvents, notSiblingEvents));
+        assertTrue(SiblingDetectorTest.isSiblings(detector, masterEvents, siblingEvents));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, masterEvents, notSiblingEvents));
     }
     @Test
     public void testNotIntersectingByTimeRightToLeft() {
@@ -207,8 +206,8 @@ public class SiblingDetectorByDistanceTest {
         e2.add(createTrackerEvent(x0, y0, t0 + dt));
         e2.add(createTrackerEvent(x0, y0, t0 + dt));
 
-        assertFalse(isSiblings(detector, e2, e1));
-        assertFalse(isSiblings(detector, e1, e2));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, e2, e1));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, e1, e2));
     }
     @Test
     public void testIsTimeNotIntersectingRightToLeft() {
@@ -234,8 +233,8 @@ public class SiblingDetectorByDistanceTest {
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
 
-        assertFalse(isSiblings(detector, l2, l1));
-        assertFalse(isSiblings(detector, l1, l2));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, l2, l1));
+        assertFalse(SiblingDetectorTest.isSiblings(detector, l1, l2));
     }
     @Test
     public void testIsTimeIntersectingRightToLeft() {
@@ -279,24 +278,7 @@ public class SiblingDetectorByDistanceTest {
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
 
-        assertTrue(isSiblings(detector, l2, l1));
-    }
-    /**
-     * @param detector
-     * @param e1Origin
-     * @param e2Origin
-     * @return
-     */
-    private boolean isSiblings(final SiblingDetector detector, final List<TrackerEventDto> e1Origin,
-            final List<TrackerEventDto> e2Origin) {
-        final List<TrackerEventDto> e1 = new LinkedList<>(e1Origin);
-        final List<TrackerEventDto> e2 = new LinkedList<>(e2Origin);
-
-        if (detector.getDirection() == CalculationDirection.RightToLeft) {
-            Collections.reverse(e1);
-            Collections.reverse(e2);
-        }
-        return detector.isSiblings(e1, e2);
+        assertTrue(SiblingDetectorTest.isSiblings(detector, l2, l1));
     }
     /**
      * @param direction
@@ -308,8 +290,8 @@ public class SiblingDetectorByDistanceTest {
              * @see com.visfresh.impl.siblingdetect.SiblingDetector#createDetecters(com.visfresh.impl.siblingdetect.CalculationDirection)
              */
             @Override
-            protected List<StateFullSiblingDetector> createDetecters(final CalculationDirection d) {
-                final List<StateFullSiblingDetector> list = new LinkedList<>();
+            protected List<StatefullSiblingDetector> createDetecters(final CalculationDirection d) {
+                final List<StatefullSiblingDetector> list = new LinkedList<>();
                 list.add(new SiblingDetectorByDistance(direction));
                 return list;
             }

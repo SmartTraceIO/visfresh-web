@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.impl.siblingdetect.CalculationDirection;
 import com.visfresh.impl.siblingdetect.SiblingDetector;
+import com.visfresh.impl.siblingdetect.StatefullSiblingDetector.State;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.tools.SingleShipmentUtils;
@@ -38,8 +39,8 @@ public final class DetectingSiblingsTool {
         final List<TrackerEventDto> e2 = loadEvents("s1.json");
         final List<TrackerEventDto> e1 = loadEvents("s2.json");
 
-        final boolean isSiblings = new SiblingDetector(
-                CalculationDirection.LeftToRight).isSiblings(e1, e2);
+        final boolean isSiblings = new SiblingDetector(CalculationDirection.LeftToRight).detectSiblingsState(
+                e1.iterator(), e2.iterator()) == State.Siblings;
         System.out.println("Is siblings: " + isSiblings);
     }
 

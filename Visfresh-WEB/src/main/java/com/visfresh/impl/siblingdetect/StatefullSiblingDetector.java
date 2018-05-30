@@ -9,20 +9,20 @@ import com.visfresh.io.TrackerEventDto;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class StateFullSiblingDetector {
-    protected enum State {
+public abstract class StatefullSiblingDetector {
+    public enum State {
         Siblings,
         NotSiblings,
-        Checking
+        Undefined
     }
 
-    private State state = State.Checking;
+    private State state = State.Undefined;
     private boolean isFinished;
 
     /**
      *
      */
-    public StateFullSiblingDetector() {
+    public StatefullSiblingDetector() {
         super();
     }
 
@@ -58,6 +58,9 @@ public abstract class StateFullSiblingDetector {
      * Finishes the calculation.
      */
     public final void finish() {
+        if (isFinished) {
+            return;
+        }
         isFinished = true;
         doFinish();
     }

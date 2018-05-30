@@ -3,7 +3,7 @@
  */
 package com.visfresh.impl.services;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +23,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.Page;
+import com.visfresh.dao.PartionedDataIterator;
+import com.visfresh.dao.PartionedDataIterator.DataProvider;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
@@ -30,6 +33,7 @@ import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.impl.siblingdetect.CalculationDirection;
 import com.visfresh.impl.siblingdetect.SiblingDetector;
+import com.visfresh.impl.siblingdetect.StatefullSiblingDetector.State;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.services.GroupLockService;
 import com.visfresh.services.RetryableException;
@@ -51,6 +55,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * The logger.
      */
     private static final Logger log = LoggerFactory.getLogger(SiblingDetectDispatcher.class);
+    private static final int DATA_FETCH_LIMIT = 1000;
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -255,7 +260,6 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
             log.debug("Search stopped to be siblings in ("
                     + StringUtils.combine(master.getSiblings(), ",")
                     + ") for shipment " + master.getId());
-            final List<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
 
             int numUnsiblified = 0;
             for (final Long id : master.getSiblings()) {
@@ -270,8 +274,9 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
                 }
 
                 //check is sibling
-                final List<TrackerEventDto> events = getTrackeEvents(sibling.getId(), direction);
-                if (!isSiblings(masterEvents, events)) {
+                final Iterator<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
+                final Iterator<TrackerEventDto> events = getTrackeEvents(sibling.getId(), direction);
+                if (detector.detectSiblingsState(masterEvents, events) == State.NotSiblings) {
                     siblingMap.get(master.getId()).remove(sibling.getId());
                     siblingMap.get(sibling.getId()).remove(master.getId());
                     updateSiblingInfo(sibling, siblingMap.get(sibling.getId()));
@@ -355,24 +360,16 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         //continue only if shipment list is not empty
         if (!shipments.isEmpty()) {
             log.debug("Fetch readings for master shipment " + master.getId());
-            final List<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
             for (final ShipmentSiblingInfo s : shipments) {
-                final List<TrackerEventDto> events = getTrackeEvents(s.getId(), direction);
-                if (isSiblings(masterEvents, events)) {
+                final Iterator<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
+                final Iterator<TrackerEventDto> events = getTrackeEvents(s.getId(), direction);
+
+                if (detector.detectSiblingsState(masterEvents, events) == State.Siblings) {
                     siblingMap.get(master.getId()).add(s.getId());
                     siblingMap.get(s.getId()).add(master.getId());
                 }
             }
         }
-    }
-    /**
-     * @param masterEvents
-     * @param events
-     * @return
-     */
-    protected boolean isSiblings(final List<TrackerEventDto> masterEvents,
-            final List<TrackerEventDto> events) {
-        return detector.isSiblings(masterEvents, events);
     }
     /**
      * @param shipment
@@ -404,39 +401,21 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
     }
     /**
      * @param shipment shipment.
-     * @param direction TODO
+     * @param direction calculation direction
      * @return array of tracker events.
      */
-    protected List<TrackerEventDto> getTrackeEvents(final Long shipment, final CalculationDirection direction) {
-        final List<TrackerEventDto> list = getLocationsFromDb(shipment, direction);
-
-        //filter events without locations.
-        final Iterator<TrackerEventDto> iter = list.iterator();
-        while (iter.hasNext()) {
-            final TrackerEventDto e = iter.next();
-            if (e.getLatitude() == null || e.getLongitude() == null) {
-                iter.remove();
+    protected Iterator<TrackerEventDto> getTrackeEvents(final Long shipment, final CalculationDirection direction) {
+        final DataProvider<TrackerEventDto> provider = new DataProvider<TrackerEventDto>() {
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.PartionedDataIterator.DataProvider#getNextPart(int, int)
+             */
+            @Override
+            public Collection<TrackerEventDto> getNextPart(final int page, final int limit) {
+                final Page p = new Page(page, limit);
+                return trackerEventDao.getOrderedByTimeNotNullLocations(
+                        shipment, p, direction == CalculationDirection.LeftToRight);
             }
-        }
-        if (direction == CalculationDirection.RightToLeft) {
-            Collections.reverse(list);
-        }
-        return list;
-    }
-    /**
-     * @param shipment
-     * @param direction TODO
-     * @return
-     */
-    protected List<TrackerEventDto> getLocationsFromDb(final Long shipment, final CalculationDirection direction) {
-        final List<Long> ids = new LinkedList<>();
-        ids.add(shipment);
-        final Map<Long, List<TrackerEventDto>> eventsForShipmentIds = trackerEventDao.getEventsForShipmentIds(ids);
-
-        List<TrackerEventDto> result = eventsForShipmentIds.get(shipment);
-        if (result == null) {
-            result = new LinkedList<>();
-        }
-        return result;
+        };
+        return new PartionedDataIterator<>(provider, DATA_FETCH_LIMIT);
     }
 }

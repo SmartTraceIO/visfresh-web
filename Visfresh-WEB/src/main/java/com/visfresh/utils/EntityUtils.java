@@ -5,10 +5,8 @@ package com.visfresh.utils;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -76,34 +74,6 @@ public final class EntityUtils {
             }
         }
         return null;
-    }
-    public static <ID extends Serializable & Comparable<ID>> CompareResult<ID>
-        compare(final Collection<ID> origin, final Collection<ID> modified) {
-
-        final Set<ID> originSet = new HashSet<>(origin);
-        final Set<ID> modifiedSet = new HashSet<>(modified);
-
-        //remove items existing in both collections
-        final Iterator<ID> iter = originSet.iterator();
-        while (iter.hasNext()) {
-            final ID next = iter.next();
-            if (modifiedSet.remove(next)) {
-                iter.remove();
-            }
-        }
-
-        //as result first set contains only deleted entries
-        //second set contains only added
-
-        final CompareResult<ID> result = new CompareResult<>();
-        result.getAdded().addAll(modifiedSet);
-        result.getDeleted().addAll(originSet);
-
-        //sort result
-        Collections.sort(result.getAdded());
-        Collections.sort(result.getDeleted());
-
-        return result;
     }
     /**
      * @param shipment

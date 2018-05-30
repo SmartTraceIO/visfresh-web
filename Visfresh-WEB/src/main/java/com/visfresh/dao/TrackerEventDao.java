@@ -103,4 +103,12 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, TrackerEvent, Lon
      * @return tracker event.
      */
     <S extends TrackerEvent> S save(S e, String gateway);
+    /**
+     * @param shipment shipment.
+     * @param page page
+     * @param isOrderAscent ordering direction.
+     * @return part of tracker events for given shipment.
+     */
+    List<TrackerEventDto> getOrderedByTimeNotNullLocations(
+            Long shipment, Page page, boolean isOrderAscent);
 }

@@ -246,27 +246,54 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
                 new HashMap<String, Object>());
 
         for (final Map<String, Object> row : rows) {
-            final TrackerEvent e = createEntity(row);
-
-            final TrackerEventDto dto = new TrackerEventDto();
-            dto.setBattery(e.getBattery());
-            dto.setCreatedOn(e.getCreatedOn());
-            dto.setId(e.getId());
-            dto.setLatitude(e.getLatitude());
-            dto.setLongitude(e.getLongitude());
-            dto.setTemperature(e.getTemperature());
-            dto.setTime(e.getTime());
-            dto.setType(e.getType());
-
-            dto.setShipmentId(((Number) row.get(SHIPMENT_FIELD)).longValue());
-            dto.setDeviceImei((String) row.get(DEVICE_FIELD));
-            dto.setGateway((String) row.get(GATEWAY));
-
+            final TrackerEventDto dto = createTrackerEventDto(row);
             events.get(dto.getShipmentId()).add(dto);
         }
 
-        //create event.
         return events;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getOrderedByTimeNotNullLocations(java.lang.Long, int, int)
+     */
+    @Override
+    public List<TrackerEventDto> getOrderedByTimeNotNullLocations(
+            final Long shipment, final Page page, final boolean isOrderAscent) {
+        final String sql = "select * from " + TABLE + " where "
+                + SHIPMENT_FIELD + " = " + shipment + " order by time"
+                + (isOrderAscent ? "" : " desc") + " limit "
+                + ((page.getPageNumber() - 1) * page.getPageSize()) + ", " + page.getPageSize();
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                sql, new HashMap<String, Object>());
+
+        final List<TrackerEventDto> events = new LinkedList<>();
+        for (final Map<String, Object> row : rows) {
+            events.add(createTrackerEventDto(row));
+        }
+
+        return events;
+    }
+
+    /**
+     * @param row
+     * @return
+     */
+    protected TrackerEventDto createTrackerEventDto(final Map<String, Object> row) {
+        final TrackerEvent e = createEntity(row);
+
+        final TrackerEventDto dto = new TrackerEventDto();
+        dto.setBattery(e.getBattery());
+        dto.setCreatedOn(e.getCreatedOn());
+        dto.setId(e.getId());
+        dto.setLatitude(e.getLatitude());
+        dto.setLongitude(e.getLongitude());
+        dto.setTemperature(e.getTemperature());
+        dto.setTime(e.getTime());
+        dto.setType(e.getType());
+
+        dto.setShipmentId(((Number) row.get(SHIPMENT_FIELD)).longValue());
+        dto.setDeviceImei((String) row.get(DEVICE_FIELD));
+        dto.setGateway((String) row.get(GATEWAY));
+        return dto;
     }
 
     /* (non-Javadoc)

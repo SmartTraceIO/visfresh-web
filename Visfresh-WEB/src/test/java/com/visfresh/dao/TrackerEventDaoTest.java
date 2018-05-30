@@ -451,6 +451,50 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(2, map.get(s2.getId()).size());
     }
     @Test
+    public void testGetOrderedByTimeNotNullLocations() {
+        final Shipment s = createShipment(device);
+
+        long time = System.currentTimeMillis() - 1000000l;
+        final TrackerEvent e1 = createEvent(s, new Date((time += 10000)));
+        final TrackerEvent e2 = createEvent(s, new Date((time += 10000)));
+        final TrackerEvent e3 = createEvent(s, new Date((time += 10000)));
+
+        //test without limit
+        List<TrackerEventDto> list = dao.getOrderedByTimeNotNullLocations(
+                s.getId(), new Page(1, 1000), true);
+        assertEquals(e1.getId(), list.get(0).getId());
+        assertEquals(e3.getId(), list.get(2).getId());
+
+        list = dao.getOrderedByTimeNotNullLocations(
+                s.getId(), new Page(1, 1000), false);
+        assertEquals(e3.getId(), list.get(0).getId());
+        assertEquals(e1.getId(), list.get(2).getId());
+
+        //test with limit
+        list = dao.getOrderedByTimeNotNullLocations(
+                s.getId(), new Page(1, 2), true);
+        assertEquals(e1.getId(), list.get(0).getId());
+        assertEquals(e2.getId(), list.get(1).getId());
+
+        //next page
+        list = dao.getOrderedByTimeNotNullLocations(
+                s.getId(), new Page(2, 2), true);
+        assertEquals(1, list.size());
+        assertEquals(e3.getId(), list.get(0).getId());
+
+        //reverse order
+        list = dao.getOrderedByTimeNotNullLocations(
+                s.getId(), new Page(1, 2), false);
+        assertEquals(e3.getId(), list.get(0).getId());
+        assertEquals(e2.getId(), list.get(1).getId());
+
+        //next page
+        list = dao.getOrderedByTimeNotNullLocations(
+                s.getId(), new Page(2, 2), false);
+        assertEquals(1, list.size());
+        assertEquals(e1.getId(), list.get(0).getId());
+    }
+    @Test
     public void testAssignShipment() {
         final Shipment s = createShipment(device);
 
