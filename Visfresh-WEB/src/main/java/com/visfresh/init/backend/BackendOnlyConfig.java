@@ -17,7 +17,7 @@ import com.visfresh.init.BackendConfig;
 @Configuration
 @Import(BackendConfig.class)
 @EnableScheduling
-@PropertySource("classpath:/app.properties")
+@PropertySource({"classpath:/app.common.properties", "classpath:/app.properties"})
 public class BackendOnlyConfig {
     /**
      * Default constructor.
