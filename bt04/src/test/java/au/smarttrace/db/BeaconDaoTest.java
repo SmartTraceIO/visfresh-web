@@ -12,7 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -27,7 +29,7 @@ import au.smarttrace.GatewayBinding;
  *
  */
 public class BeaconDaoTest {
-    private AnnotationConfigApplicationContext spring;
+    private static AnnotationConfigApplicationContext spring;
     private BeaconDao dao;
     private NamedParameterJdbcTemplate jdbc;
     private Long company;
@@ -39,12 +41,16 @@ public class BeaconDaoTest {
         super();
     }
 
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        spring = JUnitDbConfig.createContext();
+    }
+
     /* (non-Javadoc)
      * @see junit.framework.TestCase#setUp()
      */
     @Before
     public void setUp() throws Exception {
-        spring = JUnitDbConfig.createContext();
         dao = spring.getBean(BeaconDao.class);
         jdbc = spring.getBean(NamedParameterJdbcTemplate.class);
 
@@ -190,6 +196,12 @@ public class BeaconDaoTest {
         jdbc.update("delete from pairedphones", new HashMap<String, Object>());
         jdbc.update("delete from devices", new HashMap<String, Object>());
         jdbc.update("delete from companies", new HashMap<String, Object>());
+    }
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#tearDown()
+     */
+    @AfterClass
+    public static void tearDownClass() throws Exception {
         spring.close();
     }
 }

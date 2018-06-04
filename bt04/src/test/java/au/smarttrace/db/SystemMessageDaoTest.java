@@ -73,7 +73,7 @@ public class SystemMessageDaoTest extends TestCase {
         m.setTime(time);
         m.setGateway(gateway);
 
-        SystemMessage sm = dao.sendSystemMessageFor(m, location);
+        SystemMessage sm = dao.sendSystemMessageFor(m);
         sm = dao.findOne(sm.getId());
 
         assertEquals(m.getImei(), sm.getGroup());
@@ -113,7 +113,7 @@ public class SystemMessageDaoTest extends TestCase {
         m.setTemperature(temperature);
         m.setTime(new Date());
 
-        SystemMessage sm = dao.sendSystemMessageFor(m, null);
+        SystemMessage sm = dao.sendSystemMessageFor(m);
         sm = dao.findOne(sm.getId());
 
         final Reader in = new StringReader(sm.getMessageInfo());

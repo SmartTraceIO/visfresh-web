@@ -99,7 +99,7 @@ public class SystemMessageDao {
         return msg;
     }
 
-    public SystemMessage sendSystemMessageFor(final DeviceMessage e, final Location loc) {
+    public SystemMessage sendSystemMessageFor(final DeviceMessage e) {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         sdf.setTimeZone(UTC);
 
@@ -108,6 +108,8 @@ public class SystemMessageDao {
         obj.addProperty("temperature", e.getTemperature());
         obj.addProperty("time", sdf.format(e.getTime()));
         obj.addProperty("type", "AUT");
+
+        final Location loc = e.getLocation();
         if (loc != null) {
             obj.addProperty("latitude", loc.getLatitude());
             obj.addProperty("longitude", loc.getLongitude());

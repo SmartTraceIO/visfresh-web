@@ -37,6 +37,8 @@ public class DeviceMessage {
 
     private String message;
 
+    private Location location;
+
     /**
      * Default constructor.
      */
@@ -150,5 +152,17 @@ public class DeviceMessage {
      */
     public String getMessage() {
         return message;
+    }
+    /**
+     * @return the location
+     */
+    public Location getLocation() {
+        return location;
+    }
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(final Location location) {
+        this.location = location;
     }
 }

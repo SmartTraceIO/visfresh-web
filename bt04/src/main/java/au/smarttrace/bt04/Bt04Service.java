@@ -5,8 +5,12 @@ package au.smarttrace.bt04;
 
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +41,8 @@ public class Bt04Service {
     private BeaconDao deviceDao;
     @Autowired
     private InactiveDeviceAlertSender alerter;
+    @Autowired
+    private BeaconChannelLockService lockService;
 
     /**
      * Default constructor.
@@ -46,65 +52,96 @@ public class Bt04Service {
     }
 
     /**
-     * @param msgs
+     * @param bt04Message
      */
-    public void process(final Bt04Message msgs) {
-        final Map<String, Boolean> deviceCache = new HashMap<>();
+    public void process(final Bt04Message bt04Message) {
+        final Map<String, Boolean> beaconCache = new HashMap<>();
+        final List<DeviceMessage> msgs = new LinkedList<>();
 
-        for (final BeaconSignal bs : msgs.getBeacons()) {
+        for (final BeaconSignal bs : bt04Message.getBeacons()) {
             final String beaconImei = bs.getSn();
 
-            boolean foundDevice = false;
-            if (deviceCache.containsKey(beaconImei)) {
-                foundDevice = deviceCache.get(beaconImei) == Boolean.TRUE;
+            boolean foundBeacon = false;
+            if (beaconCache.containsKey(beaconImei)) {
+                foundBeacon = beaconCache.get(beaconImei) == Boolean.TRUE;
             } else {
-                final Beacon beacon = getDeviceByImei(beaconImei);
-                foundDevice = beacon != null && beacon.isActive();
+                final Beacon beacon = getBeaconByImei(beaconImei);
+                foundBeacon = beacon != null && beacon.isActive();
 
                 //only send warning at first found time
                 if (beacon != null) {
                     if (!beacon.isActive()) {
                         log.debug("Beacon " + beaconImei + " is inactive, message ignored");
                         sendAlert("Attempt to send message to inactive device " + beaconImei,
-                                "Message body:\n" + msgs.getRawData());
-                        foundDevice = false;
+                                "Message body:\n" + bt04Message.getRawData());
+                        foundBeacon = false;
                     } else if (!hasValidGateway(beacon)) {
                         log.debug("Beacon " + beaconImei
                                 + " has invalid or inactive gateway, message ignored");
                         sendAlert("Attempt to send message to device with invalid or inactive gateway"
-                                + beaconImei, "Message body:\n" + msgs.getRawData());
-                        foundDevice = false;
-                    } else if (!deviceIsGateway(msgs.getImei(), beacon)) {
+                                + beaconImei, "Message body:\n" + bt04Message.getRawData());
+                        foundBeacon = false;
+                    } else if (!deviceIsGateway(bt04Message.getImei(), beacon)) {
                         log.debug("Beacon " + beaconImei
                                 + " has gateway " + beacon.getGateway().getGateway()
-                                + ", but attempted to send using " + msgs.getImei());
-                        foundDevice = false;
+                                + ", but attempted to send using " + bt04Message.getImei());
+                        foundBeacon = false;
                     }
 
-                    deviceCache.put(beaconImei, foundDevice ? Boolean.TRUE : Boolean.FALSE);
+                    beaconCache.put(beaconImei, foundBeacon ? Boolean.TRUE : Boolean.FALSE);
                 }
             }
 
-            if (foundDevice) {
+            if (foundBeacon) {
                 final DeviceMessage msg = new DeviceMessage();
                 msg.setImei(beaconImei);
                 msg.setBattery((int) Math.round(bs.getBattery()));
                 // msg.setBeaconId(b.getSn());
                 msg.setTime(bs.getLastScannedTime());
                 msg.setTemperature(bs.getTemperature());
-                msg.setGateway(msgs.getImei());
+                msg.setGateway(bt04Message.getImei());
 
-                Location loc = null;
-                if (msgs.getLatitude() != null && msgs.getLongitude() != null) {
-                    loc = new Location(msgs.getLatitude(), msgs.getLongitude());
+                if (bt04Message.getLatitude() != null && bt04Message.getLongitude() != null) {
+                    final Location loc = new Location(bt04Message.getLatitude(), bt04Message.getLongitude());
+                    msg.setLocation(loc);
                 }
 
-                sendMessage(msg, loc);
+                msgs.add(msg);
             } else {
                 log.warn("Not found registered device " + beaconImei
                         + " for beacon " + bs.getSn() + " message will ignored");
             }
         }
+
+        final Set<String> beacons = lockBeaconChannels(getImei(msgs), bt04Message.getImei());
+        for (final DeviceMessage m : msgs) {
+            if (beacons.contains(m.getImei())) {
+                sendMessage(m);
+            } else {
+                log.debug("Beacon " + m.getImei() + " channel has locked by another gateway");
+            }
+        }
+    }
+
+    /**
+     * @param beacons set of beacon IMEI.
+     * @param gateway TODO
+     * @return successfully locked channels.
+     */
+    protected Set<String> lockBeaconChannels(final Set<String> beacons, final String gateway) {
+        return lockService.lockChannels(beacons, gateway);
+    }
+
+    /**
+     * @param msgs messages.
+     * @return set of IMEI.
+     */
+    private Set<String> getImei(final List<DeviceMessage> msgs) {
+        final Set<String> imeis = new HashSet<>();
+        for (final DeviceMessage m : msgs) {
+            imeis.add(m.getImei());
+        }
+        return imeis;
     }
 
     /**
@@ -152,10 +189,9 @@ public class Bt04Service {
     }
     /**
      * @param msg device message.
-     * @param loc location.
      */
-    protected void sendMessage(final DeviceMessage msg, final Location loc) {
-        messageDao.sendSystemMessageFor(msg, loc);
+    protected void sendMessage(final DeviceMessage msg) {
+        messageDao.sendSystemMessageFor(msg);
     }
     /**
      * @param subject
@@ -169,7 +205,7 @@ public class Bt04Service {
      * @param imei device IMEI.
      * @return device.
      */
-    protected Beacon getDeviceByImei(final String imei) {
+    protected Beacon getBeaconByImei(final String imei) {
         return deviceDao.getById(imei);
     }
 

@@ -8,9 +8,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +20,6 @@ import org.junit.Test;
 import au.smarttrace.Beacon;
 import au.smarttrace.DeviceMessage;
 import au.smarttrace.GatewayBinding;
-import au.smarttrace.Location;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -30,7 +31,7 @@ public class Bt04ServiceTest extends Bt04Service {
     private long lastId;
     private final List<DeviceMessage> messages = new LinkedList<>();
     private final List<String> alerts = new LinkedList<>();
-    private Map<Long, Location> locations = new HashMap<>();
+    private final Set<String> locks = new HashSet<>();
 
     /**
      * Default constructor.
@@ -151,6 +152,23 @@ public class Bt04ServiceTest extends Bt04Service {
         assertEquals(1, alerts.size());
     }
     @Test
+    public void testNotSuccessToLockChannel() {
+        final Bt04Message msg = createMessage(beacon.getImei());
+
+        final GatewayBinding g = new GatewayBinding();
+        g.setActive(true);
+        g.setCompany(beacon.getCompany());
+        g.setId(77l);
+        g.setGateway(msg.getImei());
+        beacon.setGateway(g);
+
+        locks.add(beacon.getImei());
+        process(msg);
+
+        assertEquals(0, messages.size());
+        assertEquals(0, alerts.size());
+    }
+    @Test
     public void testNotSendIfDeviceNotGateway() {
         final Bt04Message msg = createMessage(beacon.getImei());
 
@@ -189,16 +207,15 @@ public class Bt04ServiceTest extends Bt04Service {
      * @see com.visfresh.bt04.Bt04Service#sendMessage(com.visfresh.DeviceMessage, com.visfresh.Location)
      */
     @Override
-    protected void sendMessage(final DeviceMessage msg, final Location loc) {
+    protected void sendMessage(final DeviceMessage msg) {
         msg.setId(lastId++);
         messages.add(msg);
-        locations.put(msg.getId(), loc);
     }
     /* (non-Javadoc)
      * @see com.visfresh.bt04.Bt04Service#getDeviceByImei(java.lang.String)
      */
     @Override
-    protected Beacon getDeviceByImei(final String imei) {
+    protected Beacon getBeaconByImei(final String imei) {
         return beacons.get(imei);
     }
     /**
@@ -232,5 +249,18 @@ public class Bt04ServiceTest extends Bt04Service {
         b.setName("JUnit");
         b.setTemperature(22.);
         return b;
+    }
+    /* (non-Javadoc)
+     * @see au.smarttrace.bt04.Bt04Service#lockBeaconChannels(java.util.Set)
+     */
+    @Override
+    protected Set<String> lockBeaconChannels(final Set<String> beacons, final String gateway) {
+        final Set<String> result = new HashSet<>();
+        for (final String b : beacons) {
+            if (!locks.contains(b)) {
+                result.add(b);
+            }
+        }
+        return result;
     }
 }
