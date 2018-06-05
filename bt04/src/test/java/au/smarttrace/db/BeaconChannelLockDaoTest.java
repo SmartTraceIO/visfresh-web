@@ -110,7 +110,20 @@ public class BeaconChannelLockDaoTest {
         assertEquals(1, locked.size());
         assertEquals("b2", locked.iterator().next());
     }
+    @Test
+    public void testFullLock() {
+        final long t = System.currentTimeMillis() - 10000000l;
+        final String gateway = "gateway1";
 
+        final Set<String> beacons = new HashSet<>();
+        beacons.add("b1");
+        beacons.add("b2");
+        createLock(gateway, "b1", new Date(t - 10000l));
+        createLock(gateway, "b2", new Date(t - 10000l));
+
+        dao.createOrUpdateLocks(beacons, gateway, new Date(t));
+        assertEquals(2, dao.getLocked(gateway, new Date(t - 1000)).size());
+    }
     /**
      * @param d1
      * @param d2

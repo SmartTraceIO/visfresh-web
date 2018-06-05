@@ -42,6 +42,6 @@ public class BeaconChannelLockService {
     public Set<String> lockChannels(final Set<String> beacons, final String gateway) {
         final Date t = new Date(System.currentTimeMillis() + CHANNEL_IDLE_TIME);
         dao.createOrUpdateLocks(beacons, gateway, t);
-        return dao.getLocked(gateway, t);
+        return dao.getLocked(gateway, new Date(t.getTime() - 3000l));
     }
 }
