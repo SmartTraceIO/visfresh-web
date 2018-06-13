@@ -30,6 +30,7 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -68,6 +69,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
     protected static final String ASSETTYPE_FIELD = "assettype";
     protected static final String LASTEVENT_FIELD = "lasteventdate";
     protected static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
+    protected static final String NEAREST_DEVICE = "nearestdevice";
 
     @Autowired
     private DeviceDao deviceDao;
@@ -332,6 +334,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         e.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         e.setPoNum(((Number) map.get(PONUM_FIELD)).intValue());
         e.setAssetType((String) map.get(ASSETTYPE_FIELD));
+        e.setNearestTracker((String) map.get(NEAREST_DEVICE));
         return e;
     }
     /**
@@ -672,6 +675,17 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         return rows.size() == 0 ? null : (((Number) rows.get(0).get("tripcount")).intValue());
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceDao#setNearestDevice(com.visfresh.entities.Device, com.visfresh.entities.Device)
+     */
+    @Override
+    public void setNearestTracker(final Shipment shipment, final Device nearest) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", shipment.getId());
+        params.put("nearestdevice", nearest == null ? null : nearest.getImei());
+
+        jdbc.update("update " + TABLE + " set nearestdevice=:nearestdevice where id = :shipment", params);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#getCompanyShipments(java.lang.Long, com.visfresh.dao.Sorting, com.visfresh.dao.Page, com.visfresh.dao.Filter)
      */
     @Override
@@ -697,6 +711,11 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
             item.setDeviceName((String) row.get("deviceName"));
             item.setDeviceSN((String) row.get("deviceSn"));
             item.setDevice((String) row.get("device"));
+            item.setBeacon(DeviceModel.valueOf((String) row.get("deviceModel")).isUseGateway());
+
+            item.setNearestTracker((String) row.get("nearestTracker"));
+            item.setNearestTrackerColor((String) row.get("nearestTrackerColor"));
+
             item.setShippedFrom((String) row.get("shippedFromLocationName"));
             item.setShippedTo((String) row.get("shippedToLocationName"));
             item.setActualArrivalDate((Date) row.get("arrivalDate"));

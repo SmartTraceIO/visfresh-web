@@ -148,7 +148,10 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         d.setModel(DeviceModel.valueOf((String) map.get(MODEL_FIELD)));
         d.setDescription((String) map.get(DESCRIPTION_FIELD));
         d.setImei((String) map.get(IMEI_FIELD));
-        d.setCompany(((Number) map.get(COMPANY_FIELD)).longValue());
+        final Number companyId = (Number) map.get(COMPANY_FIELD);
+        if (companyId != null) { //null is impossible, but handled now.
+            d.setCompany(companyId.longValue());
+        }
         d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         d.setActive(Boolean.TRUE.equals(map.get(ACTIVE_FIELD)));
         d.setColor(parseColor((String) map.get(COLOR_FIELD)));

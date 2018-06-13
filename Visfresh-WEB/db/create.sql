@@ -83,7 +83,6 @@ create table correctiveactions (
         ON DELETE CASCADE
 );
 
-
 create table devices (
     description varchar(255),
     imei varchar(30) not null,
@@ -95,8 +94,7 @@ create table devices (
     tripcount int not null default 0,
     active boolean not null default true,
     primary key (imei),
-    FOREIGN KEY (company)
-        REFERENCES companies (id)
+    foreign key (company) references companies (id)
 );
 
 create table devicegroups (
@@ -327,8 +325,9 @@ create table shipments (
 --    siblinggroup bigint(20) default null,
     siblingcount int not null default 0,
     siblings longtext default NULL,
-    foreign key (device)
-        references devices (imei)
+    nearestdevice varchar(30) default null,
+    foreign key (device) references devices (imei),
+    foreign key (nearestdevice) references devices (imei)
 );
 
 create table singleshipments(

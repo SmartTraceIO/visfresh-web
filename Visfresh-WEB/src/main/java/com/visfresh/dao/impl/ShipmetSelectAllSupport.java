@@ -102,6 +102,8 @@ public final class ShipmetSelectAllSupport extends SelectAllSupport {
             //shipped from date
             super.addSortForDbField("COALESCE(" + field
                     + "," + ShipmentDaoImpl.SHIPMENTDATE_FIELD + ")", sorts, isAscent);
+        } else if (ShipmentConstants.NEAREST_TRACKER.equals(field)) {
+            super.addSortForDbField("nearestTrackerSn", sorts, isAscent);
         } else {
             super.addSortForDbField(ShipmentDaoImpl.TABLE + "." + field, sorts, isAscent);
         }

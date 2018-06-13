@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.io.NoteDto;
@@ -30,11 +31,11 @@ import com.visfresh.utils.StringUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
+public class SingleShipmentSerializerOld extends SingleShipmentBeanSerializer {
     protected TemperatureUnits tempUnits;
     private final NoteSerializer noteSerializer;
 
-    public SingleShipmentSerializer(final Language lang, final TimeZone tz, final TemperatureUnits units) {
+    public SingleShipmentSerializerOld(final Language lang, final TimeZone tz, final TemperatureUnits units) {
         super(tz, lang, units);
         this.tempUnits = units;
         noteSerializer = new NoteSerializer(tz);
@@ -61,12 +62,21 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
         final JsonObject json = new JsonObject();
 
         json.addProperty("shipmentId", dto.getShipmentId()); /*+*/
+        json.addProperty("isBeacon", dto.isBeacon());
         json.addProperty(ShipmentConstants.DEVICE_SN, dto.getDeviceSN()); /*+*/
         json.addProperty(ShipmentConstants.DEVICE_COLOR, dto.getDeviceColor());
         if (isNotSibling) {
             json.addProperty(ShipmentConstants.DEVICE_NAME, dto.getDeviceName());
         }
         json.addProperty("tripCount", dto.getTripCount()); /*+*/
+        if (dto.getNearestTracker() != null) {
+            final JsonObject nt = new JsonObject();
+            json.add("nearestTracker", nt);
+
+            nt.addProperty("device", dto.getNearestTracker());
+            nt.addProperty("sn", Device.getSerialNumber(dto.getNearestTracker()));
+            nt.addProperty("color", dto.getNearestTrackerColor());
+        }
 
         if (isNotSibling) {
             json.addProperty("shipmentDescription", dto.getShipmentDescription());

@@ -22,6 +22,8 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private Long shipmentId;
     private String deviceSN;
     private String deviceName;
+    private String nearestTracker;
+    private String nearestTrackerColor;
     private int tripCount;
     private String shipmentDescription;
     private String palettid;
@@ -61,6 +63,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String device;
     private final List<AlertBean> sentAlerts = new LinkedList<>();
     private final List<TemperatureRuleBean> temperatureRules = new LinkedList<>();
+    private boolean isBeacon;
 
     /**
      * Default constructor.
@@ -511,5 +514,41 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public List<TemperatureRuleBean> getTemperatureRules() {
         return temperatureRules;
+    }
+    /**
+     * @return the nearestTracker
+     */
+    public String getNearestTracker() {
+        return nearestTracker;
+    }
+    /**
+     * @return the nearestTrackerColor
+     */
+    public String getNearestTrackerColor() {
+        return nearestTrackerColor;
+    }
+    /**
+     * @param nearestTracker the nearestTracker to set
+     */
+    public void setNearestTracker(final String nearestTracker) {
+        this.nearestTracker = nearestTracker;
+    }
+    /**
+     * @param nearestTrackerColor the nearestTrackerColor to set
+     */
+    public void setNearestTrackerColor(final String nearestTrackerColor) {
+        this.nearestTrackerColor = nearestTrackerColor;
+    }
+    /**
+     * @param useGateway
+     */
+    public void setBeacon(final boolean useGateway) {
+        this.isBeacon = useGateway;
+    }
+    /**
+     * @return the isBeacon
+     */
+    public boolean isBeacon() {
+        return isBeacon;
     }
 }

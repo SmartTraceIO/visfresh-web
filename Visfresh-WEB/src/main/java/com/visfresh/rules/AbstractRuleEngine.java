@@ -141,6 +141,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         final Map<Long, ShipmentSession> sessions = new HashMap<>();
         final RuleContext context = new RuleContext(e, new SessionProvider(sessions));
+        context.setGatewayDevice(event.getGateway());
         context.setDeviceState(state);
 
         saveTrackerEvent(e, event.getGateway());

@@ -19,6 +19,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
@@ -319,7 +320,18 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty(ShipmentConstants.DEVICE_NAME, dto.getDeviceName());
         json.addProperty("tripCount", dto.getTripCount());
 
+        //nearest tracker.
+        if (dto.getNearestTracker() != null) {
+            final JsonObject nt = new JsonObject();
+            json.add("nearestTracker", nt);
+
+            nt.addProperty("device", dto.getNearestTracker());
+            nt.addProperty("sn", Device.getSerialNumber(dto.getNearestTracker()));
+            nt.addProperty("color", dto.getNearestTrackerColor());
+        }
+
         json.addProperty("shipmentId", dto.getShipmentId());
+        json.addProperty("isBeacon", dto.isBeacon());
         json.addProperty("shipmentDescription", dto.getShipmentDescription());
         json.addProperty("shipmentDate", getFormatted(prettyFormat, dto.getShipmentDate()));
         json.addProperty("shipmentDateISO", getFormatted(isoFormat, dto.getShipmentDate()));

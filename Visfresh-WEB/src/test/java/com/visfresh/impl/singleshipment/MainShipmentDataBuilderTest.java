@@ -20,6 +20,7 @@ import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.CorrectiveActionListDao;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
@@ -33,6 +34,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
@@ -144,6 +146,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         final Integer shutdownDeviceAfterMinutes = 2345;
         final Date startTime = new Date(System.currentTimeMillis() - 29380470934l);
         final Date eta = new Date(System.currentTimeMillis() - 1000000l);
+        final String nearestTracker = "32498703948798";
+        final Color nearestTrackerColor = Color.BlueViolet;
 
         //set fields to shipment
         final Shipment s = createDefaultNotSavedShipment(device);
@@ -165,7 +169,15 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         s.setShutdownDeviceAfterMinutes(shutdownDeviceAfterMinutes);
         s.setShipmentDate(startTime);
         s.setEta(eta);
+
         shipmentDao.save(s);
+
+        //nearest device
+        final Device nearest = createDevice(nearestTracker);
+        nearest.setColor(nearestTrackerColor);
+        context.getBean(DeviceDao.class).save(nearest);
+
+        shipmentDao.setNearestTracker(s, nearest);
 
         //set up shipment session
         final ShipmentSession ss = new ShipmentSession(s.getId());
@@ -212,6 +224,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertTrue(Math.abs(startTime.getTime() - bean.getStartTime().getTime()) < 1000l);
         assertTrue(Math.abs(eta.getTime() - bean.getEta().getTime()) < 1000l);
         assertEquals(100, bean.getPercentageComplete());
+        assertEquals(nearestTracker, bean.getNearestTracker());
+        assertEquals(nearestTrackerColor, nearestTrackerColor);
     }
     @Test
     public void testInterimStops() {

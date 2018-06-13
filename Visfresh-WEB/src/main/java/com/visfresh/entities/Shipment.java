@@ -69,6 +69,10 @@ public class Shipment extends ShipmentBase {
     private final Set<Long> siblings = new HashSet<>();
     private Date arrivalDate;
     private Date eta;
+    /**
+     * Nearest device. Read only property.
+     */
+    private String nearestTracker;
 
     /**
      * Default constructor.
@@ -274,6 +278,20 @@ public class Shipment extends ShipmentBase {
      */
     public void setCreatedBy(final String createdBy) {
         this.createdBy = createdBy;
+    }
+    /**
+     * @return the nearestDevice
+     */
+    public String getNearestTracker() {
+        return nearestTracker;
+    }
+    /**
+     * Warning!!! this method is only for DAO. The set of nearest device
+     * and saving then given device will not change associated DB field.
+     * @param nearestDevice the nearestDevice to set
+     */
+    public void setNearestTracker(final String nearestDevice) {
+        this.nearestTracker = nearestDevice;
     }
 
     /**

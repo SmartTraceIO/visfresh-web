@@ -10,7 +10,10 @@ select
     s.company as company,
     s.device as device,
     d.color as deviceColor,
+    nd.imei as nearestDevice,
+    nd.color as nearestDeviceColor,
     d.name as deviceName,
+    d.model as deviceModel,
     s.nonotifsifnoalerts as excludeNotificationsIfNoAlerts,
     s.status as status,
     s.tripcount as tripCount,
@@ -310,5 +313,7 @@ left outer join -- arrival
 	arrivals arr on arr.shipment = s.id
 join
     devices d on d.imei = s.device
+left outer join -- nearest tracker
+	devices nd on nd.imei = s.nearestdevice
 where
     s.id = 1387

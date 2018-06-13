@@ -414,9 +414,12 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = new JsonObject();
         json.addProperty("shipmentId", s.getShipmentId());
+        json.addProperty("isBeacon", s.isBeacon());
         json.addProperty("companyId", s.getCompanyId());
         json.addProperty("device", s.getDevice());
         json.addProperty("deviceName", s.getDeviceName());
+        json.addProperty("nearestTracker", s.getNearestTracker());
+        json.addProperty("nearestTrackerColor", s.getNearestTrackerColor());
         json.addProperty("tripCount", s.getTripCount());
         json.addProperty("shipmentDescription", s.getShipmentDescription());
         json.addProperty("palletId", s.getPalletId());
@@ -522,9 +525,12 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         final SingleShipmentBean s = new SingleShipmentBean();
 
         s.setShipmentId(asLong(json.get("shipmentId")));
+        s.setBeacon(Boolean.TRUE.equals(asBoolean(json.get("isBeacon"))));
         s.setCompanyId(asLong(json.get("companyId")));
         s.setDevice(asString(json.get("device")));
         s.setDeviceName(asString(json.get("deviceName")));
+        s.setNearestTracker(asString(json.get("nearestTracker")));
+        s.setNearestTrackerColor(asString(json.get("nearestTrackerColor")));
         s.setTripCount(asInt(json.get("tripCount")));
         s.setShipmentDescription(asString(json.get("shipmentDescription")));
         s.setPalletId(asString(json.get("palletId")));
@@ -1292,6 +1298,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("shipmentId", bean.getShipmentId()); /*+*/
         json.addProperty(ShipmentConstants.DEVICE_SN, Device.getSerialNumber(bean.getDevice())); /*+*/
         json.addProperty(ShipmentConstants.DEVICE_COLOR, bean.getDeviceColor());
+        json.addProperty("isBeacon", bean.isBeacon());
         json.addProperty("tripCount", bean.getTripCount()); /*+*/
         json.addProperty("isLatestShipment", bean.isLatestShipment());
         json.addProperty("trackerPositionFrontPercent", bean.getTrackerPositionFrontPercent()); /*+*/
@@ -1328,6 +1335,15 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
             }
         }
         json.add("alertsWithCorrectiveActions", alertsWithCorrectiveActions);
+
+        if (bean.getNearestTracker() != null) {
+            final JsonObject nt = new JsonObject();
+            json.add("nearestTracker", nt);
+
+            nt.addProperty("device", bean.getNearestTracker());
+            nt.addProperty("sn", Device.getSerialNumber(bean.getNearestTracker()));
+            nt.addProperty("color", bean.getNearestTrackerColor());
+        }
 
         return json;
     }

@@ -17,10 +17,12 @@ import com.visfresh.lists.ListNotificationScheduleItem;
  */
 public class SingleShipmentBean {
     private long shipmentId;
-    private String beaconId;
+    private boolean isBeacon;
     private Long companyId;
     private String device;
     private String deviceName;
+    private String nearestTracker;
+    private String nearestTrackerColor;
     private int tripCount;
     private String shipmentDescription;
     private String palletId;
@@ -86,16 +88,16 @@ public class SingleShipmentBean {
     }
 
     /**
-     * @return the beaconId
+     * @return the isBeacon
      */
-    public String getBeaconId() {
-        return beaconId;
+    public boolean isBeacon() {
+        return isBeacon;
     }
     /**
-     * @param beaconId the beaconId to set
+     * @param isBeacon the isBeacon to set
      */
-    public void setBeaconId(final String beaconId) {
-        this.beaconId = beaconId;
+    public void setBeacon(final boolean isBeacon) {
+        this.isBeacon = isBeacon;
     }
     /**
      * @return the shipmentId
@@ -144,6 +146,30 @@ public class SingleShipmentBean {
      */
     public String getDeviceColor() {
         return deviceColor;
+    }
+    /**
+     * @return the nearestTracker
+     */
+    public String getNearestTracker() {
+        return nearestTracker;
+    }
+    /**
+     * @return the nearestTrackerColor
+     */
+    public String getNearestTrackerColor() {
+        return nearestTrackerColor;
+    }
+    /**
+     * @param nearestTracker the nearestTracker to set
+     */
+    public void setNearestTracker(final String nearestTracker) {
+        this.nearestTracker = nearestTracker;
+    }
+    /**
+     * @param nearestTrackerColor the nearestTrackerColor to set
+     */
+    public void setNearestTrackerColor(final String nearestTrackerColor) {
+        this.nearestTrackerColor = nearestTrackerColor;
     }
     /**
      * @return the tripCount

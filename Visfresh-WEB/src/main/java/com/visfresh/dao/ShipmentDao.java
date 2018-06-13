@@ -115,4 +115,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @return shipment sibling info.
      */
     ShipmentSiblingInfo getShipmentSiblingInfo(Long shipmentId);
+    /**
+     * Set nearest device for target.
+     * @param target target device.
+     * @param nearest nearest device for target.
+     */
+    void setNearestTracker(Shipment target, Device nearest);
 }

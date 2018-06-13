@@ -23,6 +23,7 @@ import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.impl.services.NotificationServiceImpl;
@@ -192,9 +193,15 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         bean.setCommentsForReceiver((String) row.get("commentsForReceiver"));
         bean.setCompanyId(DaoImplBase.dbLong(row.get("company")));
 
+        //device
         bean.setDevice((String) row.get("device"));
         bean.setDeviceColor((String) row.get("deviceColor"));
         bean.setDeviceName((String) row.get("deviceName"));
+
+        //nearest device
+        bean.setNearestTracker((String) row.get("nearestDevice"));
+        bean.setNearestTrackerColor((String) row.get("nearestDeviceColor"));
+
         bean.setExcludeNotificationsIfNoAlerts(Boolean.TRUE.equals(row.get("excludeNotificationsIfNoAlerts")));
 
         bean.setStatus(ShipmentStatus.valueOf((String) row.get("status")));
@@ -210,6 +217,8 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         bean.setSendArrivalReportOnlyIfAlerts(Boolean.TRUE.equals(row.get("sendArrivalReportOnlyIfAlerts")));
         bean.setShipmentDescription((String) row.get("description"));
         bean.setShipmentId(DaoImplBase.dbLong(row.get("id")));
+        final String deviceModel = (String) row.get("deviceModel");
+        bean.setBeacon(DeviceModel.valueOf(deviceModel).isUseGateway());
         bean.setShipmentType(Boolean.TRUE.equals(row.get("autostart")) ? "Autostart": "Manual");
         bean.setShutDownAfterStartMinutes(DaoImplBase.dbInteger(row.get("shutDownAfterStartMinutes")));
         bean.setShutdownDeviceAfterMinutes(DaoImplBase.dbInteger(row.get("shutdownDeviceAfterMinutes")));

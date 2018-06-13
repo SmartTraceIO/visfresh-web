@@ -24,6 +24,7 @@ import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
@@ -587,6 +588,19 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(d2.getImei(), result.get(0).getDevice().getImei());
     }
     @Test
+    public void testShipmentsIsBeacon() {
+        final Shipment s1 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+
+        assertFalse(dao.getCompanyShipments(
+                s1.getCompanyId(), null, null, null).getItems().get(0).isBeacon());
+
+        s1.getDevice().setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(s1.getDevice());
+
+        assertTrue(dao.getCompanyShipments(
+                s1.getCompanyId(), null, null, null).getItems().get(0).isBeacon());
+    }
+    @Test
     public void testFindBySnTrip() {
         final String sn = "001111";
         final int trip = 1;
@@ -872,6 +886,22 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(to.getName(), item.getShippedTo());
         assertEquals(status, item.getStatus());
         assertEquals(s.getTripCount(), item.getTripCount());
+    }
+    @Test
+    public void testSetNearestDevice() {
+        final Device device = createDevice("35209870987098");
+        final Device nearest = createDevice("35209870987098");
+
+        final Shipment shipment = createShipment(device, ShipmentStatus.Arrived);
+
+        assertNull(dao.findOne(shipment.getId()).getNearestTracker());
+
+        dao.setNearestTracker(shipment, nearest);
+        assertEquals(nearest.getImei(), dao.findOne(shipment.getId()).getNearestTracker());
+
+        //test set null nearest device.
+        dao.setNearestTracker(shipment, null);
+        assertNull(dao.findOne(shipment.getId()).getNearestTracker());
     }
     /**
      * @param time

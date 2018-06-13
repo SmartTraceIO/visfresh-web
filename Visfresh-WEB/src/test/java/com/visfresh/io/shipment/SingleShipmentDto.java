@@ -94,6 +94,9 @@ public class SingleShipmentDto {
     private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
     private final List<AlertDto> alertsWithCorrectiveActions = new LinkedList<>();
     private AlertProfileDto alertProfile;
+    private String nearestTracker;
+    private String nearestTrackerColor;
+    private boolean isBeacon;
 
     /**
      * Default constructor.
@@ -892,5 +895,43 @@ public class SingleShipmentDto {
      */
     public void setCompanyId(final Long companyId) {
         this.companyId = companyId;
+    }
+
+    /**
+     * @param imei
+     */
+    public void setNearestTracker(final String imei) {
+        this.nearestTracker = imei;
+    }
+    /**
+     * @return the nearestTracker
+     */
+    public String getNearestTracker() {
+        return nearestTracker;
+    }
+    /**
+     * @param color nearest tracker color
+     */
+    public void setNearestTrackerColor(final String color) {
+        this.nearestTrackerColor = color;
+    }
+    /**
+     * @return the nearestTrackerColor
+     */
+    public String getNearestTrackerColor() {
+        return nearestTrackerColor;
+    }
+
+    /**
+     * @param useGateway
+     */
+    public void setBeacon(final boolean useGateway) {
+        this.isBeacon = useGateway;
+    }
+    /**
+     * @return the isBeacon
+     */
+    public boolean isBeacon() {
+        return isBeacon;
     }
 }

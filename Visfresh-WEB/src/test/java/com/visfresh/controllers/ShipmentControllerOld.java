@@ -29,6 +29,7 @@ import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NoteDao;
@@ -43,6 +44,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -62,7 +64,7 @@ import com.visfresh.entities.User;
 import com.visfresh.impl.singleshipment.MainShipmentDataBuilder;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.SingleShipmentInterimStop;
-import com.visfresh.io.json.SingleShipmentSerializer;
+import com.visfresh.io.json.SingleShipmentSerializerOld;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
@@ -114,6 +116,8 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
     private InterimStopDao interimStopDao;
     @Autowired
     private NoteDao noteDao;
+    @Autowired
+    private DeviceDao deviceDao;
     @Autowired
     private DeviceGroupDao deviceGroupDao;
     @Autowired
@@ -209,7 +213,7 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
             auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.Viewed, null);
         }
 
-        final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
+        final SingleShipmentSerializerOld ser = getSingleShipmentSerializer(user);
         return createSuccessResponse(dto == null ? null : ser.exportToViewData(dto));
     }
     /**
@@ -534,6 +538,12 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
             dto.setAlertProfileName(shipment.getAlertProfile().getName());
             dto.setAlertProfile(new AlertProfileDto(shipment.getAlertProfile()));
         }
+        if (shipment.getNearestTracker() != null) {
+            final Device d = deviceDao.findByImei(shipment.getNearestTracker());
+            dto.setNearestTracker(d.getImei());
+            dto.setNearestTrackerColor(d.getColor() == null ? null : d.getColor().name());
+        }
+        dto.setBeacon(shipment.getDevice().getModel().isUseGateway());
 
         dto.setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
         dto.setArrivalNotificationWithinKm(shipment.getArrivalNotificationWithinKm());
@@ -791,8 +801,8 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
      * @param user
      * @return
      */
-    private SingleShipmentSerializer getSingleShipmentSerializer(final User user) {
-        return new SingleShipmentSerializer(user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
+    private SingleShipmentSerializerOld getSingleShipmentSerializer(final User user) {
+        return new SingleShipmentSerializerOld(user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
     }
     /**
      * @param alert

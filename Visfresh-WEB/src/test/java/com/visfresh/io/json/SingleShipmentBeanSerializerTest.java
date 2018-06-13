@@ -111,6 +111,8 @@ public class SingleShipmentBeanSerializerTest {
         final boolean latest = true;
         final double maxTemp = 45.5;
         final double minTemp = 6.6;
+        final String nearestTracker = "2390817987908";
+        final String nearestTrackerColor = "red";
         final Integer noAlertsAfterArrivalMinutes = 40;
         final Integer noAlertsAfterStartMinutes = 57;
         final String palletId = "palen N3";
@@ -152,6 +154,8 @@ public class SingleShipmentBeanSerializerTest {
         s.setLatestShipment(latest);
         s.setMaxTemp(maxTemp);
         s.setMinTemp(minTemp);
+        s.setNearestTracker(nearestTracker);
+        s.setNearestTrackerColor(nearestTrackerColor);
         s.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
         s.setNoAlertsAfterStartMinutes(noAlertsAfterStartMinutes);
         s.setPalletId(palletId);
@@ -160,6 +164,7 @@ public class SingleShipmentBeanSerializerTest {
         s.setSendArrivalReportOnlyIfAlerts(sendArrivalReportOnlyIfAlerts);
         s.setShipmentDescription(shipmentDescription);
         s.setShipmentId(shipmentId);
+        s.setBeacon(true);
         s.setShipmentType(shipmentType);
         s.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
         s.setShutdownDeviceAfterMinutes(shutdownDeviceAfterMinutes);
@@ -194,6 +199,8 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(latest, s.isLatestShipment());
         assertEquals(maxTemp, s.getMaxTemp(), 0.0001);
         assertEquals(minTemp, s.getMinTemp(), 0.0001);
+        assertEquals(nearestTracker, s.getNearestTracker());
+        assertEquals(nearestTrackerColor, s.getNearestTrackerColor());
         assertEquals(noAlertsAfterArrivalMinutes, s.getNoAlertsAfterArrivalMinutes());
         assertEquals(noAlertsAfterStartMinutes, s.getNoAlertsAfterStartMinutes());
         assertEquals(palletId, s.getPalletId());
@@ -203,6 +210,7 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(shipmentDescription, s.getShipmentDescription());
         assertEquals(shipmentId, s.getShipmentId());
         assertEquals(shipmentType, s.getShipmentType());
+        assertEquals(true, s.isBeacon());
         assertEquals(shutDownAfterStartMinutes, s.getShutDownAfterStartMinutes());
         assertEquals(shutdownDeviceAfterMinutes, s.getShutdownDeviceAfterMinutes());
         assertEqualDates(shutdownTime, s.getShutdownTime());

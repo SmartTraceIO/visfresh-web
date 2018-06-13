@@ -48,6 +48,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
@@ -846,6 +847,31 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(s1.getId(), ids.get(2));
     }
     @Test
+    public void testGetShipmentsSortedByNearestTracker() throws RestServiceException, IOException {
+        final Shipment s1 = createShipment(true);
+        final Shipment s2 = createShipment(true);
+        final Shipment s3 = createShipment(true);
+
+        s1.getDevice().setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(s1.getDevice());
+
+        final Device n1 = createDevice("aaaaaaaaaaaaaaa", true);
+        final Device n2 = createDevice("bbbbbbbbbbbbbbb", true);
+
+        shipmentDao.setNearestTracker(s1, n1);
+        shipmentDao.setNearestTracker(s2, n2);
+
+        List<Long> ids = getSortedShipmentId(ShipmentConstants.NEAREST_TRACKER, true);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s1.getId(), ids.get(1));
+        assertEquals(s2.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.NEAREST_TRACKER, false);
+        assertEquals(s2.getId(), ids.get(0));
+        assertEquals(s1.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+    }
+    @Test
     public void testSortingByEta() throws RestServiceException, IOException {
         final long currentTime = System.currentTimeMillis();
 
@@ -1210,6 +1236,26 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertEquals(0, sd.get("alertsWithCorrectiveActions").getAsJsonArray().size());
+    }
+    @Test
+    public void testGetSingleShipmentNearestTracker() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+        s.getDevice().setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(s.getDevice());
+
+        final String nearestTracker = "32498703948798";
+        final Color nearestTrackerColor = Color.BlueViolet;
+
+        context.getBean(SingleShipmentBeanDao.class).clearShipmentBean(s.getId());
+
+        //nearest device
+        final Device nearest = createDevice(nearestTracker, false);
+        nearest.setColor(nearestTrackerColor);
+        context.getBean(DeviceDao.class).save(nearest);
+
+        shipmentDao.setNearestTracker(s, nearest);
+        final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
+        assertNotNull(sd.get("nearestTracker"));
     }
     @Test
     public void testGetSingleShipmentLite() throws RestServiceException, IOException {

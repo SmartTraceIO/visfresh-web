@@ -142,6 +142,7 @@ public class SingleShipmentBeanDaoTest extends BaseDaoTest<SingleShipmentBeanDao
     private SingleShipmentBean createBean(final Shipment s) {
         final SingleShipmentBean bean = new SingleShipmentBean();
         bean.setShipmentId(s.getId());
+        bean.setBeacon(s.getDevice().getModel().isUseGateway());
         bean.setDevice(s.getDevice().getImei());
         bean.setStatus(s.getStatus());
         bean.setCompanyId(s.getCompanyId());

@@ -90,6 +90,7 @@ public class JsonSerializerFactoryTest {
         s.setSendArrivalReport(true);
         s.setSendArrivalReportOnlyIfAlerts(true);
         s.setShipmentDescription("JUnit shipment");
+        s.setBeacon(true);
         s.setShipmentId(33l);
         s.setShipmentType("JUnit");
         s.setShutDownAfterStartMinutes(95);

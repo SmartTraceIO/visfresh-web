@@ -2246,6 +2246,12 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
+      "isBeacon": true,
+      "nearestTracker": {
+        "device": "bbbbbbbbbbbbbbb",
+        "sn": "bbbbbb",
+        "color": "DarkCyan"
+      },
       "shipmentId": 4341,
       "shipmentDescription": "Any Description",
       "shipmentDate": "22:06 12 May 2016",
@@ -2325,6 +2331,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
+      "isBeacon": true,
+      "nearestTracker": null,
       "shipmentId": 4342,
       "shipmentDescription": "Any Description",
       "shipmentDate": "22:07 12 May 2016",
@@ -3111,6 +3119,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "shipmentId": 9088,
     "deviceSN": "000011",
     "deviceColor": "Crimson",
+    "isBeacon": true,
     "deviceName": "Device Name",
     "tripCount": 1,
     "shipmentDescription": "Any Description",
@@ -3493,7 +3502,12 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "correctiveActionListId": 222,
         "type": "CriticalHot"
       }
-    ]
+    ],
+    "nearestTracker": {
+      "device": "32498703948798",
+      "sn": "394879",
+      "color": "BlueViolet"
+    }
   }
 }
 ```

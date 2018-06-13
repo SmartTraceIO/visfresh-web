@@ -816,6 +816,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             DEVICE_SN, //should add trip count next
             ARRIVAL_DATE,
             COMMENTS_FOR_RECEIVER,
+            NEAREST_TRACKER,
             ETA,
             SHIPMENT_DESCRIPTION,
             ALERT_PROFILE_ID,
