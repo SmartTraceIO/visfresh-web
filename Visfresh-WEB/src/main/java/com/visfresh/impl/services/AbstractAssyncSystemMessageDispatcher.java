@@ -8,6 +8,8 @@ import java.util.List;
 
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.services.RetryableException;
+import com.visfresh.services.SystemMessageHandler;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,8 +45,20 @@ public abstract class AbstractAssyncSystemMessageDispatcher extends AbstractSyst
                 }
 
                 try {
-                    messageHandlers.get(msg.getType()).handle(msg);
-                    handleSuccess(msg);
+                    final SystemMessageHandler h = messageHandlers.get(msg.getType());
+                    if (h != null) {
+                        h.handle(msg);
+                        handleSuccess(msg);
+                    } else {
+                        //possible dispatcher not yet fully initialized but messages are selected
+                        //on previous web application deploy session.
+                        final RetryableException exc = new RetryableException("Found not handler"
+                                + " for message of given type " + msg.getType()
+                                + ". Possible not yet initialized.");
+                        exc.setCanRetry(true);
+                        exc.setRetryTimeOut(180000l);
+                        throw exc;
+                    }
                 } catch(final Throwable e) {
                     handleError(msg, e);
                 }

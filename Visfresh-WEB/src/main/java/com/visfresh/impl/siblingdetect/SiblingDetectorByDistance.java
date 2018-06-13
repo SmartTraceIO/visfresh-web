@@ -36,7 +36,10 @@ public class SiblingDetectorByDistance extends StatefullSiblingDetector {
      * @see com.visfresh.impl.siblingdetect.StateFullSiblingDetector#doNext(com.visfresh.io.TrackerEventDto, com.visfresh.io.TrackerEventDto)
      */
     @Override
-    protected void doNext(final TrackerEventDto e1, final TrackerEventDto e2) {
+    protected void doNext(final TrackerEventDto e1Orig, final TrackerEventDto e2Orig) {
+        final TrackerEventDto e1 = isNullOrNullLocation(e1Orig) ? null : e1Orig;
+        final TrackerEventDto e2 = isNullOrNullLocation(e2Orig) ? null : e2Orig;
+
         if (e1 != null && e2 != null) {
             doMeasure(getDistance(e1, e2));
             e1Prev = e1;
@@ -52,6 +55,14 @@ public class SiblingDetectorByDistance extends StatefullSiblingDetector {
             }
             e2Prev = e2;
         }
+    }
+
+    /**
+     * @param e event.
+     * @return true if event has null location.
+     */
+    private boolean isNullOrNullLocation(final TrackerEventDto e) {
+        return e == null || e.getLatitude() == null || e.getLongitude() == null;
     }
 
     /**
