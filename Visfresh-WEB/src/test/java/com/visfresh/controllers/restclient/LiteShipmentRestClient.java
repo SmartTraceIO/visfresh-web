@@ -19,6 +19,7 @@ import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.SortColumn;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
@@ -95,6 +96,21 @@ public class LiteShipmentRestClient extends RestClient {
         final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
         req.setSortColumn(column);
         req.setSortOrder(ascent ? "asc": "desc");
+        return getShipments(req);
+    }
+    /**
+     * @param column sorting column.
+     * @param ascent sort order
+     * @return array of shipments.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<LiteShipment> getShipmentsSorted(final List<SortColumn> sortColumns)
+            throws RestServiceException, IOException {
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        for (final SortColumn sc : sortColumns) {
+            req.addSortColumn(sc.getName(), sc.isAscent());
+        }
         return getShipments(req);
     }
     /**

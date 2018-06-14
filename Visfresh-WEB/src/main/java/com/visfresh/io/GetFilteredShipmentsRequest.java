@@ -4,6 +4,7 @@
 package com.visfresh.io;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.visfresh.entities.ShipmentStatus;
@@ -32,6 +33,7 @@ public class GetFilteredShipmentsRequest {
     private String sortOrder;
     private String sortColumn;
     private String deviceSn;
+    private final List<SortColumn> sortColumns = new LinkedList<>();
 
     /**
      *
@@ -231,6 +233,19 @@ public class GetFilteredShipmentsRequest {
      */
     public void setSortColumn(final String sortColumn) {
         this.sortColumn = sortColumn;
+    }
+    /**
+     * @param name column name.
+     * @param ascent column direction.
+     */
+    public void addSortColumn(final String name, final boolean ascent) {
+        this.sortColumns.add(new SortColumn(name, ascent));
+    }
+    /**
+     * @return the sortColumns
+     */
+    public List<SortColumn> getSortColumns() {
+        return sortColumns;
     }
     /**
      * @return the goods

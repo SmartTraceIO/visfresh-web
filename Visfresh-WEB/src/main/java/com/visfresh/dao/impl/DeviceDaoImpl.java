@@ -285,8 +285,15 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
 
         if (sorting != null && sorting.getSortProperties().length > 0) {
             sql += "order by ";
-            final String direction = sorting.isAscentDirection() ? " asc" : " desc";
-            sql += StringUtils.combine(sorting.getSortProperties(), direction + ",") + direction;
+            final StringBuilder sb = new StringBuilder();
+            for (final String prop : sorting.getSortProperties()) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(prop);
+                sb.append(sorting.isAscentDirection(prop) ? " asc" : " desc");
+            }
+            sql += sb.toString();
         }
         if (page != null) {
             sql += " limit " + ((page.getPageNumber() - 1) * page.getPageSize()) + "," + page.getPageSize();

@@ -39,9 +39,8 @@ public class SelectAllSupport {
      */
     protected void addSortsForFindAll(final List<String> sorts, final Map<String, Object> params,
             final Sorting sorting) {
-        final boolean isAscent = sorting.isAscentDirection();
         for (final String property : sorting.getSortProperties()) {
-            addSortForFindAll(property, sorts, isAscent);
+            addSortForFindAll(property, sorts, sorting.isAscentDirection(property));
         }
     }
 

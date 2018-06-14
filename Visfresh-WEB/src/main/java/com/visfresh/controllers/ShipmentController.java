@@ -66,6 +66,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.SortColumn;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
@@ -446,10 +447,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         final Filter filter = createFilter(req);
         final ListResult<ListShipmentItem> shipments = getShipments(
                 user.getCompanyId(),
-                createSortingShipments(
-                        req.getSortColumn(),
-                        req.getSortOrder(),
-                        getDefaultListShipmentsSortingOrder(), 2),
+                createSortingShipments(req),
                 filter,
                 page, user);
 
@@ -791,8 +789,35 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
         return e;
     }
+    /**
+     * @param req
+     * @return
+     */
+    protected Sorting createSortingShipments(final GetFilteredShipmentsRequest req) {
+        if (req.getSortColumns().size() > 0) { //new way with multiple sort columns.
+            final Sorting sort = new Sorting();
+            for (final SortColumn sc : req.getSortColumns()) {
+                sort.addSortProperty(sc.getName(), sc.isAscent());
+            }
+            return sort;
+        }
+
+        //else old way
+        return createSortingShipments(
+                req.getSortColumn(),
+                req.getSortOrder(),
+                getDefaultListShipmentsSortingOrder(), 2);
+    }
     private Sorting createSortingShipments(final String sc, final String so,
             final String[] defaultSortOrder, final int maxNumOfSortColumns) {
+        final String sortColumn = fixSortShipmentColumnName(sc);
+        return super.createSorting(sortColumn, so, defaultSortOrder, maxNumOfSortColumns);
+    }
+    /**
+     * @param sc column name.
+     * @return fixed column name.
+     */
+    private String fixSortShipmentColumnName(final String sc) {
         String sortColumn;
         if (SHIPPED_FROM.equals(sc)) {
             sortColumn = SHIPPED_FROM_LOCATION_NAME;
@@ -801,7 +826,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         } else {
             sortColumn = sc;
         }
-        return super.createSorting(sortColumn, so, defaultSortOrder, maxNumOfSortColumns);
+        return sortColumn;
     }
     /**
      * @return

@@ -60,7 +60,7 @@ public class AuthTokenSerializerTest {
      * @param d2 second date to compare.
      */
     private void assertEqualsDates(final Date d1, final Date d2) {
-        if (Math.abs(d1.getTime() - d2.getTime()) > 60001) {
+        if (Math.abs(d1.getTime() - d2.getTime()) > 61000) {
             throw new AssertionFailedError("Not equals dates: " + d1 + " != " + d2);
         }
     }

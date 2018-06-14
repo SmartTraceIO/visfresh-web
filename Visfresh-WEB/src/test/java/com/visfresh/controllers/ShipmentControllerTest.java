@@ -73,6 +73,7 @@ import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.SortColumn;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.mock.MockAuditSaver;
@@ -867,6 +868,42 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(s2.getId(), ids.get(2));
 
         ids = getSortedShipmentId(ShipmentConstants.NEAREST_TRACKER, false);
+        assertEquals(s2.getId(), ids.get(0));
+        assertEquals(s1.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+    }
+    @Test
+    public void testGetShipmentsSortedNew() throws RestServiceException, IOException {
+        final Shipment s1 = createShipment(true);
+        final Shipment s2 = createShipment(true);
+        final Shipment s3 = createShipment(true);
+
+        s1.getDevice().setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(s1.getDevice());
+
+        //nearest tracker
+        final Device n1 = createDevice("aaaaaaaaaaaaaaa", true);
+        final Device n2 = createDevice("aaaaaaaaaaaaaaa", true);
+        final Device n3 = createDevice("aaaaaaaaaaaaaaa", true);
+
+        shipmentDao.setNearestTracker(s1, n1);
+        shipmentDao.setNearestTracker(s2, n2);
+        shipmentDao.setNearestTracker(s3, n3);
+
+        //description
+        s3.setShipmentDescription("desc-aaa");
+        s1.setShipmentDescription("desc-bbb");
+        s2.setShipmentDescription("desc-ccc");
+
+        shipmentDao.save(s1);
+        shipmentDao.save(s2);
+        shipmentDao.save(s3);
+
+        final List<SortColumn> sortBy = new LinkedList<>();
+        sortBy.add(new SortColumn(ShipmentConstants.NEAREST_TRACKER, true));
+        sortBy.add(new SortColumn(ShipmentConstants.SHIPMENT_DESCRIPTION, false));
+
+        final List<Long> ids = getSortedShipmentId(sortBy);
         assertEquals(s2.getId(), ids.get(0));
         assertEquals(s1.getId(), ids.get(1));
         assertEquals(s3.getId(), ids.get(2));
@@ -2068,6 +2105,21 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         loc.setName(name);
         loc.setAddress("");
         return getContext().getBean(LocationProfileDao.class).save(loc);
+    }
+    /**
+     * @param sortBy
+     * @return
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    private List<Long> getSortedShipmentId(final List<SortColumn> sortBy) throws RestServiceException, IOException {
+        final JsonArray items = shipmentClient.getShipmentsSorted(sortBy);
+        final List<Long> ids = new LinkedList<>();
+        for (final JsonElement e : items) {
+            final Long id = e.getAsJsonObject().get("shipmentId").getAsLong();
+            ids.add(id);
+        }
+        return ids;
     }
     /**
      * @param column

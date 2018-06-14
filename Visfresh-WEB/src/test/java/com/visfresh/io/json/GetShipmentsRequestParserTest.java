@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.SortColumn;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -94,6 +95,8 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         final Integer pageSize = 200;
         final String sortColumn = "anyColumn";
         final String sortOrder = "asc";
+        final String sortAscent = "sortAsc";
+        final String sortDescent = "sortDesc";
 
         req.setAlertsOnly(true);
         req.setDeviceImei(deviceImei);
@@ -114,6 +117,8 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         req.setPageSize(pageSize);
         req.setSortColumn(sortColumn);
         req.setSortOrder(sortOrder);
+        req.addSortColumn(sortAscent, true);
+        req.addSortColumn(sortDescent, false);
 
         json = serializer.toJson(req);
         req = serializer.parseGetFilteredShipmentsRequest(json);
@@ -137,6 +142,12 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         assertEquals(pageSize, req.getPageSize());
         assertEquals(sortColumn, req.getSortColumn());
         assertEquals(sortOrder, req.getSortOrder());
+
+        final List<SortColumn> sortColumns = req.getSortColumns();
+        assertEquals(sortAscent, sortColumns.get(0).getName());
+        assertTrue(sortColumns.get(0).isAscent());
+        assertEquals(sortDescent, sortColumns.get(1).getName());
+        assertFalse(sortColumns.get(1).isAscent());
     }
     /**
      * @param date

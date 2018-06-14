@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.SortColumn;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -26,7 +28,6 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
      */
     public GetShipmentsRequestParser(final TimeZone tz) {
         super(tz);
-        // TODO Auto-generated constructor stub
     }
     /**
      * @param json
@@ -86,6 +87,14 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
         if (json.has(JSON_SORT_COLUMN)) {
             req.setSortColumn(asString(json.get(JSON_SORT_COLUMN)));
         }
+        if (has(json, "sortBy")) {
+            for (final JsonElement e : json.get("sortBy").getAsJsonArray()) {
+                final JsonObject eson = e.getAsJsonObject();
+                req.addSortColumn(
+                        asString(eson.get("column")),
+                        !"desc".equalsIgnoreCase(asString(eson.get("direction"))));
+            }
+        }
 
         return req;
     }
@@ -98,64 +107,76 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
             return null;
         }
 
-        final JsonObject obj = new JsonObject();
-        obj.addProperty("alertsOnly", r.isAlertsOnly());
+        final JsonObject json = new JsonObject();
+        json.addProperty("alertsOnly", r.isAlertsOnly());
         if (r.getDeviceImei() != null) {
-            obj.addProperty("deviceImei", r.getDeviceImei());
+            json.addProperty("deviceImei", r.getDeviceImei());
         }
         if (r.getLast2Days() != null) {
-            obj.addProperty("last2Days", r.getLast2Days());
+            json.addProperty("last2Days", r.getLast2Days());
         }
         if (r.getLastDay() != null) {
-            obj.addProperty("lastDay", r.getLastDay());
+            json.addProperty("lastDay", r.getLastDay());
         }
         if (r.getLastMonth() != null) {
-            obj.addProperty("lastMonth", r.getLastMonth());
+            json.addProperty("lastMonth", r.getLastMonth());
         }
         if (r.getLastWeek() != null) {
-            obj.addProperty("lastWeek", r.getLastWeek());
+            json.addProperty("lastWeek", r.getLastWeek());
         }
         if (r.getShipmentDateFrom() != null) {
-            obj.addProperty("shipmentDateFrom", formatDate(r.getShipmentDateFrom()));
+            json.addProperty("shipmentDateFrom", formatDate(r.getShipmentDateFrom()));
         }
         if (r.getShipmentDateTo() != null) {
-            obj.addProperty("shipmentDateTo", formatDate(r.getShipmentDateTo()));
+            json.addProperty("shipmentDateTo", formatDate(r.getShipmentDateTo()));
         }
         if (r.getShipmentDescription() != null) {
-            obj.addProperty("shipmentDescription", r.getShipmentDescription());
+            json.addProperty("shipmentDescription", r.getShipmentDescription());
         }
         if (r.getShippedFrom() != null && !r.getShippedFrom().isEmpty()) {
-            obj.add("shippedFrom", asJsonArray(r.getShippedFrom()));
+            json.add("shippedFrom", asJsonArray(r.getShippedFrom()));
         }
         if (r.getShippedTo() != null && !r.getShippedTo().isEmpty()) {
-            obj.add("shippedTo", asJsonArray(r.getShippedTo()));
+            json.add("shippedTo", asJsonArray(r.getShippedTo()));
         }
         if (r.getStatus() != null) {
-            obj.addProperty("status", r.getStatus().toString());
+            json.addProperty("status", r.getStatus().toString());
         }
         if (r.getGoods() != null) {
-            obj.addProperty("goods", r.getGoods());
+            json.addProperty("goods", r.getGoods());
         }
         if (r.getExcludePriorShipments() != null) {
-            obj.addProperty("excludePriorShipments", r.getExcludePriorShipments());
+            json.addProperty("excludePriorShipments", r.getExcludePriorShipments());
         }
         if (r.getDeviceSn() != null) {
-            obj.addProperty(ShipmentConstants.DEVICE_SN, r.getDeviceSn());
+            json.addProperty(ShipmentConstants.DEVICE_SN, r.getDeviceSn());
         }
         if (r.getPageIndex() != null) {
-            obj.addProperty("pageIndex", r.getPageIndex());
+            json.addProperty("pageIndex", r.getPageIndex());
         }
         if (r.getPageSize() != null) {
-            obj.addProperty("pageSize", r.getPageSize());
+            json.addProperty("pageSize", r.getPageSize());
         }
         if (r.getSortOrder() != null) {
-            obj.addProperty(JSON_SORT_ORDER, r.getSortOrder());
+            json.addProperty(JSON_SORT_ORDER, r.getSortOrder());
         }
         if (r.getSortColumn() != null) {
-            obj.addProperty(JSON_SORT_COLUMN, r.getSortColumn());
+            json.addProperty(JSON_SORT_COLUMN, r.getSortColumn());
         }
 
-        return obj;
+        if (r.getSortColumns().size() > 0) {
+            final JsonArray sortBy = new JsonArray();
+            for (final SortColumn sc : r.getSortColumns()) {
+                final JsonObject scJson = new JsonObject();
+                scJson.addProperty("column", sc.getName());
+                scJson.addProperty("direction", sc.isAscent() ? "asc" : "desc");
+
+                sortBy.add(scJson);
+            }
+            json.add("sortBy", sortBy);
+        }
+
+        return json;
     }
     /**
      * @param lsit

@@ -25,6 +25,7 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.SortColumn;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.json.fastxml.JsonSerializerFactory;
@@ -193,6 +194,21 @@ public class ShipmentRestClient extends RestClient {
         final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
         req.setSortColumn(column);
         req.setSortOrder(ascent ? "asc": "desc");
+        return getShipments(req);
+    }
+    /**
+     * @param column sorting column.
+     * @param ascent sort order
+     * @return array of shipments.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public JsonArray getShipmentsSorted(final List<SortColumn> sortColumns)
+            throws RestServiceException, IOException {
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        for (final SortColumn sc : sortColumns) {
+            req.addSortColumn(sc.getName(), sc.isAscent());
+        }
         return getShipments(req);
     }
     /**

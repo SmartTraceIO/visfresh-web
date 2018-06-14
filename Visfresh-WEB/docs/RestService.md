@@ -1239,7 +1239,17 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "pageIndex": 10,
   "pageSize": 200,
   "sortOrder": "asc",
-  "sortColumn": "anyColumn"
+  "sortColumn": "anyColumn",
+  "sortBy": [
+    {
+      "column": "nearestTracker",
+      "direction": "asc"
+    },
+    {
+      "column": "shipmentDescription",
+      "direction": "desc"
+    }
+  ]
 }
 ```
 ### Save Note request ###
