@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.dao.impl;
+package com.visfresh.dao.impl.shipment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +27,9 @@ import com.visfresh.dao.PreliminarySingleShipmentData;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.Sorting;
+import com.visfresh.dao.impl.AlertDaoImpl;
+import com.visfresh.dao.impl.DefaultCustomFilter;
+import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
@@ -254,19 +257,19 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
         //select alerts.
         final String selectAs = buildSelectAs(AlertDaoImpl.getFields(true), "a", resultPrefix);
-        final String sql = "select " + selectAs + " from " + AlertDaoImpl.TABLE + " a, "
-                + DeviceDaoImpl.TABLE + " d"
-                + " where a." + AlertDaoImpl.DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
-                + " and d." + DeviceDaoImpl.COMPANY_FIELD + " = :companyId"
-                + " and a." + AlertDaoImpl.DATE_FIELD + " >= :startDate and a." + AlertDaoImpl.DATE_FIELD + " <= :endDate"
-                + " order by a." + AlertDaoImpl.DATE_FIELD;
+        final String sql = "select " + selectAs + " from alerts a, "
+                + "devices d"
+                + " where a.device = d.imei"
+                + " and d.company = :companyId"
+                + " and a.date >= :startDate and a.date <= :endDate"
+                + " order by a.date";
 
         //map of device alerts. The key is device ID.
         final Map<String, List<Alert>> deviceAlerts = new HashMap<String, List<Alert>>();
 
         final List<Map<String, Object>> list = jdbc.queryForList(sql, params);
         for (final Map<String, Object> row : list) {
-            final String deviceId = (String) row.get(resultPrefix + AlertDaoImpl.DEVICE_FIELD);
+            final String deviceId = (String) row.get(resultPrefix + "device");
             //add alert to map
             List<Alert> alerts = deviceAlerts.get(deviceId);
             if (alerts == null) {
@@ -521,7 +524,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      */
     @Override
     public ShipmetSelectAllSupport createSelectAllSupport() {
-        return new ShipmetSelectAllSupport(getTableName());
+        return new ShipmetSelectAllSupport();
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#createNewFrom(com.visfresh.entities.ShipmentTemplate)

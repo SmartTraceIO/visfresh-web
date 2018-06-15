@@ -26,7 +26,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.impl.SelectAllSupport;
-import com.visfresh.dao.impl.ShipmentDaoImpl;
+import com.visfresh.dao.impl.shipment.ShipmentDaoImpl;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.StringUtils;

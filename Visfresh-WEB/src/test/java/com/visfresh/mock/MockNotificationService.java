@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -28,7 +29,7 @@ public class MockNotificationService extends NotificationServiceImpl {
      * @see com.visfresh.mpl.services.NotificationServiceImpl#sendShipmentReport(com.visfresh.entities.Shipment, java.util.List)
      */
     @Override
-    public void sendShipmentReport(final Shipment shipment, final List<User> users) {
+    public void sendShipmentReport(final Shipment shipment, final List<ShortUserInfo> users) {
         final JsonObject json = createSendShipmentReportMessage(shipment, users);
 
         //create and handle system message synchronously

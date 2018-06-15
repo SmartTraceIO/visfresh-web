@@ -17,6 +17,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 
@@ -46,7 +47,6 @@ public class NotificationScheduleDaoTest
         u.setEmail("asuvorov@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
-        u.setEmail("asuvorov@google.com");
         u.setPhone("11111111117");
         u.setTemperatureUnits(TemperatureUnits.Celsius);
         u.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -65,8 +65,8 @@ public class NotificationScheduleDaoTest
         s.setDescription("Test schedule");
 
         final PersonSchedule ps = createPersonalSchedule();
-
         s.getSchedules().add(ps);
+
         return s;
     }
 
@@ -88,7 +88,13 @@ public class NotificationScheduleDaoTest
         assertTrue(ps.isSendEmail());
         assertTrue(ps.isSendSms());
         assertEquals(150, ps.getToTime());
-        assertNotNull(ps.getUser());
+
+        final ShortUserInfo user = ps.getUser();
+        assertNotNull(user.getId());
+        assertEquals("asuvorov@mail.ru", user.getEmail());
+        assertEquals("Alexander", user.getFirstName());
+        assertEquals("Suvorov", user.getLastName());
+        assertEquals("11111111117", user.getPhone());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
@@ -110,7 +116,13 @@ public class NotificationScheduleDaoTest
         assertEquals(45, ps.getFromTime());
         assertTrue(ps.isSendApp());
         assertEquals(150, ps.getToTime());
-        assertNotNull(ps.getUser());
+
+        final ShortUserInfo user = ps.getUser();
+        assertNotNull(user.getId());
+        assertEquals("asuvorov@mail.ru", user.getEmail());
+        assertEquals("Alexander", user.getFirstName());
+        assertEquals("Suvorov", user.getLastName());
+        assertEquals("11111111117", user.getPhone());
     }
     @Test
     public void testFindByCompany() {

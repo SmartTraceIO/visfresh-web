@@ -44,6 +44,7 @@ import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TemperatureAlert;
@@ -123,7 +124,8 @@ public class NotificationServiceImpl implements NotificationService {
         final List<User> emailedUsers = new LinkedList<>();
 
         for (final PersonSchedule s : schedules) {
-            final User user = s.getUser();
+            final ShortUserInfo shortUserInfo = s.getUser();
+            final User user = userDao.findOne(shortUserInfo.getId());
 
             //send email
             if (s.isSendEmail()) {
@@ -252,7 +254,7 @@ public class NotificationServiceImpl implements NotificationService {
      * @param shipment
      */
     @Override
-    public void sendShipmentReport(final Shipment shipment, final List<User> users) {
+    public void sendShipmentReport(final Shipment shipment, final List<ShortUserInfo> users) {
         if (!users.isEmpty()) {
             final JsonObject json = createSendShipmentReportMessage(shipment, users);
             arrivalDispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
@@ -265,12 +267,13 @@ public class NotificationServiceImpl implements NotificationService {
      * @param users report recipients.
      * @return system message payload.
      */
-    protected JsonObject createSendShipmentReportMessage(final Shipment shipment, final List<User> users) {
+    protected JsonObject createSendShipmentReportMessage(
+            final Shipment shipment, final List<ShortUserInfo> users) {
         final JsonObject json = new JsonObject();
         json.addProperty(SHIPMENT, shipment.getId());
 
         final JsonArray array = new JsonArray();
-        for (final User u : users) {
+        for (final ShortUserInfo u : users) {
             array.add(new JsonPrimitive(u.getId()));
         }
 

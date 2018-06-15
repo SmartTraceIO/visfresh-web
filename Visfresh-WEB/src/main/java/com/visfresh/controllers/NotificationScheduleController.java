@@ -24,7 +24,7 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.Page;
-import com.visfresh.dao.impl.ShipmentBaseDao;
+import com.visfresh.dao.impl.shipment.ShipmentBaseDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.ReferenceInfo;

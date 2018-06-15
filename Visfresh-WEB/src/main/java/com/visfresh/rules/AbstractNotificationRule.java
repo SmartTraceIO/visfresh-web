@@ -19,8 +19,8 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.User;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.NotificationService;
 
@@ -169,8 +169,8 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param date date for schedule email.
      * @return list of users to send email.
      */
-    public static List<User> getEmailingUsers(final List<NotificationSchedule> schedules, final Date date) {
-        final List<User> users = new LinkedList<>();
+    public static List<ShortUserInfo> getEmailingUsers(final List<NotificationSchedule> schedules, final Date date) {
+        final List<ShortUserInfo> users = new LinkedList<>();
         for (final PersonSchedule sched : getPersonalSchedules(schedules, date)) {
             if (sched.isSendEmail() && sched.getUser().isActive()) {
                 users.add(sched.getUser());

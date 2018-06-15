@@ -35,6 +35,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -174,7 +175,7 @@ public class NotificationServiceTest {
         final User u = createUser("junit@smarttrace.com.au");
 
         //check not send for empty user list
-        final List<User> users = new LinkedList<>();
+        final List<ShortUserInfo> users = new LinkedList<>();
         service.sendShipmentReport(shipment, users);
 
         assertFalse(service.isArrivalReportSent(shipment));

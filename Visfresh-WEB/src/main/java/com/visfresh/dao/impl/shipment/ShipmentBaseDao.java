@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.dao.impl;
+package com.visfresh.dao.impl.shipment;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,6 +20,8 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.dao.impl.EntityWithCompanyDaoImplBase;
+import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentBase;
@@ -48,9 +50,9 @@ public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> exten
 
     public static final String ID_FIELD = "id";
     protected static final String ISTEMPLATE_FIELD = "istemplate";
-    protected static final String NAME_FIELD = "name";
-    protected static final String DESCRIPTION_FIELD = "description";
-    protected static final String ALERT_PROFILE_FIELD = "alert";
+    public static final String NAME_FIELD = "name";
+    public static final String DESCRIPTION_FIELD = "description";
+    public static final String ALERT_PROFILE_FIELD = "alert";
     protected static final String NOALERTIFCOODOWN_FIELD = "noalertsifcooldown";
     protected static final String ARRIVALNOTIFWITHIN_FIELD = "arrivalnotifwithIn";
     protected static final String NONOTIFSIFNOALERTS_FIELD = "nonotifsifnoalerts";

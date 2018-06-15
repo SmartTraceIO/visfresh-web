@@ -24,6 +24,7 @@ import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.impl.shipment.ShipmentTemplateDaoImpl;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;

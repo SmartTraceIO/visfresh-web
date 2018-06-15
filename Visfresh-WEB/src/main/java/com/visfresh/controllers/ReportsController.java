@@ -44,6 +44,7 @@ import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.EmailShipmentReportRequest;
@@ -262,7 +263,7 @@ public class ReportsController extends AbstractController {
             bean.getWhoReceivedReport().clear();
 
             //calculate report receivers
-            for(final User u: AbstractNotificationRule.getEmailingUsers(
+            for(final ShortUserInfo u: AbstractNotificationRule.getEmailingUsers(
                     s.getArrivalNotificationSchedules(), s.getArrivalDate())) {
                 bean.getWhoReceivedReport().add(ShipmentReportDaoImpl.createUserName(u));
             }

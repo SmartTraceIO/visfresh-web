@@ -41,11 +41,7 @@ public class PersonSchedule implements EntityWithId<Long> {
      * End minute from start of day.
      */
     private int toTime;
-    /**
-     * Person to notify.
-     */
-    private User user;
-
+    private ShortUserInfo user;
     /**
      *
      */
@@ -109,18 +105,6 @@ public class PersonSchedule implements EntityWithId<Long> {
         return weekDays;
     }
     /**
-     * @return the user
-     */
-    public User getUser() {
-        return user;
-    }
-    /**
-     * @param user the user to set
-     */
-    public void setUser(final User user) {
-        this.user = user;
-    }
-    /**
      * @return the true if should send email to user.
      */
     public boolean isSendEmail() {
@@ -168,5 +152,19 @@ public class PersonSchedule implements EntityWithId<Long> {
      */
     public void setAllWeek() {
         setWeekDays(true, true, true, true, true, true, true);
+    }
+
+    /**
+     * @return user ID.
+     */
+    public ShortUserInfo getUser() {
+        return user;
+    }
+
+    /**
+     * @param u the userId to set
+     */
+    public void setUser(final ShortUserInfo u) {
+        this.user = u;
     }
 }

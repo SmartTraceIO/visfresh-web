@@ -18,9 +18,9 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.entities.User;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.NotificationService;
 import com.visfresh.services.ShipmentShutdownService;
@@ -137,7 +137,7 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
                 return;
             }
 
-            final List<User> users = AbstractNotificationRule.getEmailingUsers(
+            final List<ShortUserInfo> users = AbstractNotificationRule.getEmailingUsers(
                     shipment.getArrivalNotificationSchedules(), new Date());
             notificationService.sendShipmentReport(shipment, users);
         }

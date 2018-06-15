@@ -19,7 +19,7 @@ import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.dao.impl.ShipmentTemplateDaoImpl;
+import com.visfresh.dao.impl.shipment.ShipmentTemplateDaoImpl;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;

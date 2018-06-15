@@ -10,17 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.dao.UserDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.ReferenceInfo;
+import com.visfresh.entities.ShortUserInfo;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,9 +47,6 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
     private static final String SCHEDULE_FIELD = "schedule";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
-
-    @Autowired
-    private UserDao userDao;
 
     /**
      * Default constructor.
@@ -191,18 +187,31 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
      */
     private List<PersonSchedule> findPersonalSchedulesFor(final Long id) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(SCHEDULE_FIELD, id);
+        params.put("schedule", id);
         final List<Map<String, Object>> list = jdbc.queryForList(
-                "select * from "
-                + PERSONAL_SCHEDULE_TABLE
-                + (id == null ? "" : " where " + SCHEDULE_FIELD + " = :" + SCHEDULE_FIELD),
+                "select s.*, u.active as userActive,"
+                + "u.email as userEmail, u.firstname as userFirstName,"
+                + "u.lastname as userLastName, u.phone as userPhone"
+                + " from personalschedules s"
+                + " join users u on s.user = u.id"
+                + (id == null ? "" : " where s.schedule = :schedule"),
                 params);
 
         final List<PersonSchedule> result = new LinkedList<PersonSchedule>();
         for (final Map<String,Object> map : list) {
             final PersonSchedule ps = new PersonSchedule();
             ps.setId(((Number) map.get(ID_FIELD)).longValue());
-            ps.setUser(userDao.findOne(((Number) map.get(USER_FIELD)).longValue()));
+
+            final ShortUserInfo user = new ShortUserInfo();
+            user.setId(((Number) map.get(USER_FIELD)).longValue());
+            user.setActive((Boolean) map.get("userActive"));
+            user.setEmail((String) map.get("userEmail"));
+            user.setFirstName((String) map.get("userFirstName"));
+            user.setLastName((String) map.get("userLastName"));
+            user.setPhone((String) map.get("userPhone"));
+
+            ps.setUser(user);
+
             ps.setSendApp((Boolean) map.get(SENDAPP_FIELD));
             ps.setSendEmail((Boolean) map.get(SENDEMAIL_FIELD));
             ps.setSendSms((Boolean) map.get(SENDSMS_FIELD));

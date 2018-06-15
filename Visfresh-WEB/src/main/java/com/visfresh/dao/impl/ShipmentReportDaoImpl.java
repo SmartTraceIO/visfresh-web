@@ -37,6 +37,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.shipment.ArrivalBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
@@ -149,7 +150,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         bean.getWhoWasNotifiedByAlert().addAll(
             toNameList(getNotifiedUsers(alerts, NotificationType.Alert)));
 
-        List<User> usersReceivedReports = new LinkedList<>();
+        List<ShortUserInfo> usersReceivedReports = new LinkedList<>();
         if (s.getStatus() == ShipmentStatus.Arrived) {
             if (arrival != null) {
                 //notified users
@@ -159,7 +160,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             }
         } else if (!s.hasFinalStatus()){
             //user to be notified map. Map - because need to avoid of duplicates.
-            final Map<Long, User> all = new HashMap<>();
+            final Map<Long, ShortUserInfo> all = new HashMap<>();
             //get not potentially notified users without filtering by time frames
             for (final NotificationSchedule schedule : s.getArrivalNotificationSchedules()) {
                 final List<PersonSchedule> personalSchedules = schedule.getSchedules();
@@ -178,9 +179,9 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @param issues
      * @return
      */
-    private List<User> getNotifiedUsers(final List<? extends NotificationIssue> issues, final NotificationType type) {
+    private List<ShortUserInfo> getNotifiedUsers(final List<? extends NotificationIssue> issues, final NotificationType type) {
         final Set<Long> ids = new HashSet<>();
-        final List<User> list = new LinkedList<>();
+        final List<ShortUserInfo> list = new LinkedList<>();
 
         final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(issues), type);
         for (final Notification n : notifs) {
@@ -193,9 +194,9 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         return list;
     }
-    private List<String> toNameList(final List<User> users) {
+    private <U extends ShortUserInfo> List<String> toNameList(final List<U> users) {
         final List<String> names = new LinkedList<>();
-        for (final User u : users) {
+        for (final ShortUserInfo u : users) {
             names.add(createUserName(u));
         }
         return names;
@@ -204,7 +205,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @param u user.
      * @return user name.
      */
-    public static String createUserName(final User u) {
+    public static String createUserName(final ShortUserInfo u) {
         final StringBuilder sb = new StringBuilder();
         if (u.getFirstName() != null) {
             sb.append(u.getFirstName());

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.dao.impl;
+package com.visfresh.dao.impl.shipment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.impl.AlertProfileDaoImpl;
+import com.visfresh.dao.impl.LocationProfileDaoImpl;
+import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.ShipmentTemplate;
 
 /**

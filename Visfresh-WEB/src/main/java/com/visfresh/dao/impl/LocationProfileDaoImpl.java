@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.impl.shipment.ShipmentDaoImpl;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShortShipmentInfo;
 
@@ -151,9 +152,9 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
         final String sql = "select "
                 + ShipmentDaoImpl.ID_FIELD + ", "
                 + ShipmentDaoImpl.DESCRIPTION_FIELD + ", "
-                + ShipmentDaoImpl.ISTEMPLATE_FIELD + " from " + ShipmentDaoImpl.TABLE
-                + " where " + ShipmentDaoImpl.SHIPPEDFROM_FIELD + " = :loc"
-                + " or " + ShipmentDaoImpl.SHIPPEDTO_FIELD + " = :loc"
+                + "istemplate from " + ShipmentDaoImpl.TABLE
+                + " where shippedfrom = :loc"
+                + " or shippedto = :loc"
                 + " group by " + ShipmentDaoImpl.ID_FIELD + " order by " + ShipmentDaoImpl.ID_FIELD;
 
         //execute query
@@ -163,7 +164,7 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
             final ShortShipmentInfo i = new ShortShipmentInfo();
             i.setId(((Number) map.get(ShipmentDaoImpl.ID_FIELD)).longValue());
             i.setShipmentDescription((String) map.get(ShipmentDaoImpl.DESCRIPTION_FIELD));
-            i.setTemplate((Boolean) map.get(ShipmentDaoImpl.ISTEMPLATE_FIELD));
+            i.setTemplate((Boolean) map.get("istemplate"));
             info.add(i);
         }
 

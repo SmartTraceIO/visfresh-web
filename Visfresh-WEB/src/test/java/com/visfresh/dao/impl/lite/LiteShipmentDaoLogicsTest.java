@@ -22,7 +22,7 @@ import com.visfresh.controllers.lite.LiteShipmentResult;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
-import com.visfresh.dao.impl.ShipmentDaoImpl;
+import com.visfresh.dao.impl.shipment.ShipmentDaoImpl;
 import com.visfresh.entities.ShipmentStatus;
 
 /**

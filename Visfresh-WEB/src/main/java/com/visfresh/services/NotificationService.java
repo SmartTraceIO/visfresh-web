@@ -8,6 +8,7 @@ import java.util.List;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortUserInfo;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 
@@ -33,7 +34,7 @@ public interface NotificationService {
      * @param shipment shipment.
      * @param usersReceivedReports report receivers.
      */
-    void sendShipmentReport(Shipment shipment, List<User> usersReceivedReports);
+    void sendShipmentReport(Shipment shipment, List<ShortUserInfo> usersReceivedReports);
     /**
      * @param shipment the shipment session.
      * @return true if arrival report has sent for given shipment.

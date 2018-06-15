@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.dao.impl;
+package com.visfresh.dao.impl.shipment;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +11,7 @@ import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
+import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.Device;
 import com.visfresh.utils.StringUtils;
 
@@ -18,15 +19,15 @@ import com.visfresh.utils.StringUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public final class ShipmetSelectAllSupport extends SelectAllSupport {
+public final class ShipmetBaseSelectAllSupport extends SelectAllSupport {
     private static final String selectAll = StringUtils.loadSql("getShipments");
     private static final String allForCompany = StringUtils.loadSql("getCompanyShipments");
 
     /**
      * @param tableName
      */
-    public ShipmetSelectAllSupport(final String tableName) {
-        super(tableName);
+    public ShipmetBaseSelectAllSupport() {
+        super(ShipmentBaseDao.TABLE);
     }
 
     /* (non-Javadoc)
