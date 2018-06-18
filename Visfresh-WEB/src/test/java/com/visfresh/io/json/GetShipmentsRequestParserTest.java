@@ -68,6 +68,8 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         assertNull(req.getStatus());
         assertNull(req.getGoods());
         assertNull(req.getExcludePriorShipments());
+        assertTrue(req.getIncludeBeacons());
+        assertTrue(req.getIncludeTrackers());
 
         //test not null values
         req = new GetFilteredShipmentsRequest();
@@ -148,6 +150,30 @@ public class GetShipmentsRequestParserTest extends AbstractSerializerTest {
         assertTrue(sortColumns.get(0).isAscent());
         assertEquals(sortDescent, sortColumns.get(1).getName());
         assertFalse(sortColumns.get(1).isAscent());
+    }
+    @Test
+    public void testIncludeBeaconsTrackers() {
+        //test all nulls
+        GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+
+        req.setIncludeBeacons(true);
+        req.setIncludeTrackers(true);
+
+        JsonObject json = serializer.toJson(req);
+        req = serializer.parseGetFilteredShipmentsRequest(json);
+
+        assertTrue(req.getIncludeBeacons());
+        assertTrue(req.getIncludeTrackers());
+
+        //test false
+        req.setIncludeBeacons(false);
+        req.setIncludeTrackers(false);
+
+        json = serializer.toJson(req);
+        req = serializer.parseGetFilteredShipmentsRequest(json);
+
+        assertFalse(req.getIncludeBeacons());
+        assertFalse(req.getIncludeTrackers());
     }
     /**
      * @param date

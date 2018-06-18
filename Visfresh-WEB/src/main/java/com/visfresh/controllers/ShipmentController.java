@@ -911,6 +911,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         if (req.getDeviceSn() != null) {
             f.addFilter(ShipmentConstants.DEVICE_SN, req.getDeviceSn());
         }
+        if (req.getIncludeBeacons() != null) {
+            f.addFilter(ShipmentConstants.INCLUDE_BEACONS, req.getIncludeBeacons());
+        }
+        if (req.getIncludeTrackers() != null) {
+            f.addFilter(ShipmentConstants.INCLUDE_TRACKERS, req.getIncludeTrackers());
+        }
         return f;
     }
     /**

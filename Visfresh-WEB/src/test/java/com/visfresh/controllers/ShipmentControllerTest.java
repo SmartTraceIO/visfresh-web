@@ -1708,6 +1708,35 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(2, currentJsonResponse.get("totalCount").getAsInt());
     }
     @Test
+    public void testExcludeBeacons() throws RestServiceException, IOException {
+        final Device d1 = createDevice("329487092384570", true);
+        d1.setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(d1);
+
+        createShipment(d1, true);
+
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        assertEquals(1, shipmentClient.getShipments(req).size());
+        assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
+
+        req.setIncludeBeacons(false);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+        assertEquals(0, currentJsonResponse.get("totalCount").getAsInt());
+    }
+    @Test
+    public void testExcludeTrackers() throws RestServiceException, IOException {
+        final Device d1 = createDevice("329487092384570", true);
+        createShipment(d1, true);
+
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        assertEquals(1, shipmentClient.getShipments(req).size());
+        assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
+
+        req.setIncludeTrackers(false);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+        assertEquals(0, currentJsonResponse.get("totalCount").getAsInt());
+    }
+    @Test
     public void testSaveEmpty() throws RestServiceException, IOException {
         final Shipment shipment = new Shipment();
         shipment.setDevice(createDevice("123987230987", true));

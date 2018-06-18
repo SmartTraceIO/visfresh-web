@@ -95,6 +95,8 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
                         !"desc".equalsIgnoreCase(asString(eson.get("direction"))));
             }
         }
+        req.setIncludeBeacons(!Boolean.FALSE.equals(asBoolean(json.get(ShipmentConstants.INCLUDE_BEACONS))));
+        req.setIncludeTrackers(!Boolean.FALSE.equals(asBoolean(json.get(ShipmentConstants.INCLUDE_TRACKERS))));
 
         return req;
     }
@@ -163,6 +165,8 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
         if (r.getSortColumn() != null) {
             json.addProperty(JSON_SORT_COLUMN, r.getSortColumn());
         }
+        json.addProperty(ShipmentConstants.INCLUDE_BEACONS, r.getIncludeBeacons());
+        json.addProperty(ShipmentConstants.INCLUDE_TRACKERS, r.getIncludeTrackers());
 
         if (r.getSortColumns().size() > 0) {
             final JsonArray sortBy = new JsonArray();

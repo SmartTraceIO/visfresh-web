@@ -3,9 +3,11 @@
  */
 package com.visfresh.dao.impl.shipment;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.Filter;
@@ -13,6 +15,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -171,8 +174,29 @@ public final class ShipmetSelectAllSupport extends SelectAllSupport {
             filters.add(sb.toString());
         } else if (ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS.equals(property)){
             //nothing in where clause
+        } else if (ShipmentConstants.INCLUDE_TRACKERS.equals(property)){
+            if (Boolean.FALSE.equals(value)) {
+                filters.add("d.model not in ('"
+                        + String.join("','", getOnlyBeaconOrTrackerModels(false))
+                        + "')");
+            }
+        } else if (ShipmentConstants.INCLUDE_BEACONS.equals(property)){
+            if (Boolean.FALSE.equals(value)) {
+                filters.add("d.model not in ('"
+                        + String.join("','", getOnlyBeaconOrTrackerModels(true))
+                        + "')");
+            }
         } else {
             super.addFilterValue(property, value, params, filters);
         }
+    }
+    private Set<String> getOnlyBeaconOrTrackerModels(final boolean beacon) {
+        final Set<String> models = new HashSet<>();
+        for (final DeviceModel m : DeviceModel.values()) {
+            if (beacon && m.isUseGateway() || !beacon && !m.isUseGateway()) {
+                models.add(m.name());
+            }
+        }
+        return models;
     }
 }

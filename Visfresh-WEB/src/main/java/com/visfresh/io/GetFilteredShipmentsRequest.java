@@ -33,6 +33,8 @@ public class GetFilteredShipmentsRequest {
     private String sortOrder;
     private String sortColumn;
     private String deviceSn;
+    private Boolean includeBeacons;
+    private Boolean includeTrackers;
     private final List<SortColumn> sortColumns = new LinkedList<>();
 
     /**
@@ -282,5 +284,29 @@ public class GetFilteredShipmentsRequest {
      */
     public void setDeviceSn(final String deviceSn) {
         this.deviceSn = deviceSn;
+    }
+    /**
+     * @return the includeBeacons
+     */
+    public Boolean getIncludeBeacons() {
+        return includeBeacons;
+    }
+    /**
+     * @param includeBeacons the includeBeacons to set
+     */
+    public void setIncludeBeacons(final Boolean includeBeacons) {
+        this.includeBeacons = includeBeacons;
+    }
+    /**
+     * @return the includeTrackers
+     */
+    public Boolean getIncludeTrackers() {
+        return includeTrackers;
+    }
+    /**
+     * @param includeTrackers the includeTrackers to set
+     */
+    public void setIncludeTrackers(final Boolean includeTrackers) {
+        this.includeTrackers = includeTrackers;
     }
 }

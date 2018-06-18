@@ -1222,6 +1222,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```json
 {
   "alertsOnly": true,
+  "includeBeacons": true,
+  "includeTrackers": false
   "deviceImei": "283409237873234",
   "last2Days": true,
   "lastDay": true,
