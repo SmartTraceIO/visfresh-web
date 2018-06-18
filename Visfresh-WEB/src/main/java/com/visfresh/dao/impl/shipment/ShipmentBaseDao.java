@@ -56,8 +56,8 @@ public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> exten
     protected static final String NOALERTIFCOODOWN_FIELD = "noalertsifcooldown";
     protected static final String ARRIVALNOTIFWITHIN_FIELD = "arrivalnotifwithIn";
     protected static final String NONOTIFSIFNOALERTS_FIELD = "nonotifsifnoalerts";
-    private static final String SEND_ARRIVAL_REPORT_FIELD = "arrivalreport";
-    private static final String ARRIVAL_REPORT_ONLYIFALERTS_FIELD = "arrivalreportonlyifalerts";
+    protected static final String SEND_ARRIVAL_REPORT_FIELD = "arrivalreport";
+    protected static final String ARRIVAL_REPORT_ONLYIFALERTS_FIELD = "arrivalreportonlyifalerts";
 
     protected static final String SHUTDOWNTIMEOUT_FIELD = "shutdownafterarrivalminutes";
     protected static final String NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD = "noalertsafterarrivalminutes";

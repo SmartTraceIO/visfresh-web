@@ -706,7 +706,24 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         final ListResult<ListShipmentItem> result = new ListResult<ListShipmentItem>();
         for (final Map<String,Object> row : list) {
             //create shipment without resolved entities.
-            final ListShipmentItem item = new ListShipmentItem(createEntity(row));
+            final ListShipmentItem item = new ListShipmentItem();
+
+            item.setAssetNum((String) row.get(ASSETNUM_FIELD));
+            item.setAssetType((String) row.get(ASSETTYPE_FIELD));
+            item.setPalettid((String) row.get(PALETTID_FIELD));
+            item.setPercentageComplete(0);
+            item.setShipmentDescription((String) row.get(DESCRIPTION_FIELD));
+            item.setShipmentId(((Number) row.get(ID_FIELD)).longValue());
+            item.setShipmentDate((Date) row.get(SHIPMENTDATE_FIELD));
+            final Object statusObject = row.get(STATUS_FIELD);
+            if (statusObject != null) {
+                item.setStatus(ShipmentStatus.valueOf((String) statusObject));
+            }
+            item.setTripCount(((Number) row.get(TRIPCOUNT_FIELD)).intValue());
+            item.setSiblingCount(((Number) row.get(SIBLINGCOUNT_FIELD)).intValue());
+            item.setSendArrivalReport((Boolean) row.get(SEND_ARRIVAL_REPORT_FIELD));
+            item.setSendArrivalReportOnlyIfAlerts((Boolean) row.get(ARRIVAL_REPORT_ONLYIFALERTS_FIELD));
+            item.setEta((Date) row.get(ETA_FIELD));
 
             //add other fields
             item.setAlertProfileId(dbLong(row.get("alertProfileId")));

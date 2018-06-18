@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.visfresh.entities.EntityWithId;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.InterimStopBean;
@@ -36,7 +35,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String assetType;
     private Long alertProfileId;
     private String alertProfileName;
-    private ShipmentStatus status;
+    private ShipmentStatus status = ShipmentStatus.Default;
     private int siblingCount = 5;
 
     //last reading data
@@ -70,29 +69,6 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public ListShipmentItem() {
         super();
-    }
-    public ListShipmentItem(final Shipment s) {
-        super();
-        this.setAlertProfileId(s.getAlertProfile() != null ? s.getAlertProfile().getId() : null);
-        this.setAlertProfileName(s.getAlertProfile() != null ? s.getAlertProfile().getName() : null);
-        this.setAssetNum(s.getAssetNum());
-        this.setAssetType(s.getAssetType());
-        this.setDeviceName(s.getDevice().getName());
-        this.setDeviceSN(s.getDevice().getSn());
-        this.setPalettid(s.getPalletId());
-        this.setPercentageComplete(0);
-        this.setShipmentDescription(s.getShipmentDescription());
-        this.setShipmentId(s.getId());
-        this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getName());
-        this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getName());
-        this.setStatus(s.getStatus());
-        this.setTripCount(s.getTripCount());
-        this.setSiblingCount(s.getSiblingCount());
-        this.setSendArrivalReport(s.isSendArrivalReport());
-        this.setSendArrivalReportOnlyIfAlerts(s.isSendArrivalReportOnlyIfAlerts());
-        this.setEta(s.getEta());
-        this.setLastReadingTime(s.getLastEventDate());
-        this.setShipmentDate(s.getShipmentDate());
     }
     /**
      * @param eta
