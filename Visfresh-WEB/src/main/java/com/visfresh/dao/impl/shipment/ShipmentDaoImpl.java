@@ -25,7 +25,6 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.PreliminarySingleShipmentData;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.impl.AlertDaoImpl;
 import com.visfresh.dao.impl.DefaultCustomFilter;
@@ -76,8 +75,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
     @Autowired
     private DeviceDao deviceDao;
-    @Autowired
-    private SingleShipmentBeanDao shipmentBeanDao;
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
@@ -227,7 +224,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         params.put("new", newDevice.getImei());
 
         jdbc.update(sql, params);
-        shipmentBeanDao.clearShipmentBeanForDevice(oldDevice.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#getShipmentId(java.lang.String, int)
@@ -387,7 +383,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         if (insert) {
             deviceDao.save(s.getDevice());
         }
-        shipmentBeanDao.clearShipmentBean(s.getId());
         return result;
     }
     @Override
@@ -568,7 +563,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
         jdbc.update("update " + TABLE + " set " + ETA_FIELD + " = :eta where " + ID_FIELD + "=:s",
                 params);
-        shipmentBeanDao.clearShipmentBean(s.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#updateSiblingInfo(com.visfresh.entities.Shipment)
@@ -586,7 +580,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
                 + " where " + ID_FIELD + "=:s",
                 params);
 
-        shipmentBeanDao.clearShipmentBean(shipmentId);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#updateLastEventDate(com.visfresh.entities.Shipment, java.util.Date)
@@ -604,7 +597,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
         jdbc.update("update " + TABLE + " set " + LASTEVENT_FIELD + " = :lev where " + ID_FIELD + "=:s",
                 params);
-        shipmentBeanDao.clearShipmentBean(s.getId());
     }
     @Override
     public void markAsAutostarted(final Shipment s) {
