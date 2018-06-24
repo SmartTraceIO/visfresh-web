@@ -13,7 +13,9 @@ import com.visfresh.controllers.restclient.CompanyRestClient;
 import com.visfresh.controllers.restclient.DeviceRestClient;
 import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.lists.ExpandedListUserItem;
 import com.visfresh.services.RestServiceException;
@@ -54,7 +56,7 @@ public class AbstractTool {
         companyService.setServiceUrl(u);
 
         //device client
-        deviceService = new DeviceRestClient(UTС);
+        deviceService = new DeviceRestClient(UTС, Language.English, TemperatureUnits.Celsius);
         deviceService.setServiceUrl(u);
     }
 

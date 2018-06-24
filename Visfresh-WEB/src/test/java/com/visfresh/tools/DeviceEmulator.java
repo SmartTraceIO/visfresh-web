@@ -26,6 +26,7 @@ import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
@@ -34,7 +35,6 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.ShipmentDto;
-import com.visfresh.lists.DeviceDto;
 import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.RestServiceException;
@@ -346,8 +346,8 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private Device createDeviceIfNeed() throws RestServiceException, IOException {
         final String id = "111111";
 
-        final List<DeviceDto> devices = deviceService.getDevices(null, true, 1, 100000);
-        for (final DeviceDto d : devices) {
+        final List<ListDeviceItem> devices = deviceService.getDevices(null, true, 1, 100000);
+        for (final ListDeviceItem d : devices) {
             if (id.equals(d.getImei())) {
                 final Device device = new Device();
                 device.setCompany(company.getCompanyId());

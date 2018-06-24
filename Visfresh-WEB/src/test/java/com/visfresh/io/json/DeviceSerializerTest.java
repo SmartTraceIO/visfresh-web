@@ -6,6 +6,9 @@ package com.visfresh.io.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,8 +17,11 @@ import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceModel;
+import com.visfresh.entities.Language;
+import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.lists.DeviceDto;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,7 +38,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
 
     @Before
     public void setUp() {
-        serializer = new DeviceSerializer(UTC);
+        serializer = new DeviceSerializer(UTC, Language.English, TemperatureUnits.Celsius);
         serializer.setDeviceResolver(resolver);
     }
     @Test
@@ -84,7 +90,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
     }
     @Test
     public void testListDeviceItemDto() {
-        DeviceDto dto = new DeviceDto();
+        ListDeviceItem dto = new ListDeviceItem();
 
         final boolean active = false;
         final Long autostartTemplateId = 754L;
@@ -93,53 +99,60 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         final Integer lastReadingBattery = 3000;
         final Double lastReadingLat = 56.78;
         final Double lastReadingLong = 12.34;
-        final String lastReadingTemperature = "12.245";
-        final String lastReadingTimeISO = "2016-03-03 11:11:11";
-        final String lastReadingTime = "11:33am 12 Mar 2016";
+        final Double lastReadingTemperature = 12.245;
+        final Date lastReadingTime = parseIso("2016-03-03 11:11:11");
         final Long lastShipmentId = 9l;
         final String name = "JUnit Device";
-        final String shipmentNumber = "12345(10)";
-        final String status = ShipmentStatus.Arrived.name();
-        final String sn = "12345";
-        final String color = "color";
+        final ShipmentStatus status = ShipmentStatus.Arrived;
+        final Color color = Color.DarkOlivegreen;
         final DeviceModel model = DeviceModel.TT18;
 
         dto.setActive(active);
         dto.setAutostartTemplateId(autostartTemplateId);
         dto.setAutostartTemplateName(autostartTemplateName);
         dto.setDescription(description);
-        dto.setLastReadingBattery(lastReadingBattery);
-        dto.setLastReadingLat(lastReadingLat);
-        dto.setLastReadingLong(lastReadingLong);
-        dto.setLastReadingTemperature(lastReadingTemperature);
-        dto.setLastReadingTimeISO(lastReadingTimeISO);
+        dto.setBattery(lastReadingBattery);
+        dto.setLatitude(lastReadingLat);
+        dto.setLongitude(lastReadingLong);
+        dto.setTemperature(lastReadingTemperature);
         dto.setLastReadingTime(lastReadingTime);
-        dto.setLastShipmentId(lastShipmentId);
+        dto.setShipmentId(lastShipmentId);
         dto.setName(name);
         dto.setModel(model);
-        dto.setShipmentNumber(shipmentNumber);
         dto.setShipmentStatus(status);
-        dto.setSn(sn);
         dto.setColor(color);
 
-        dto = serializer.parseListDeviceItem(serializer.toJson(dto));
+        dto = serializer.parseListDeviceItem(serializer.exportToView(dto));
 
         assertEquals(active, dto.isActive());
         assertEquals(autostartTemplateId, dto.getAutostartTemplateId());
         assertEquals(autostartTemplateName, dto.getAutostartTemplateName());
         assertEquals(description, dto.getDescription());
-        assertEquals(lastReadingBattery, dto.getLastReadingBattery());
-        assertEquals(lastReadingLat, dto.getLastReadingLat());
-        assertEquals(lastReadingLong, dto.getLastReadingLong());
-        assertEquals(lastReadingTemperature, dto.getLastReadingTemperature());
-        assertEquals(lastReadingTimeISO, dto.getLastReadingTimeISO());
+        assertEquals(lastReadingBattery, dto.getBattery());
+        assertEquals(lastReadingLat, dto.getLatitude());
+        assertEquals(lastReadingLong, dto.getLongitude());
+        assertEquals(lastReadingTemperature, dto.getTemperature(), 0.1);
         assertEquals(lastReadingTime, dto.getLastReadingTime());
-        assertEquals(lastShipmentId, dto.getLastShipmentId());
+        assertEquals(lastShipmentId, dto.getShipmentId());
         assertEquals(name, dto.getName());
-        assertEquals(shipmentNumber, dto.getShipmentNumber());
         assertEquals(status, dto.getShipmentStatus());
-        assertEquals(sn, dto.getSn());
         assertEquals(color, dto.getColor());
         assertEquals(model, dto.getModel());
+    }
+
+    /**
+     * @param str
+     * @return
+     */
+    private Date parseIso(final String str) {
+        if (str == null) {
+            return null;
+        }
+
+        try {
+            return DateTimeUtils.createIsoFormat(Language.English, UTC).parse(str);
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

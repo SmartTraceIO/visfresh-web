@@ -58,13 +58,11 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.ShortTrackerEventWithAlerts;
 import com.visfresh.entities.SpringRoles;
-import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
-import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.DeviceCommandService;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.RestServiceException;
@@ -284,62 +282,21 @@ public class DeviceController extends AbstractController implements DeviceConsta
             @RequestParam(required = false) final String so) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-            //check logged in.
-            final User user = getLoggedInUser();
-            final DeviceSerializer ser = createSerializer(user);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final DeviceSerializer ser = createSerializer(user);
 
-            final List<ListDeviceItem> devices = dao.getDevices(user.getCompanyId(),
-                    createSorting(sc, so, getDefaultSortOrder(), 1),
-                    page);
-            final int total = dao.getEntityCount(user.getCompanyId(), null);
+        final List<ListDeviceItem> devices = dao.getDevices(user.getCompanyId(),
+                createSorting(sc, so, getDefaultSortOrder(), 1),
+                page);
+        final int total = dao.getEntityCount(user.getCompanyId(), null);
 
-            final JsonArray array = new JsonArray();
-            for (final ListDeviceItem item : devices) {
-                array.add(ser.toJson(createDto(item, user)));
-            }
-
-            return createListSuccessResponse(array, total);
-    }
-    /**
-     * @param item
-     * @param user
-     * @return
-     */
-    private DeviceDto createDto(final ListDeviceItem item,final User user) {
-        final DateFormat isoFormat = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-        final DateFormat prettyFormat = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
-        final TemperatureUnits temperatureUnits = user.getTemperatureUnits();
-
-        final DeviceDto dto = new DeviceDto();
-        dto.setActive(item.isActive());
-        dto.setDescription(item.getDescription());
-        dto.setImei(item.getImei());
-        dto.setModel(item.getModel());
-        dto.setSn(Device.getSerialNumber(item.getImei()));
-        dto.setName(item.getName());
-        dto.setAutostartTemplateId(item.getAutostartTemplateId());
-        dto.setAutostartTemplateName(item.getAutostartTemplateName());
-        if (item.getColor() != null) {
-            dto.setColor(item.getColor().name());
+        final JsonArray array = new JsonArray();
+        for (final ListDeviceItem item : devices) {
+            array.add(ser.exportToView(item));
         }
 
-        if (item.getLastReadingTime() != null) {
-            dto.setLastReadingTimeISO(isoFormat.format(item.getLastReadingTime()));
-            dto.setLastReadingTime(prettyFormat.format(item.getLastReadingTime()));
-            dto.setLastReadingBattery(item.getBattery());
-            dto.setLastReadingLat(item.getLatitude());
-            dto.setLastReadingLong(item.getLongitude());
-            dto.setLastReadingTemperature(LocalizationUtils.getTemperatureString(
-                    item.getTemperature(), temperatureUnits));
-        }
-
-        if (item.getShipmentId() != null) {
-            dto.setLastShipmentId(item.getShipmentId());
-            dto.setShipmentNumber(dto.getSn() + "(" + item.getTripCount() + ")");
-            dto.setShipmentStatus(item.getShipmentStatus().name());
-        }
-
-        return dto;
+        return createListSuccessResponse(array, total);
     }
     /**
      * @return default sort order.
@@ -411,8 +368,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
 
         //format result
-        return createSuccessResponse(createSerializer(user).toJson(
-                createDto(item, user)));
+        return createSuccessResponse(createSerializer(user).exportToView(item));
     }
     /**
      * @param authToken authentication token.
@@ -829,7 +785,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return
      */
     private DeviceSerializer createSerializer(final User user) {
-        final DeviceSerializer deviceSerializer = new DeviceSerializer(user.getTimeZone());
+        final DeviceSerializer deviceSerializer = new DeviceSerializer(user);
         deviceSerializer.setDeviceResolver(deviceResolver);
         return deviceSerializer;
     }

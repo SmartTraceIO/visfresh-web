@@ -18,9 +18,11 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.Language;
+import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.User;
 import com.visfresh.io.json.DeviceSerializer;
-import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
 
@@ -33,8 +35,16 @@ public class DeviceRestClient extends RestClient {
     /**
      *
      */
-    public DeviceRestClient(final TimeZone tz) {
-        serializer = new DeviceSerializer(tz);
+    public DeviceRestClient(final User user) {
+        this(user.getTimeZone(), user.getLanguage(), user.getTemperatureUnits());
+    }
+    /**
+     * @param tz
+     * @param lang
+     * @param tu
+     */
+    public DeviceRestClient(final TimeZone tz, final Language lang, final TemperatureUnits tu) {
+        serializer = new DeviceSerializer(tz, lang, tu);
     }
 
     /**
@@ -51,7 +61,7 @@ public class DeviceRestClient extends RestClient {
      * @param pageSize page size.
      * @return
      */
-    public List<DeviceDto> getDevices(final String sortColumn, final boolean sortOrder,
+    public List<ListDeviceItem> getDevices(final String sortColumn, final boolean sortOrder,
             final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
@@ -66,7 +76,7 @@ public class DeviceRestClient extends RestClient {
         final JsonArray response = sendGetRequest(getPathWithToken("getDevices"),
                 params).getAsJsonArray();
 
-        final List<DeviceDto> devices = new ArrayList<DeviceDto>(response.size());
+        final List<ListDeviceItem> devices = new ArrayList<>(response.size());
         for (int i = 0; i < response.size(); i++) {
             devices.add(serializer.parseListDeviceItem(response.get(i).getAsJsonObject()));
         }

@@ -139,7 +139,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
 
         final List<Device> devices = deviceDao.findByGroup(group);
 
-        final DeviceSerializer ser = new DeviceSerializer(user.getTimeZone());
+        final DeviceSerializer ser = new DeviceSerializer(user);
         final JsonArray array = new JsonArray();
         for (final Device d : devices) {
             array.add(ser.toJson(d));

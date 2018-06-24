@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,12 +29,14 @@ public class DeviceGroupRestClient extends RestClient {
      * Serializer.
      */
     private DeviceGroupSerializer serializer;
+    private final User user;
 
     /**
      * @param user user.
      */
     public DeviceGroupRestClient(final User user) {
         super();
+        this.user = user;
         this.serializer = new DeviceGroupSerializer(user);
     }
 
@@ -264,7 +265,7 @@ public class DeviceGroupRestClient extends RestClient {
             RestServiceException {
         final JsonArray array = sendGetRequest(getPathWithToken("getDevicesOfGroup"), params).getAsJsonArray();
 
-        final DeviceSerializer devSer = new DeviceSerializer(TimeZone.getTimeZone("UTC"));
+        final DeviceSerializer devSer = new DeviceSerializer(user);
         final List<Device> list = new LinkedList<Device>();
         for (final JsonElement e : array) {
             list.add(devSer.parseDevice(e.getAsJsonObject()));

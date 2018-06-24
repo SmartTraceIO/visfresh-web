@@ -63,35 +63,6 @@ public final class LocalizationUtils {
         return unitsString + getDegreeSymbol(units);
     }
     /**
-     * @param sd
-     * @param units
-     * @return
-     */
-    public static double convertSdToUnits(final double sd,
-            final TemperatureUnits units) {
-        double temp;
-        switch (units) {
-            case Fahrenheit:
-                temp = sd * 1.8;
-                break;
-                default:
-                    temp = sd;
-                    //nothing
-                    break;
-        }
-        return temp;
-    }
-    /**
-     * @param sd
-     * @param units
-     * @return
-     */
-    public static String getSdString(final double sd,
-            final TemperatureUnits units) {
-        final String unitsString = formatByOneDecimal(convertSdToUnits(sd, units));
-        return unitsString + getDegreeSymbol(units);
-    }
-    /**
      * @param t
      * @param units
      * @return

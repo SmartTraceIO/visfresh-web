@@ -32,6 +32,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
@@ -42,6 +43,7 @@ import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Language;
+import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -51,7 +53,6 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.lists.DeviceDto;
 import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockShipmentShutdownService;
 import com.visfresh.services.AuthService;
@@ -67,7 +68,7 @@ import junit.framework.AssertionFailedError;
  */
 public class DeviceControllerTest extends AbstractRestServiceTest {
     private DeviceDao dao;
-    private DeviceRestClient client = new DeviceRestClient(UTC);
+    private DeviceRestClient client;
     //check latest reading:
     final DateFormat format = DateTimeUtils.createDateFormat(
             "yyyy-MM-dd HH:mm", Language.English, UTC);
@@ -82,8 +83,11 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     @Before
     public void setUp() {
         dao = context.getBean(DeviceDao.class);
+
+        final User user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
+        client = new DeviceRestClient(user);
         client.setServiceUrl(getServiceUrl());
-        client.setAuthToken(login());
+        client.setAuthToken(login(user));
     }
     @After
     public void tearDown() {
@@ -180,25 +184,22 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(0, client.getDevices(null, true, 5, 1).size());
 
         //check data for d1
-        final DeviceDto item = client.getDevices(null, true, 3, 1).get(0);
+        final ListDeviceItem item = client.getDevices(null, true, 3, 1).get(0);
         assertEquals(d1.getDescription(), item.getDescription());
         assertEquals(d1.getId(), item.getImei());
         assertEquals(d1.getImei(), item.getImei());
         assertEquals(d1.getModel(), item.getModel());
         assertEquals(d1.getName(), item.getName());
-        assertEquals(d1.getSn(), item.getSn());
         assertEquals(tpl.getName(), item.getAutostartTemplateName());
         assertEquals(aut.getId(), item.getAutostartTemplateId());
 
         //last reading data
-        assertEquals(e1.getBattery(), item.getLastReadingBattery().intValue());
-        assertEquals(e1.getLatitude(), item.getLastReadingLat(), 0.0001);
-        assertEquals(e1.getLongitude(), item.getLastReadingLong(), 0.0001);
-        assertEquals(LocalizationUtils.getTemperatureString(23.46, TemperatureUnits.Celsius),
-                item.getLastReadingTemperature());
-        assertNotNull(item.getLastReadingTimeISO());
+        assertEquals(e1.getBattery(), item.getBattery().intValue());
+        assertEquals(e1.getLatitude(), item.getLatitude(), 0.0001);
+        assertEquals(e1.getLongitude(), item.getLongitude(), 0.0001);
+        assertEquals(23.46, item.getTemperature(), 0.1);
         assertNotNull(item.getLastReadingTime());
-        assertEquals(e1.getShipment().getId(), item.getLastShipmentId());
+        assertEquals(e1.getShipment().getId(), item.getShipmentId());
     }
     @Test
     public void testGetDevicesSortByImei() throws RestServiceException, IOException {
@@ -206,7 +207,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final Device d2 = createDevice("2222222222222", true);
         final Device d3 = createDevice("1111111111111", true);
 
-        List<DeviceDto> dto;
+        List<ListDeviceItem> dto;
 
         dto = client.getDevices(DeviceConstants.PROPERTY_IMEI, true, null, null);
         assertEquals(d3.getImei(), dto.get(0).getImei());
@@ -227,7 +228,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         dao.save(d1);
         dao.save(d2);
 
-        List<DeviceDto> dto;
+        List<ListDeviceItem> dto;
 
         dto = client.getDevices(DeviceConstants.PROPERTY_MODEL, true, null, null);
         assertEquals(d2.getImei(), dto.get(0).getImei());
@@ -247,7 +248,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         createShipment(d2, true);
         //d3 without shipment, and therefore without shipment number
 
-        List<DeviceDto> dto;
+        List<ListDeviceItem> dto;
 
         dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_NUMBER, true, null, null);
         assertEquals(d2.getImei(), dto.get(0).getImei());
@@ -276,7 +277,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         context.getBean(ShipmentDao.class).save(s2);
         context.getBean(ShipmentDao.class).save(s3);
 
-        List<DeviceDto> dto;
+        List<ListDeviceItem> dto;
 
         dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_STATUS, true, null, null);
         assertEquals(d3.getImei(), dto.get(0).getImei());
