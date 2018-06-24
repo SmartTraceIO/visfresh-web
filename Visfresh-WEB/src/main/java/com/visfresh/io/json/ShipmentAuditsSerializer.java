@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.ShipmentAuditConstants;
 import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.entities.ShipmentAuditItem;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -36,6 +37,7 @@ public class ShipmentAuditsSerializer extends AbstractJsonSerializer
         json.addProperty(ShipmentAuditConstants.ACTION, item.getAction().toString());
         json.addProperty(ShipmentAuditConstants.SHIPMENT_ID, item.getShipmentId());
         json.addProperty(ShipmentAuditConstants.TIME, formatDate(item.getTime()));
+        json.addProperty("timeTimestamp", DateTimeUtils.toTimestamp(item.getTime()));
         json.addProperty(ShipmentAuditConstants.USER_ID, item.getUserId() == null ? null : item.getUserId());
         json.add(ShipmentAuditConstants.ADDITIONAL_INFO, SerializerUtils.toJson(item.getAdditionalInfo()));
         return json;

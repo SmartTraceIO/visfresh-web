@@ -14,6 +14,7 @@ import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.SortColumn;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -128,9 +129,11 @@ public class GetShipmentsRequestParser extends AbstractJsonSerializer {
         }
         if (r.getShipmentDateFrom() != null) {
             json.addProperty("shipmentDateFrom", formatDate(r.getShipmentDateFrom()));
+            json.addProperty("shipmentDateFromTimestamp", DateTimeUtils.toTimestamp(r.getShipmentDateFrom()));
         }
         if (r.getShipmentDateTo() != null) {
             json.addProperty("shipmentDateTo", formatDate(r.getShipmentDateTo()));
+            json.addProperty("shipmentDateToTimestamp", DateTimeUtils.toTimestamp(r.getShipmentDateTo()));
         }
         if (r.getShipmentDescription() != null) {
             json.addProperty("shipmentDescription", r.getShipmentDescription());

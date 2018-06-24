@@ -160,11 +160,14 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.SHIPPED_FROM, s.getShippedFrom());
         obj.addProperty(ShipmentConstants.SHIPPED_TO, s.getShippedTo());
         obj.addProperty(ShipmentConstants.SHIPMENT_DATE, formatDate(s.getShipmentDate()));
+        obj.addProperty("shipmentDateTimestamp", DateTimeUtils.toTimestamp(s.getShipmentDate()));
         obj.addProperty(ShipmentConstants.ARRIVAL_DATE, formatDate(s.getArrivalDate()));
+        obj.addProperty("actualArrivalDateTimestamp", DateTimeUtils.toTimestamp(s.getArrivalDate()));
         obj.addProperty(ShipmentConstants.SHUTDOWN_TIME_ISO,
                 s.getDeviceShutdownTime() == null ? null : isoFormat.format(s.getDeviceShutdownTime()));
         obj.addProperty(ShipmentConstants.DEVICE_SHUTDOWN_TIME,
                 s.getDeviceShutdownTime() == null ? null : prettyFormat.format(s.getDeviceShutdownTime()));
+        obj.addProperty("shutdownTimeTimestamp", DateTimeUtils.toTimestamp(s.getDeviceShutdownTime()));
 
         obj.addProperty(ShipmentConstants.ALERT_PROFILE_ID, s.getAlertProfile());
         obj.addProperty(ShipmentConstants.ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());
@@ -185,6 +188,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         obj.add(ShipmentConstants.CUSTOM_FIELDS, SerializerUtils.toJson(s.getCustomFields()));
         obj.addProperty(START_DATE, formatDate(s.getStartDate()));
+        obj.addProperty("startDateTimestamp", DateTimeUtils.toTimestamp(s.getStartDate()));
         obj.addProperty(CREATED_BY, s.getCreatedBy());
 
         //end location alternatives
@@ -334,7 +338,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("shipmentDescription", dto.getShipmentDescription());
         json.addProperty("shipmentDate", getFormatted(prettyFormat, dto.getShipmentDate()));
         json.addProperty("shipmentDateISO", getFormatted(isoFormat, dto.getShipmentDate()));
-        json.addProperty("shipmentDateTimestamp", getTimeStamp(dto.getShipmentDate()));
+        json.addProperty("shipmentDateTimestamp", DateTimeUtils.toTimestamp(dto.getShipmentDate()));
 
         json.addProperty("palletId", dto.getPalettId());
         json.addProperty("assetNum", dto.getAssetNum());
@@ -344,11 +348,11 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("shippedTo", dto.getShippedTo());
         json.addProperty("estArrivalDate", getFormatted(prettyFormat, dto.getEta()));
         json.addProperty("estArrivalDateISO", getFormatted(isoFormat, dto.getEta()));
-        json.addProperty("estArrivalDateTimestamp", getTimeStamp(dto.getEta()));
+        json.addProperty("estArrivalDateTimestamp", DateTimeUtils.toTimestamp(dto.getEta()));
 
         json.addProperty("actualArrivalDate", getFormatted(prettyFormat, dto.getActualArrivalDate()));
         json.addProperty("actualArrivalDateISO", getFormatted(isoFormat, dto.getActualArrivalDate()));
-        json.addProperty("actualArrivalDateTimestamp", getTimeStamp(dto.getActualArrivalDate()));
+        json.addProperty("actualArrivalDateTimestamp", DateTimeUtils.toTimestamp(dto.getActualArrivalDate()));
         json.addProperty("percentageComplete", dto.getPercentageComplete());
 
         json.addProperty("alertProfileId", dto.getAlertProfileId());
@@ -359,7 +363,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         //last reading data
         json.addProperty(ShipmentConstants.LAST_READING_TIME, getFormatted(prettyFormat, dto.getLastReadingTime()));
         json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, getFormatted(isoFormat, dto.getLastReadingTime()));
-        json.addProperty("lastReadingTimeTimestamp", getTimeStamp(dto.getLastReadingTime()));
+        json.addProperty("lastReadingTimeTimestamp", DateTimeUtils.toTimestamp(dto.getLastReadingTime()));
         json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE,
                 dto.getLastReadingTemperature() == null ? null
                         : LocalizationUtils.convertToUnits(dto.getLastReadingTemperature(), this.units));
@@ -372,7 +376,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("firstReadingLong", dto.getFirstReadingLong());
         json.addProperty("firstReadingTime", getFormatted(prettyFormat, dto.getFirstReadingTime()));
         json.addProperty("firstReadingTimeISO", getFormatted(isoFormat, dto.getFirstReadingTime()));
-        json.addProperty("firstReadingTimeTimestamp", getTimeStamp(dto.getFirstReadingTime()));
+        json.addProperty("firstReadingTimeTimestamp", DateTimeUtils.toTimestamp(dto.getFirstReadingTime()));
 
         int i = 1;
         for (final InterimStopBean stp : dto.getInterimStops()) {
@@ -380,7 +384,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty(prefix, stp.getLocation().getName());
             json.addProperty(prefix + "Time", getFormatted(prettyFormat, stp.getStopDate()));
             json.addProperty(prefix + "TimeISO", getFormatted(isoFormat, stp.getStopDate()));
-            json.addProperty(prefix + "TimeTimestamp", getTimeStamp(stp.getStopDate()));
+            json.addProperty(prefix + "TimeTimestamp", DateTimeUtils.toTimestamp(stp.getStopDate()));
             i++;
         }
 
@@ -452,7 +456,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("lon", kl.getLongitude());
         json.addProperty("desc", kl.getDescription());
         json.addProperty("time", getFormatted(prettyFormat, new Date(kl.getTime())));
-        json.addProperty("timeTimestamp", getTimeStamp(kl.getTime()));
+        json.addProperty("timeTimestamp", DateTimeUtils.toTimestamp(kl.getTime()));
         return json;
     }
     public KeyLocation parseKeyLocation(final JsonElement el) {
@@ -483,22 +487,5 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.remove("date");
         obj.remove("device");
         obj.remove("shipment");
-    }
-    /**
-     * @param d date
-     * @return timestamp.
-     */
-    private Long getTimeStamp(final Date d) {
-        if (d != null) {
-            return DateTimeUtils.toTimestamp(d);
-        }
-        return null;
-    }
-    /**
-     * @param d date
-     * @return timestamp.
-     */
-    private long getTimeStamp(final long d) {
-        return DateTimeUtils.toTimestamp(d);
     }
 }

@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.TrackerEventConstants;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,7 +33,9 @@ public class TrackerEventSerializer extends AbstractJsonSerializer {
         obj.addProperty(TrackerEventConstants.PROPERTY_ID, e.getId());
         obj.addProperty(TrackerEventConstants.PROPERTY_TEMPERATURE, e.getTemperature());
         obj.addProperty(TrackerEventConstants.PROPERTY_TIME, formatDate(e.getTime()));
+        obj.addProperty(TrackerEventConstants.PROPERTY_TIME + "Timestamp", DateTimeUtils.toTimestamp(e.getTime()));
         obj.addProperty(TrackerEventConstants.PROPERTY_CREATEDON, formatDate(e.getCreatedOn()));
+        obj.addProperty(TrackerEventConstants.PROPERTY_CREATEDON + "Timestamp", DateTimeUtils.toTimestamp(e.getCreatedOn()));
         obj.addProperty(TrackerEventConstants.PROPERTY_TYPE, e.getType().toString());
         obj.addProperty(TrackerEventConstants.PROPERTY_LATITUDE, e.getLatitude());
         obj.addProperty(TrackerEventConstants.PROPERTY_LONGITUDE, e.getLongitude());

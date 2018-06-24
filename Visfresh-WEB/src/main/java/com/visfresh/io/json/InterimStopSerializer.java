@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.io.InterimStopDto;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -72,6 +73,7 @@ public class InterimStopSerializer extends AbstractJsonSerializer {
         json.addProperty("locationId", req.getLocationId());
         json.addProperty("time", req.getTime());
         json.addProperty("stopDate", req.getDate() == null ? null : isoFormat.format(req.getDate()));
+        json.addProperty("stopDateTimestamp", DateTimeUtils.toTimestamp(req.getDate()));
         return json;
     }
 

@@ -12,6 +12,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.ShipmentResolver;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -73,6 +74,7 @@ public class AlertSerializer extends AbstractJsonSerializer {
         //add common alert properties
         json.addProperty("id", alert.getId());
         json.addProperty("date", formatDate(alert.getDate()));
+        json.addProperty("dateTimestamp", DateTimeUtils.toTimestamp(alert.getDate()));
         json.addProperty("device", alert.getDevice().getId());
         json.addProperty("shipment", alert.getShipment().getId());
         json.addProperty("type", alert.getType().name());

@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.services.AuthToken;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -29,6 +30,7 @@ public class AuthTokenSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.addProperty("token", token.getToken());
         obj.addProperty("expired", formatDate(token.getExpirationTime()));
+        obj.addProperty("expiredTimestamp", DateTimeUtils.toTimestamp(token.getExpirationTime()));
         obj.addProperty("instance", token.getClientInstanceId());
         return obj;
     }

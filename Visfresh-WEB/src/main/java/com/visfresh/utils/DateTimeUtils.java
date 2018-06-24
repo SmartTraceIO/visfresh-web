@@ -121,7 +121,10 @@ public final class DateTimeUtils {
      * @param d date.
      * @return time stamp for given date in seconds.
      */
-    public static long toTimestamp(final Date d) {
+    public static Long toTimestamp(final Date d) {
+        if (d == null) {
+            return null;
+        }
         final long t = d.getTime();
         return toTimestamp(t);
     }

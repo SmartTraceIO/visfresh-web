@@ -72,6 +72,7 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         json.addProperty("verifiedTimePretty", formatDatePretty(at.getVerifiedTime()));
 
         json.addProperty(ALERT_TIME, formatDate(at.getAlertTime()));
+        json.addProperty("alertTimeTimestamp", DateTimeUtils.toTimestamp(at.getAlertTime()));
         json.addProperty(ALERT_DESCRIPTION, ruleBundle.buildDescription(at.getAlertRule(), units));
         json.addProperty(CONFIRMED_BY_EMAIL, at.getConfirmedByEmail());
         json.addProperty(CONFIRMED_BY_NAME, at.getConfirmedByName());
@@ -100,8 +101,11 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         json.addProperty(ID, at.getId());
         json.add(ACTION, CorrectiveActionListSerializer.toJson(at.getAction()));
         json.addProperty(TIME, formatDate(at.getTime()));
+        json.addProperty("timeTimestamp", DateTimeUtils.toTimestamp(at.getTime()));
         json.addProperty(CREATED_ON, formatDate(at.getCreatedOn()));
+        json.addProperty("createdOnTimestamp", DateTimeUtils.toTimestamp(at.getCreatedOn()));
         json.addProperty(VERIFIED_TIME, formatDate(at.getVerifiedTime()));
+        json.addProperty("verifiedTimeTimestamp", DateTimeUtils.toTimestamp(at.getVerifiedTime()));
         json.addProperty(COMMENTS, at.getComments());
         json.addProperty(VERIFIED_COMMENTS, at.getVerifiedComments());
         json.addProperty(ALERT, at.getAlert());

@@ -11,6 +11,7 @@ import com.visfresh.constants.CompanyConstants;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.PaymentMethod;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -77,6 +78,7 @@ public class CompanySerializer extends AbstractJsonSerializer {
         obj.addProperty(CompanyConstants.EMAIL, c.getEmail());
         obj.addProperty(CompanyConstants.TIME_ZONE, c.getTimeZone() == null ? null : c.getTimeZone().getID());
         obj.addProperty(CompanyConstants.START_DATE, formatDate(c.getStartDate()));
+        obj.addProperty("startDateTimestamp", DateTimeUtils.toTimestamp(c.getStartDate()));
         obj.addProperty(CompanyConstants.TRACKERS_EMAIL, c.getTrackersEmail());
         obj.addProperty(CompanyConstants.PAYMENT_METHOD, c.getPaymentMethod() == null ? null : c.getPaymentMethod().name());
         obj.addProperty(CompanyConstants.BILLING_PERSON, c.getBillingPerson());

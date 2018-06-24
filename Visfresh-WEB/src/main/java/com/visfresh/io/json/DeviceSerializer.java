@@ -222,6 +222,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_LAST_SHIPMENT, item.getShipmentId());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO, formatIso(item.getLastReadingTime()));
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME, formatPretty(item.getLastReadingTime()));
+        obj.addProperty("lastReadingTimeTimestamp", DateTimeUtils.toTimestamp(item.getLastReadingTime()));
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE,
                 item.getTemperature() == null ? null : LocalizationUtils.getTemperatureString(
                         item.getTemperature(), temperatureUnits));

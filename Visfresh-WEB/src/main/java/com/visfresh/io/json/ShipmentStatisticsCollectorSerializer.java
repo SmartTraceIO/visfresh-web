@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.dao.impl.ShipmentTemperatureStatsCollector;
 import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -131,6 +132,7 @@ public class ShipmentStatisticsCollectorSerializer extends AbstractJsonSerialize
         final JsonObject json = new JsonObject();
         json.addProperty(TEMPERATURE, e.getTemperature());
         json.addProperty(TIME, createDateFormat().format(e.getTime()));
+        json.addProperty(TIME + "Timestamp", DateTimeUtils.toTimestamp(e.getTime()));
         return json;
     }
     /**
@@ -147,7 +149,6 @@ public class ShipmentStatisticsCollectorSerializer extends AbstractJsonSerialize
         json.addProperty(END_TIME, ranges.getEndTime());
         return json;
     }
-
     /* (non-Javadoc)
      * @see com.visfresh.io.AbstractJsonSerializer#createDateFormat()
      */

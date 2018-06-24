@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Arrival;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.ShipmentResolver;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -52,6 +53,7 @@ public class ArrivalSerializer extends AbstractJsonSerializer {
         json.addProperty("id", arrival.getId());
         json.addProperty("numberOfMetersOfArrival", arrival.getNumberOfMettersOfArrival());
         json.addProperty("date", formatDate(arrival.getDate()));
+        json.addProperty("dateTimestamp", DateTimeUtils.toTimestamp(arrival.getDate()));
         json.addProperty("device", arrival.getDevice().getId());
         json.addProperty("shipment", arrival.getShipment().getId());
         return json;
