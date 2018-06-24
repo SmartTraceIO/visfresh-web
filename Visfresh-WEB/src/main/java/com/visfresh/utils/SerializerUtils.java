@@ -107,6 +107,16 @@ public final class SerializerUtils {
      */
     public static JsonObject diff(final JsonElement originSource,
             final JsonElement originResult) {
+        return diff(originSource, originResult, null);
+    }
+    /**
+     * Warning!!! This feature does not support of merging of arrays.
+     * @param source source object.
+     * @param pattern pattern object.
+     * @return result JSON.
+     */
+    public static JsonObject diff(final JsonElement originSource,
+            final JsonElement originResult, final DiffFilter f) {
         final JsonElement source = originSource == null ? JsonNull.INSTANCE : originSource;
         final JsonElement result = originResult == null ? JsonNull.INSTANCE : originResult;
 
@@ -122,11 +132,11 @@ public final class SerializerUtils {
             final JsonObject dstObj = clone(result).getAsJsonObject();
 
             final Set<String> keys = new HashSet<>();
-            keys.addAll(getKeys(srcObj));
-            keys.addAll(getKeys(dstObj));
+            keys.addAll(getKeys(srcObj, f));
+            keys.addAll(getKeys(dstObj, f));
 
             for (final String key : keys) {
-                final JsonObject e = diff(srcObj.get(key), dstObj.get(key));
+                final JsonObject e = diff(srcObj.get(key), dstObj.get(key), f);
                 if (e != null) {
                     diff.add(key, e);
                 }
@@ -140,7 +150,8 @@ public final class SerializerUtils {
             for (int i = 0; i < len; i++) {
                 final JsonObject e = diff(
                         srcArray.size() > i ? srcArray.get(i) : null,
-                        dstArray.size() > i ? dstArray.get(i) : null);
+                        dstArray.size() > i ? dstArray.get(i) : null,
+                        f);
                 if (e != null) {
                     diff.add("[" + i + "]", e);
                 }
@@ -154,10 +165,12 @@ public final class SerializerUtils {
      * @param srcObj
      * @return
      */
-    private static Set<String> getKeys(final JsonObject srcObj) {
+    private static Set<String> getKeys(final JsonObject srcObj, final DiffFilter f) {
         final Set<String> keys = new HashSet<>();
         for (final Map.Entry<String, JsonElement> e : srcObj.entrySet()) {
-            keys.add(e.getKey());
+            if (f == null || f.accept(e.getKey())) {
+                keys.add(e.getKey());
+            }
         }
         return keys;
     }

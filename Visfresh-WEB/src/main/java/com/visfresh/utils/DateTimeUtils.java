@@ -22,6 +22,8 @@ import com.visfresh.entities.Language;
  *
  */
 public final class DateTimeUtils {
+    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
     /**
      * Default constructor.
      */
@@ -113,6 +115,23 @@ public final class DateTimeUtils {
             }
         }
         return tzString;
+    }
+
+    /**
+     * @param d date.
+     * @return time stamp for given date in seconds.
+     */
+    public static long toTimestamp(final Date d) {
+        final long t = d.getTime();
+        return toTimestamp(t);
+    }
+
+    /**
+     * @param t
+     * @return
+     */
+    public static long toTimestamp(final long t) {
+        return (t - (TimeZone.getDefault().getOffset(t) - UTC.getOffset(t))) / 1000L;
     }
     /**
      * @param time

@@ -1048,6 +1048,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         final ArrivalBean arrival = bean.getArrival();
         json.addProperty("arrivalNotificationTimeISO", arrival == null ? null : formatIso(arrival.getDate()));
         json.addProperty("arrivalNotificationTime", arrival == null ? null : formatPretty(arrival.getDate()));
+        json.addProperty("arrivalNotificationTimeTimestamp", arrival == null ? null : toTimestamp(arrival.getDate()));
 
         json.addProperty("arrivalNotificationWithinKm", bean.getArrivalNotificationWithinKm());
         json.addProperty("excludeNotificationsIfNoAlerts", bean.isExcludeNotificationsIfNoAlerts());
@@ -1070,11 +1071,13 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
 
         json.addProperty("shutdownTimeISO", formatIso(bean.getShutdownTime()));
         json.addProperty("shutdownTime", formatPretty(bean.getShutdownTime()));
+        json.addProperty("shutdownTimeTimestamp", toTimestamp(bean.getShutdownTime()));
 
         json.addProperty("startLocation",
                 bean.getStartLocation() == null ? null : bean.getStartLocation().getName());
         json.addProperty("startTimeISO", formatIso(bean.getStartTime()));
         json.addProperty("startTime", formatPretty(bean.getStartTime()));
+        json.addProperty("startTimeTimestamp", toTimestamp(bean.getStartTime()));
         json.add("startLocationForMap",
                 bean.getStartLocation() == null ? null : toJson(bean.getStartLocation().getLocation()));
 
@@ -1082,14 +1085,17 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
                 bean.getEndLocation() == null ? null : bean.getEndLocation().getName());
         json.addProperty("etaISO", formatIso(bean.getEta()));
         json.addProperty("eta", formatPretty(bean.getEta()));
+        json.addProperty("etaTimestamp", toTimestamp(bean.getEta()));
 
         json.addProperty("arrivalTimeISO", formatIso(bean.getArrivalTime()));
         json.addProperty("arrivalTime", formatPretty(bean.getArrivalTime()));
+        json.addProperty("arrivalTimeTimestamp", toTimestamp(bean.getArrivalTime()));
         json.add("endLocationForMap", bean.getEndLocation() == null ? null : toJson(bean.getEndLocation().getLocation()));
 
         json.addProperty("lastReadingLocation", bean.getCurrentLocationDescription());
         json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, formatIso(bean.getLastReadingTime()));
         json.addProperty(ShipmentConstants.LAST_READING_TIME, formatPretty(bean.getLastReadingTime()));
+        json.addProperty("lastReadingTimeTimestamp", toTimestamp(bean.getLastReadingTime()));
         json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE,
                 convertTemperature(bean.getLastReadingTemperature()));
         json.addProperty("batteryLevel", bean.getBatteryLevel());
@@ -1101,10 +1107,12 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("maxTemp", convertTemperature(bean.getMaxTemp()));
         json.addProperty("firstReadingTimeISO", formatIso(bean.getFirstReadingTime()));
         json.addProperty("firstReadingTime", formatPretty(bean.getFirstReadingTime()));
+        json.addProperty("firstReadingTimeTimestamp", toTimestamp(bean.getFirstReadingTime()));
 
         json.addProperty("alertsSuppressed", bean.isAlertsSuppressed());
         json.addProperty("alertsSuppressionTime", formatPretty(bean.getAlertsSuppressionTime()));
         json.addProperty("alertsSuppressionTimeIso", formatIso(bean.getAlertsSuppressionTime()));
+        json.addProperty("alertsSuppressionTimeTimestamp", toTimestamp(bean.getAlertsSuppressionTime()));
 
         json.addProperty(ShipmentConstants.SEND_ARRIVAL_REPORT, bean.isSendArrivalReport());
         json.addProperty(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS, bean.isSendArrivalReportOnlyIfAlerts());
@@ -1217,6 +1225,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("temperature", convertTemperature(reading.getTemperature()));
         json.addProperty("timeISO", formatIso(reading.getTime()));
         json.addProperty("time", formatPretty(reading.getTime()));
+        json.addProperty("timeTimestamp", toTimestamp(reading.getTime()));
         json.addProperty("type", eventTypeToString(reading.getType()));
         json.add("alerts", new JsonArray());
 
@@ -1363,6 +1372,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("time", stop.getTime());
         json.addProperty("stopDate", formatPretty(stop.getStopDate()));
         json.addProperty("stopDateISO", formatIso(stop.getStopDate()));
+        json.addProperty("stopDateTimestamp", toTimestamp(stop.getStopDate()));
         json.add("location", toJson(stop.getLocation()));
         return json;
     }
@@ -1520,6 +1530,16 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         return this.isoFormat.format(time);
     }
     /**
+     * @param date
+     * @return
+     */
+    private Long toTimestamp(final Date date) {
+        if (date != null) {
+            return DateTimeUtils.toTimestamp(date);
+        }
+        return null;
+    }
+    /**
      * @param rules alert profile.
      * @param user current user.
      * @return temperature alerts yet to fire so user can suppress future notifications.
@@ -1541,6 +1561,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty(NoteConstants.ACTIVE_FLAG, dto.isActive());
         json.addProperty(NoteConstants.CREATED_BY, dto.getCreatedBy());
         json.addProperty(NoteConstants.CREATION_DATE, formatIso(dto.getCreationDate()));
+        json.addProperty("creationDateTimestamp", toTimestamp(dto.getCreationDate()));
         json.addProperty(NoteConstants.NOTE_NUM, dto.getNoteNum());
         json.addProperty(NoteConstants.NOTE_TEXT, dto.getNoteText());
         json.addProperty(NoteConstants.SHIPMENT_ID, bean.getShipmentId());
@@ -1548,6 +1569,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty(NoteConstants.SN, Device.getSerialNumber(bean.getDevice()));
         json.addProperty(NoteConstants.TRIP, bean.getTripCount());
         json.addProperty(NoteConstants.TIME_ON_CHART, formatIso(dto.getTimeOnChart()));
+        json.addProperty("timeOnChartTimestamp", toTimestamp(dto.getTimeOnChart()));
         json.addProperty(NoteConstants.CREATE_CREATED_BY_NAME, dto.getCreatedByName());
 
         return json;
@@ -1563,6 +1585,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("id", a.getId());
         json.addProperty("time", formatPretty(a.getDate()));
         json.addProperty("timeISO", formatIso(a.getDate()));
+        json.addProperty("timeTimestamp", toTimestamp(a.getDate()));
         json.addProperty("correctiveActionListId", correctiveActionListId);
         json.addProperty("type", a.getType().toString());
         json.addProperty("description", ruleBundle.buildDescription(rule, this.tempUnits));

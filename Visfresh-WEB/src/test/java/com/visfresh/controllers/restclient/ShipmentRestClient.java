@@ -32,6 +32,7 @@ import com.visfresh.io.json.fastxml.JsonSerializerFactory;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.DiffFilter;
 import com.visfresh.utils.SerializerUtils;
 
 import junit.framework.AssertionFailedError;
@@ -43,6 +44,7 @@ import junit.framework.AssertionFailedError;
 public class ShipmentRestClient extends RestClient {
     private ShipmentSerializer serializer;
     private GetShipmentsRequestParser reqParser;
+    private final DiffFilter diffFilter;
 
     /**
      *
@@ -52,6 +54,12 @@ public class ShipmentRestClient extends RestClient {
         this.serializer = new ShipmentSerializer(user.getLanguage(), user.getTimeZone(),
                 user.getTemperatureUnits());
         this.reqParser = new GetShipmentsRequestParser(user.getTimeZone());
+        diffFilter = new DiffFilter() {
+            @Override
+            public boolean accept(final String key) {
+                return !key.endsWith("Timestamp");
+            }
+        };
     }
     public JsonElement getSingleShipment(final Shipment shipment)
             throws IOException, RestServiceException {
@@ -67,7 +75,7 @@ public class ShipmentRestClient extends RestClient {
         final long newTime = System.currentTimeMillis() - startTime;
         System.out.println("Old execution time: " + oldTime + ", new execution time: " + newTime);
 
-        final JsonObject diff = SerializerUtils.diff(oldVersionResult, newVersionResult);
+        final JsonObject diff = SerializerUtils.diff(oldVersionResult, newVersionResult, diffFilter);
         if (diff != null) {
             throw new AssertionFailedError("Old and new version are not equals: " + diff);
         }
@@ -91,7 +99,7 @@ public class ShipmentRestClient extends RestClient {
         final long newTime = System.currentTimeMillis() - startTime;
         System.out.println("Old execution time: " + oldTime + ", new execution time: " + newTime);
 
-        final JsonObject diff = SerializerUtils.diff(oldResult, newResult);
+        final JsonObject diff = SerializerUtils.diff(oldResult, newResult, diffFilter);
         if (diff != null) {
             throw new AssertionFailedError("Old and new version are not equals: " + diff);
         }

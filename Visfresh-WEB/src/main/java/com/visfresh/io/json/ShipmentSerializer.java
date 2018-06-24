@@ -3,7 +3,6 @@
  */
 package com.visfresh.io.json;
 
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -31,9 +30,9 @@ import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.lists.ListShipmentItem;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
-import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -335,6 +334,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("shipmentDescription", dto.getShipmentDescription());
         json.addProperty("shipmentDate", getFormatted(prettyFormat, dto.getShipmentDate()));
         json.addProperty("shipmentDateISO", getFormatted(isoFormat, dto.getShipmentDate()));
+        json.addProperty("shipmentDateTimestamp", getTimeStamp(dto.getShipmentDate()));
 
         json.addProperty("palletId", dto.getPalettId());
         json.addProperty("assetNum", dto.getAssetNum());
@@ -344,8 +344,11 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("shippedTo", dto.getShippedTo());
         json.addProperty("estArrivalDate", getFormatted(prettyFormat, dto.getEta()));
         json.addProperty("estArrivalDateISO", getFormatted(isoFormat, dto.getEta()));
+        json.addProperty("estArrivalDateTimestamp", getTimeStamp(dto.getEta()));
+
         json.addProperty("actualArrivalDate", getFormatted(prettyFormat, dto.getActualArrivalDate()));
         json.addProperty("actualArrivalDateISO", getFormatted(isoFormat, dto.getActualArrivalDate()));
+        json.addProperty("actualArrivalDateTimestamp", getTimeStamp(dto.getActualArrivalDate()));
         json.addProperty("percentageComplete", dto.getPercentageComplete());
 
         json.addProperty("alertProfileId", dto.getAlertProfileId());
@@ -356,6 +359,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         //last reading data
         json.addProperty(ShipmentConstants.LAST_READING_TIME, getFormatted(prettyFormat, dto.getLastReadingTime()));
         json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, getFormatted(isoFormat, dto.getLastReadingTime()));
+        json.addProperty("lastReadingTimeTimestamp", getTimeStamp(dto.getLastReadingTime()));
         json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE,
                 dto.getLastReadingTemperature() == null ? null
                         : LocalizationUtils.convertToUnits(dto.getLastReadingTemperature(), this.units));
@@ -368,6 +372,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("firstReadingLong", dto.getFirstReadingLong());
         json.addProperty("firstReadingTime", getFormatted(prettyFormat, dto.getFirstReadingTime()));
         json.addProperty("firstReadingTimeISO", getFormatted(isoFormat, dto.getFirstReadingTime()));
+        json.addProperty("firstReadingTimeTimestamp", getTimeStamp(dto.getFirstReadingTime()));
 
         int i = 1;
         for (final InterimStopBean stp : dto.getInterimStops()) {
@@ -375,6 +380,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty(prefix, stp.getLocation().getName());
             json.addProperty(prefix + "Time", getFormatted(prettyFormat, stp.getStopDate()));
             json.addProperty(prefix + "TimeISO", getFormatted(isoFormat, stp.getStopDate()));
+            json.addProperty(prefix + "TimeTimestamp", getTimeStamp(stp.getStopDate()));
             i++;
         }
 
@@ -446,6 +452,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("lon", kl.getLongitude());
         json.addProperty("desc", kl.getDescription());
         json.addProperty("time", getFormatted(prettyFormat, new Date(kl.getTime())));
+        json.addProperty("timeTimestamp", getTimeStamp(kl.getTime()));
         return json;
     }
     public KeyLocation parseKeyLocation(final JsonElement el) {
@@ -477,22 +484,21 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.remove("device");
         obj.remove("shipment");
     }
-
-    public static void main(final String[] args) throws Exception {
-        final ShipmentSerializer ser = new ShipmentSerializer(Language.English, TimeZone.getDefault(),
-                TemperatureUnits.Celsius);
-
-        final String req;
-        final InputStream in = ShipmentSerializer.class.getResourceAsStream("req.json");
-        try {
-            req = StringUtils.getContent(in, "UTF-8");
-        } finally {
-            in.close();
+    /**
+     * @param d date
+     * @return timestamp.
+     */
+    private Long getTimeStamp(final Date d) {
+        if (d != null) {
+            return DateTimeUtils.toTimestamp(d);
         }
-
-        final JsonObject json = SerializerUtils.parseJson(req).getAsJsonObject();
-
-        final SaveShipmentRequest s = ser.parseSaveShipmentRequest(json);
-        System.out.println(s);
+        return null;
+    }
+    /**
+     * @param d date
+     * @return timestamp.
+     */
+    private long getTimeStamp(final long d) {
+        return DateTimeUtils.toTimestamp(d);
     }
 }
