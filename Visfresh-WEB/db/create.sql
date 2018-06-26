@@ -330,15 +330,6 @@ create table shipments (
     foreign key (nearestdevice) references devices (imei)
 );
 
-create table singleshipments(
-    shipment bigint(20) not null,
-    sn varchar(8) not null,
-    trip int not null,
-    bean longtext not null,
-    FOREIGN KEY (shipment)
-        REFERENCES shipments (id) ON DELETE CASCADE
-);
-
 create table autostartshipments (
     id bigint(20) auto_increment not null,
     company bigint(20) not null,
