@@ -474,6 +474,7 @@ create table trackerevents (
     beacon varchar(127);
     shipment bigint(20),
     gateway varchar(30) default NULL,
+    humidity TINYINT,
     primary key (id),
     foreign key (shipment)
         references shipments (id),

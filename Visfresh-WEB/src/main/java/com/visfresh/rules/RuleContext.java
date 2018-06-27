@@ -22,7 +22,6 @@ public class RuleContext {
     private Map<TrackerEventRule, Boolean> processedMap = new HashMap<TrackerEventRule, Boolean>();
     private DeviceState deviceState;
     private boolean isEventConsumed;
-    private String gatewayDevice;
 
     /**
      * @param e tracker event.
@@ -99,17 +98,5 @@ public class RuleContext {
      */
     public void setEventConsumed() {
         this.isEventConsumed = true;
-    }
-    /**
-     * @return the gatewayDevice
-     */
-    public String getGatewayDevice() {
-        return gatewayDevice;
-    }
-    /**
-     * @param gatewayDevice the gatewayDevice to set
-     */
-    public void setGatewayDevice(final String gatewayDevice) {
-        this.gatewayDevice = gatewayDevice;
     }
 }

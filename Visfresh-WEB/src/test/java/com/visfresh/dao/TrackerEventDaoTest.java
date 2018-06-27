@@ -126,6 +126,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         e.setType(TrackerEventType.INIT);
         e.setLatitude(0.);
         e.setLongitude(0.);
+        e.setHumidity(55);
         return e;
     }
     /* (non-Javadoc)
@@ -138,6 +139,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(27, e.getBattery());
         assertEquals(5.5, e.getTemperature(), 0.00001);
         assertEquals(TrackerEventType.INIT, e.getType());
+        assertEquals(55, e.getHumidity().intValue());
 
         final Device d = e.getDevice();
         assertNotNull(d);
@@ -169,6 +171,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(27, e.getBattery());
         assertEquals(5.5, e.getTemperature(), 0.00001);
         assertEquals(TrackerEventType.INIT, e.getType());
+        assertEquals(55, e.getHumidity().intValue());
 
         final Device d = e.getDevice();
         assertNotNull(d);
@@ -548,13 +551,15 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         final String gateway = "any-gateway";
 
         final TrackerEvent e = createTestEntity();
-        dao.save(e, gateway);
+        e.setGateway(gateway);
+        dao.save(e);
 
         final Set<Long> shipments = new HashSet<>();
         shipments.add(e.getShipment().getId());
 
         final TrackerEventDto e1 = dao.getEventPart(shipments, 0, 1000).get(0);
         assertEquals(gateway, e1.getGateway());
+        assertEquals(gateway, dao.findOne(e.getId()).getGateway());
     }
     /**
      * @param device device.

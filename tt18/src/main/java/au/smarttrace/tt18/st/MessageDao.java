@@ -60,8 +60,8 @@ public class MessageDao {
 
         final GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbc.update("INSERT INTO devicemsg"
-            + "(imei, type, time, battery, temperature, numretry, retryon, stations) "
-            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations)"
+            + "(imei, type, time, battery, temperature, numretry, retryon, stations, humidity) "
+            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations, :humidity)"
             , new MapSqlParameterSource(params), holder);
 
         msg.setId(holder.getKey().longValue());
@@ -83,6 +83,8 @@ public class MessageDao {
         map.put("battery", new Integer(msg.getBattery()));
         //temperature float NOT NULL,
         map.put("temperature", new Float(msg.getTemperature()));
+        //humidity
+        map.put("humidity", msg.getHumidity());
         //current retry number.
         map.put("numretry", msg.getNumberOfRetry());
         //the ready time.

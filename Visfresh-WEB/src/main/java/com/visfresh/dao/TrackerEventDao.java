@@ -98,12 +98,6 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, TrackerEvent, Lon
     List<TrackerEvent> findForArrivedShipmentsInDateRanges(Company c, Date startDate,
             Date endDate, LocationProfile endLocation, Page page);
     /**
-     * @param e tracker event.
-     * @param gateway beacon gateway.
-     * @return tracker event.
-     */
-    <S extends TrackerEvent> S save(S e, String gateway);
-    /**
      * @param shipment shipment.
      * @param page page
      * @param isOrderAscent ordering direction.

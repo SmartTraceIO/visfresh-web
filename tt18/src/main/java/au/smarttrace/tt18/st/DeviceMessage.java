@@ -51,6 +51,7 @@ public class DeviceMessage {
     private Date retryOn = new Date();
     private String message;
     private String typeString;
+    private Integer humidity;
 
     /**
      * Default constructor.
@@ -210,5 +211,17 @@ public class DeviceMessage {
      */
     public String getMessage() {
         return message;
+    }
+    /**
+     * @param humidity
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
     }
 }

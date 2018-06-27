@@ -20,6 +20,7 @@ public class DeviceDcsNativeEvent {
     private double temperature;
     private int battery;
     private String gateway;
+    private Integer humidity;
 
     /**
      * Default constructor.
@@ -130,5 +131,17 @@ public class DeviceDcsNativeEvent {
      */
     public void setGateway(final String gateway) {
         this.gateway = gateway;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
     }
 }

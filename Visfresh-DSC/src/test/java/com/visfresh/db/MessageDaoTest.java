@@ -71,6 +71,7 @@ public class MessageDaoTest extends TestCase {
         final DeviceMessageType type = DeviceMessageType.BRT;
         final Date retryOn = new Date(System.currentTimeMillis() + 11111111L);
         final int numRetry = 135;
+        final int humidity = 99;
 
         //add first station
         final StationSignal s1 = new StationSignal();
@@ -93,6 +94,7 @@ public class MessageDaoTest extends TestCase {
         message.setBattery(battery);
         message.setImei(imei);
         message.setTemperature(temperature);
+        message.setHumidity(humidity);
         message.setTime(time);
         message.setType(type);
         message.setNumberOfRetry(numRetry);
@@ -108,6 +110,7 @@ public class MessageDaoTest extends TestCase {
 
         final Map<String, Object> row = list.get(0);
         assertEquals(battery, row.get(MessageDao.BATTERY_FIELD));
+        assertEquals(humidity, ((Number) row.get(MessageDao.HUMIDITY_FIELD)).intValue());
         assertEquals(imei, row.get(MessageDao.IMEI_FIELD));
         assertEquals(Double.toString(temperature), "" + row.get(MessageDao.TEMPERATURE_FIELD));
 

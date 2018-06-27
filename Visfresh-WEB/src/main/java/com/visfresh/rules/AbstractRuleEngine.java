@@ -141,10 +141,9 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         final Map<Long, ShipmentSession> sessions = new HashMap<>();
         final RuleContext context = new RuleContext(e, new SessionProvider(sessions));
-        context.setGatewayDevice(event.getGateway());
         context.setDeviceState(state);
 
-        saveTrackerEvent(e, event.getGateway());
+        saveTrackerEvent(e);
         log.debug("Tracker event accepted: " + e);
 
         try {
@@ -181,6 +180,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         e.setTime(event.getDate());
         e.setCreatedOn(event.getCreatedOn());
         e.setType(TrackerEventType.valueOf(event.getType()));
+        e.setGateway(event.getGateway());
+        e.setHumidity(event.getHumidity());
 
         //set device
         e.setDevice(findDevice(event.getImei()));
@@ -462,8 +463,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param gateway beacon gateway
      * @return saved tracker event.
      */
-    protected TrackerEvent saveTrackerEvent(final TrackerEvent e, final String gateway) {
-        return trackerEventDao.save(e, gateway);
+    protected TrackerEvent saveTrackerEvent(final TrackerEvent e) {
+        return trackerEventDao.save(e);
     }
     /**
      * @param imei device IMEI.

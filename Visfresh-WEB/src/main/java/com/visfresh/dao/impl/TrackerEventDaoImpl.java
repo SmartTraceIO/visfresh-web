@@ -59,6 +59,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
     protected static final String DEVICE_FIELD = "device";
     protected static final String SHIPMENT_FIELD = "shipment";
     private static final String GATEWAY = "gateway";
+    private static final String HUMIDITY = "humidity";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -88,18 +89,10 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
      */
     @Override
     public <S extends TrackerEvent> S save(final S event) {
-        return save(event, null);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.TrackerEventDao#save(com.visfresh.entities.TrackerEvent, java.lang.String)
-     */
-    @Override
-    public <S extends TrackerEvent> S save(final S event, final String gateway) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
         final List<String> fields = getFields(false);
-        fields.add(GATEWAY);
 
         if (event.getId() == null) {
             //create on field is not updateable.
@@ -121,7 +114,8 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         paramMap.put(LATITUDE_FIELD, event.getLatitude());
         paramMap.put(LONGITUDE_FIELD, event.getLongitude());
         paramMap.put(DEVICE_FIELD, event.getDevice().getId());
-        paramMap.put(GATEWAY, gateway);
+        paramMap.put(GATEWAY, event.getGateway());
+        paramMap.put(HUMIDITY, event.getHumidity());
         paramMap.put(SHIPMENT_FIELD, event.getShipment() == null ? null : event.getShipment().getId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -155,6 +149,8 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         fields.add(LONGITUDE_FIELD);
         fields.add(DEVICE_FIELD);
         fields.add(SHIPMENT_FIELD);
+        fields.add(GATEWAY);
+        fields.add(HUMIDITY);
         if (includeId) {
             fields.add(ID_FIELD);
         }
@@ -391,6 +387,11 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         e.setTime((Date) map.get(TIME_FIELD));
         e.setCreatedOn((Date) map.get(CREATED_ON_FIELD));
         e.setType(TrackerEventType.valueOf((String) map.get(TYPE_FIELD)));
+        e.setGateway((String) map.get(GATEWAY));
+        final Number humidity = (Number) map.get(HUMIDITY);
+        if (humidity != null) {
+            e.setHumidity(humidity.intValue());
+        }
         return e;
     }
     /* (non-Javadoc)

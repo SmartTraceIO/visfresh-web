@@ -71,6 +71,7 @@ public class SmartTraceRawMessageHandler implements RawMessageHandler {
         msg.setImei(raw.getImei());
         msg.setRetryOn(new Date());
         msg.setTemperature(raw.getTemperature());
+        msg.setHumidity(raw.getHumidity());
         msg.setTime(raw.getTime());
         msg.setType(DeviceMessageType.AUT);
         msg.setTypeString(DeviceMessageType.AUT.name());

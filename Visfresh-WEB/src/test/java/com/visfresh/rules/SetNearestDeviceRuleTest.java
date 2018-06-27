@@ -59,30 +59,30 @@ public class SetNearestDeviceRuleTest extends SetNearestDeviceRule {
 
     @Test
     public void testNotAcceptIfEventHasNotGateway() {
-        context.setGatewayDevice(null);
+        context.getEvent().setGateway(null);
         assertFalse(accept(context));
     }
     @Test
     public void testNotAcceptNoShipment() {
-        context.setGatewayDevice("2222222222222222");
+        context.getEvent().setGateway("2222222222222222");
         context.getEvent().setShipment(null);
         assertFalse(accept(context));
     }
     @Test
     public void testNotAcceptIfGivenGatewayAlreadySet() {
-        context.setGatewayDevice("2222222222222222");
-        context.getEvent().getShipment().setNearestTracker(context.getGatewayDevice());
+        context.getEvent().setGateway("2222222222222222");
+        context.getEvent().getShipment().setNearestTracker(context.getEvent().getGateway());
         assertFalse(accept(context));
     }
     @Test
     public void testNotAcceptIfDeviceIsNotBeacon() {
-        context.setGatewayDevice("2222222222222222");
+        context.getEvent().setGateway("2222222222222222");
         context.getEvent().getDevice().setModel(DeviceModel.SmartTrace);
         assertFalse(accept(context));
     }
     @Test
     public void testAccept() {
-        context.setGatewayDevice("2222222222222222");
+        context.getEvent().setGateway("2222222222222222");
         assertTrue(accept(context));
     }
     @Test
@@ -93,7 +93,7 @@ public class SetNearestDeviceRuleTest extends SetNearestDeviceRule {
         gateway.setCompany(8888888888l);
         devices.add(gateway);
 
-        context.setGatewayDevice(gatewayImei);
+        context.getEvent().setGateway(gatewayImei);
 
         assertTrue(accept(context));
         assertFalse(handle(context));
@@ -110,7 +110,7 @@ public class SetNearestDeviceRuleTest extends SetNearestDeviceRule {
         gateway.setCompany(context.getEvent().getDevice().getCompanyId());
         devices.add(gateway);
 
-        context.setGatewayDevice(gatewayImei);
+        context.getEvent().setGateway(gatewayImei);
 
         assertTrue(accept(context));
         assertFalse(handle(context));

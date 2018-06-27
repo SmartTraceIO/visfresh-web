@@ -11,6 +11,7 @@ CREATE TABLE devicemsg (
   retryon timestamp NOT NULL default CURRENT_TIMESTAMP,
   numretry int not null default 0,
   stations varchar(256) NOT NULL,
+  humidity TINYINT,
   PRIMARY KEY (id)
 );
 

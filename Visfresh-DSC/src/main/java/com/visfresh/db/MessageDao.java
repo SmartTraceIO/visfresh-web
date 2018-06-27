@@ -39,6 +39,7 @@ public class MessageDao {
     public static final String LONGITUDE_FIELD = "longitude";
     public static final String LATITUDE_FIELD = "latitude";
     public static final String PROCESSOR_FIELD = "processor";
+    public static final String HUMIDITY_FIELD = "humidity";
 
     //tables
     public static final String TABLE = "devicemsg";
@@ -116,6 +117,10 @@ public class MessageDao {
             msg.setType(DeviceMessageType.valueOf((String) map.get(TYPE_FIELD)));
             msg.setTime(new Date(((Date) map.get(TIME_FIELD)).getTime()));
             msg.setBattery((Integer) map.get(BATTERY_FIELD));
+            final Number humidity = (Number) map.get(HUMIDITY_FIELD);
+            if (humidity != null) {
+                msg.setHumidity(humidity.intValue());
+            }
             msg.setTemperature((Float) map.get(TEMPERATURE_FIELD));
             msg.setRetryOn(new Date(((Date) map.get(RETRYON_FIELD)).getTime()));
             msg.setNumberOfRetry((Integer) map.get(NUMRETRY_FIELD));
@@ -163,12 +168,13 @@ public class MessageDao {
             + ", " + TYPE_FIELD
             + ", " + TIME_FIELD
             + ", " + BATTERY_FIELD
+            + ", " + HUMIDITY_FIELD
             + ", " + TEMPERATURE_FIELD
             + ", " + NUMRETRY_FIELD
             + ", " + RETRYON_FIELD
             + ", " + STATIONS_FIELD
             + ") "
-            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations)"
+            + "VALUES(:imei, :type, :time, :battery, :humidity, :temperature, :numretry, :readyon, :stations)"
             , new MapSqlParameterSource(params), holder);
 
         msg.setId(holder.getKey().longValue());
@@ -187,7 +193,8 @@ public class MessageDao {
         //time datetime NOT NULL,
         map.put("time", msg.getTime());
         //battery int NOT NULL,
-        map.put("battery", new Integer(msg.getBattery()));
+        map.put("battery", msg.getBattery());
+        map.put("humidity", msg.getHumidity());
         //temperature float NOT NULL,
         map.put("temperature", new Float(msg.getTemperature()));
         //current retry number.

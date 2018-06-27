@@ -15,6 +15,7 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -45,12 +46,13 @@ public class SetNearestDeviceRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final RuleContext req) {
-        if (req.isProcessed(this) || req.getEvent().getShipment() == null) {
+        final TrackerEvent event = req.getEvent();
+        if (req.isProcessed(this) || event.getShipment() == null) {
             return false;
         }
-        final Shipment shipment = req.getEvent().getShipment();
-        return req.getGatewayDevice() != null
-                && !req.getGatewayDevice().equals(shipment.getNearestTracker())
+        final Shipment shipment = event.getShipment();
+        return event.getGateway() != null
+                && !event.getGateway().equals(shipment.getNearestTracker())
                 && shipment.getDevice().getModel().isUseGateway();
     }
     /* (non-Javadoc)
@@ -60,8 +62,9 @@ public class SetNearestDeviceRule implements TrackerEventRule {
     public final boolean handle(final RuleContext context) {
         context.setProcessed(this);
 
-        final Shipment shipment = context.getEvent().getShipment();
-        final Device gateway = findDevice(context.getGatewayDevice());
+        final TrackerEvent e = context.getEvent();
+        final Shipment shipment = e.getShipment();
+        final Device gateway = findDevice(e.getGateway());
         if (gateway != null) {
             if (shipment.getCompanyId().equals(gateway.getCompanyId())) {
                 shipment.setNearestTracker(gateway.getImei());
@@ -72,7 +75,7 @@ public class SetNearestDeviceRule implements TrackerEventRule {
                     + " to shipment " + shipment.getId());
             }
         } else {
-            log.error("Gateway device " + context.getGatewayDevice() + " not found ");
+            log.error("Gateway device " + e.getGateway() + " not found ");
         }
 
         return false;

@@ -35,6 +35,14 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     private double temperature;
     /**
+     * Humidity in percents 0-100%
+     */
+    private Integer humidity;
+    /**
+     * Gateway device.
+     */
+    private String gateway;
+    /**
      * The device.
      */
     private Device device;
@@ -170,6 +178,30 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     public void setCreatedOn(final Date createdOn) {
         this.createdOn = createdOn;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
+    }
+    /**
+     * @return the gateway
+     */
+    public String getGateway() {
+        return gateway;
+    }
+    /**
+     * @param gateway the gateway to set
+     */
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
     }
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
