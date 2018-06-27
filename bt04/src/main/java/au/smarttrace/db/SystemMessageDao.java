@@ -116,6 +116,7 @@ public class SystemMessageDao {
         }
         obj.addProperty("imei", e.getImei());
         obj.addProperty("gateway", e.getGateway());
+        obj.addProperty("humidity", e.getHumidity());
 
         final SystemMessage sm = new SystemMessage();
         sm.setMessageInfo(obj.toString());

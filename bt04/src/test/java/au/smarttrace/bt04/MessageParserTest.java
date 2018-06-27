@@ -60,6 +60,7 @@ public class MessageParserTest {
         assertEquals(98, b.getBattery(), 0.1);
         assertNotNull(b.getLastScannedTime());
         assertEquals("3901", b.getHardwareModel());
+        assertEquals(79.68, b.getHumidity().doubleValue(), 0.001);
     }
     @Test
     public void testParseWithEmptyLocations() {

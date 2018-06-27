@@ -34,6 +34,10 @@ public class DeviceMessage {
      * The IMEI of gateway phone.
      */
     private String gateway;
+    /**
+     * The IMEI of gateway phone.
+     */
+    private Integer humidity;
 
     private String message;
 
@@ -164,5 +168,17 @@ public class DeviceMessage {
      */
     public void setLocation(final Location location) {
         this.location = location;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
     }
 }

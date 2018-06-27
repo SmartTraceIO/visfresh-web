@@ -100,6 +100,7 @@ public class Bt04Service {
                 msg.setTime(bs.getLastScannedTime());
                 msg.setTemperature(bs.getTemperature());
                 msg.setGateway(bt04Message.getImei());
+                msg.setHumidity(round(bs.getHumidity()));
 
                 if (bt04Message.getLatitude() != null && bt04Message.getLongitude() != null) {
                     final Location loc = new Location(bt04Message.getLatitude(), bt04Message.getLongitude());
@@ -122,7 +123,16 @@ public class Bt04Service {
             }
         }
     }
-
+    /**
+     * @param d
+     * @return
+     */
+    private Integer round(final Double d) {
+        if (d == null) {
+            return null;
+        }
+        return (int) Math.round(d);
+    }
     /**
      * @param beacons set of beacon IMEI.
      * @param gateway TODO

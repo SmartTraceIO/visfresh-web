@@ -41,13 +41,13 @@ public class Bt04ServiceTest extends Bt04Service {
     }
     @Before
     public void setUp() {
-        this.beacon = addBeacon("1289374698773");
+        this.beacon = createBeaconDevice("1289374698773");
     }
 
     /**
      * @param imei
      */
-    private Beacon addBeacon(final String imei) {
+    private Beacon createBeaconDevice(final String imei) {
         final Beacon d = new Beacon();
         d.setImei(imei);
         d.setActive(true);
@@ -78,13 +78,13 @@ public class Bt04ServiceTest extends Bt04Service {
         final int battery = 50;
         final double distance = 100.;
         final String hardwareModel = "M123";
-        final double humidity = 45.;
+        final double humidity = 45.88;
         final Date lastScannedTime = new Date(System.currentTimeMillis() - 239487023985l);
         final String name = "Test1";
         final double temperature = 33.;
 
         //create device for SN
-        addBeacon(sn);
+        createBeaconDevice(sn);
 
         final BeaconSignal b = new BeaconSignal();
         b.setSn(sn);
@@ -99,7 +99,7 @@ public class Bt04ServiceTest extends Bt04Service {
         msg.getBeacons().add(b);
         msg.getBeacons().add(crateBeacon("7654321"));
         //create device for SN
-        addBeacon("7654321");
+        createBeaconDevice("7654321");
 
         process(msg);
 
@@ -110,6 +110,7 @@ public class Bt04ServiceTest extends Bt04Service {
         assertEquals(battery, Math.round(m.getBattery()));
         assertTrue(m.getImei().contains(sn));
         assertEquals(temperature, m.getTemperature(), 0.001);
+        assertEquals((int) Math.round(humidity), m.getHumidity().intValue());
         assertTrue(Math.abs(lastScannedTime.getTime() - m.getTime().getTime()) < 1000l);
     }
     @Test
@@ -187,7 +188,7 @@ public class Bt04ServiceTest extends Bt04Service {
     @Test
     public void testAlertForInactiveDevice() {
         final Bt04Message m = createMessage(beacon.getImei());
-        final Beacon d = addBeacon(m.getBeacons().get(0).getSn());
+        final Beacon d = createBeaconDevice(m.getBeacons().get(0).getSn());
         d.setActive(false);
 
         process(m);
