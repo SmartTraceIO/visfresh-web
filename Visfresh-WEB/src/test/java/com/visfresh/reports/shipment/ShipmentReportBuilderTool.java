@@ -352,6 +352,7 @@ public final class ShipmentReportBuilderTool {
         e.setLongitude(bean.getLongitude());
         e.setShipmentId(s.getShipmentId());
         e.setTemperature(bean.getTemperature());
+        e.setHumidity(bean.getHumidity());
         e.setTime(bean.getTime());
         e.setType(bean.getType());
         return e;

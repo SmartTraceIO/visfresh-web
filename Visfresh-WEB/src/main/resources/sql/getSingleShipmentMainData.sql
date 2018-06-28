@@ -281,7 +281,7 @@ select
 			'type', r.type,
 			't', r.temp,
 			'timeout', r.timeout, 
-			'cumulative', IF(r.cumulative, 'true', false),
+			'cumulative', IF(r.cumulative, 'true', 'false'),
 			'profile', r.alertprofile,
 			'maxrates', r.maxrateminutes, 
 			'actionsId', r.corractions,

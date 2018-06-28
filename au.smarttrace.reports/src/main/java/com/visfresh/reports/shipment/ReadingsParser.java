@@ -105,6 +105,12 @@ public class ReadingsParser {
 
         e.setTime(dateParser.parse(reading.remove("time")));
         e.setBattery(Integer.parseInt(reading.remove("battery")));
+        final String humidity = reading.remove("humidity");
+        if (humidity != null && !humidity.isEmpty()) {
+            //cut percents symbol.
+            final String hum = humidity.endsWith("%") ? humidity.substring(0, humidity.length() - 1) : humidity;
+            e.setHumidity(Integer.parseInt(hum));
+        }
         final String lat = reading.remove("latitude");
         if (!lat.isEmpty()) {
             e.setLatitude(Double.parseDouble(lat));

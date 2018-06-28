@@ -31,17 +31,7 @@ public class ShortTrackerEventWithAlerts extends ShortTrackerEvent {
      * @param e
      */
     public ShortTrackerEventWithAlerts(final ShortTrackerEvent e) {
-        super();
-        this.setBattery(e.getBattery());
-        this.setCreatedOn(e.getCreatedOn());
-        this.setDeviceImei(e.getDeviceImei());
-        this.setId(e.getId());
-        this.setLatitude(e.getLatitude());
-        this.setLongitude(e.getLongitude());
-        this.setShipmentId(e.getShipmentId());
-        this.setTemperature(e.getTemperature());
-        this.setTime(e.getTime());
-        this.setType(e.getType());
+        super(e);
     }
     /**
      * @return the alerts

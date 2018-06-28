@@ -651,7 +651,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
         out.write(("id,shipment,time,temperature "
                 + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())
-                + ",battery,latitude,longitude,device,createdon,type,alerts").getBytes());
+                + ",humidity,battery,latitude,longitude,device,createdon,type,alerts").getBytes());
         out.write((byte) '\n');
 
         //print headers
@@ -677,6 +677,11 @@ public class DeviceController extends AbstractController implements DeviceConsta
             //temperature
             out.write(LocalizationUtils.convertToUnitsString(e.getTemperature(),
                     user.getTemperatureUnits()).getBytes());
+            out.write((byte) ',');
+            //time
+            if (e.getHumidity() != null) {
+                out.write((e.getHumidity() + "%").getBytes());
+            }
             out.write((byte) ',');
             //battery
             out.write(Integer.toString(e.getBattery()).getBytes());

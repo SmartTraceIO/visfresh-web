@@ -283,6 +283,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         dto.setLatitude(e.getLatitude());
         dto.setLongitude(e.getLongitude());
         dto.setTemperature(e.getTemperature());
+        dto.setHumidity(e.getHumidity());
         dto.setTime(e.getTime());
         dto.setType(e.getType());
 
@@ -590,14 +591,15 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         ue.setLatitude(e.getLatitude());
         ue.setLongitude(e.getLongitude());
         ue.setTemperature(e.getTemperature());
+        ue.setHumidity(e.getHumidity());
         ue.setTime(e.getTime());
         ue.setType(e.getType());
         ue.setCreatedOn(e.getCreatedOn());
 
-        final Object shipmentField = row.get(SHIPMENT_FIELD);
+        final Number shipmentField = (Number) row.get(SHIPMENT_FIELD);
         //possible null if not shipment assigned for given event. It is possible
         if (shipmentField != null) {
-            ue.setShipmentId(((Number) shipmentField).longValue());
+            ue.setShipmentId(shipmentField.longValue());
         }
         ue.setDeviceImei((String) row.get(DEVICE_FIELD));
         return ue;
@@ -637,6 +639,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
             e.setLatitude(DaoImplBase.dbDouble(row.get("latitude")));
             e.setLongitude(DaoImplBase.dbDouble(row.get("longitude")));
             e.setTemperature(DaoImplBase.dbDouble(row.get("temperature")));
+            e.setHumidity(DaoImplBase.dbInteger(row.get("humidity")));
             e.setTime((Date) row.get("time"));
             e.setType(TrackerEventType.valueOf((String) row.get("type")));
             e.setShipmentId(DaoImplBase.dbLong(row.get("shipment")));

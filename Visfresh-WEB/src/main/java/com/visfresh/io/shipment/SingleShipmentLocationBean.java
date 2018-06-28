@@ -19,6 +19,10 @@ public class SingleShipmentLocationBean {
     private Double latitude;
     private Double longitude;
     private double temperature;
+    /**
+     * Humidity in percents 0-100%
+     */
+    private Integer humidity;
     private Date time;
     private final List<AlertBean> alerts = new LinkedList<>();
     private TrackerEventType type;
@@ -38,6 +42,7 @@ public class SingleShipmentLocationBean {
         setLatitude(e.getLatitude());
         setLongitude(e.getLongitude());
         setTemperature(e.getTemperature());
+        setHumidity(e.getHumidity());
         setTime(e.getTime());
         setType(e.getType());
     }
@@ -89,6 +94,18 @@ public class SingleShipmentLocationBean {
      */
     public void setTemperature(final double temperature) {
         this.temperature = temperature;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
     }
     /**
      * @return the time

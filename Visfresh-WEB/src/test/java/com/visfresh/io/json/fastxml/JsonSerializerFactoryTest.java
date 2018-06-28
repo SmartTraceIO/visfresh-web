@@ -177,6 +177,7 @@ public class JsonSerializerFactoryTest {
         loc.setLatitude(7.7);
         loc.setLongitude(8.8);
         loc.setTemperature(34.54);
+        loc.setHumidity(77);
         loc.setTime(new Date(System.currentTimeMillis() - 1089847l));
         loc.setType(TrackerEventType.AUT);
 

@@ -645,6 +645,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("latitude", loc.getLatitude());
         json.addProperty("longitude", loc.getLongitude());
         json.addProperty("temperature", loc.getTemperature());
+        json.addProperty("humidity", loc.getHumidity());
         json.addProperty("time", toIsoString(loc.getTime()));
         json.add("alerts", alertsToJson(loc.getAlerts()));
         json.addProperty("type", loc.getType().toString());
@@ -665,6 +666,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         bean.setLatitude(asDouble(json.get("latitude")));
         bean.setLongitude(asDouble(json.get("longitude")));
         bean.setTemperature(asDouble(json.get("temperature")));
+        bean.setHumidity(asInteger(json.get("humidity")));
         bean.setTime(parseIsoDate(json.get("time")));
         bean.getAlerts().addAll(parseAlertBeans(json.get("alerts").getAsJsonArray()));
         bean.setType(TrackerEventType.valueOf(asString(json.get("type"))));
@@ -1223,6 +1225,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("lat", reading.getLatitude());
         json.addProperty("long", reading.getLongitude());
         json.addProperty("temperature", convertTemperature(reading.getTemperature()));
+        json.addProperty("humidity", reading.getHumidity());
         json.addProperty("timeISO", formatIso(reading.getTime()));
         json.addProperty("time", formatPretty(reading.getTime()));
         json.addProperty("timeTimestamp", toTimestamp(reading.getTime()));

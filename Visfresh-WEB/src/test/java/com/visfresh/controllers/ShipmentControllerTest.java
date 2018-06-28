@@ -1175,11 +1175,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         shipmentClient.getSingleShipment(sp).getAsJsonObject();
     }
-    //@RequestMapping(value = "/getShipmentData", method = RequestMethod.GET)
-    //public @ResponseBody String getShipmentData(
-    //        @RequestParam final String fromDate,
-    //        @RequestParam final String toDate,
-    //        @RequestParam final String onlyWithAlerts
     @Test
     public void testGetSingleShipment() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
@@ -2045,6 +2040,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         e.setType(type);
         e.setLatitude(lat);
         e.setLongitude(lon);
+        e.setHumidity(77);
 
         trackerEventDao.save(e);
         return e;

@@ -41,6 +41,10 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
     private Double latitude;
     private Double longitude;
     private Date createdOn;
+    /**
+     * Humidity in percents 0-100%
+     */
+    private Integer humidity;
 
     /**
      * Default constructor.
@@ -64,6 +68,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
         this.setTemperature(e.getTemperature());
         this.setTime(e.getTime());
         this.setType(e.getType());
+        this.setHumidity(e.getHumidity());
     }
 
     /**
@@ -81,6 +86,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
         this.setTemperature(e.getTemperature());
         this.setTime(e.getTime());
         this.setType(e.getType());
+        this.setHumidity(e.getHumidity());
     }
 
     /* (non-Javadoc)
@@ -204,6 +210,18 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
      */
     public Date getCreatedOn() {
         return createdOn;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
     }
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)

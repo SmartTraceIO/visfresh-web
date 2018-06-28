@@ -69,6 +69,7 @@ public final class DetectingSiblingsTool {
             dto.setLongitude(e.getLongitude());
             dto.setShipmentId(e.getShipment().getId());
             dto.setTemperature(e.getTemperature());
+            dto.setHumidity(e.getHumidity());
             dto.setTime(e.getTime());
             dto.setType(e.getType());
 

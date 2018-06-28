@@ -18,6 +18,7 @@ public class SingleShipmentLocation {
     private String time;
     private final List<SingleShipmentAlert> alerts = new LinkedList<>();
     private String type;
+    private Integer humidity;
 
     /**
      * Default constructor.
@@ -92,7 +93,18 @@ public class SingleShipmentLocation {
     public List<SingleShipmentAlert> getAlerts() {
         return alerts;
     }
-
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
+    }
     /**
      * @param eventType
      */

@@ -403,6 +403,7 @@ public class SingleShipmentBeanSerializerTest {
         final Double latitude = 7.7;
         final Double longitude = 8.8;
         final double temperature = 34.45;
+        final int humidity = 77;
         final Date time = new Date(System.currentTimeMillis() - 1089847l);
         final TrackerEventType eventType = TrackerEventType.AUT;
 
@@ -413,7 +414,7 @@ public class SingleShipmentBeanSerializerTest {
         loc.setTemperature(temperature);
         loc.setTime(time);
         loc.setType(eventType);
-
+        loc.setHumidity(humidity);
 
         loc = serializer.parseSingleShipmentLocationBean(serializer.toJson(loc));
 
@@ -423,6 +424,7 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(temperature, loc.getTemperature(), 0.001);
         assertEquals(time, loc.getTime());
         assertEquals(eventType, loc.getType());
+        assertEquals(humidity, loc.getHumidity().intValue());
     }
     /**
      * List<SingleShipmentLocationBean> locations = new LinkedList<>();

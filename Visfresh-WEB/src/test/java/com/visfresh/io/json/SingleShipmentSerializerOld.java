@@ -244,6 +244,7 @@ public class SingleShipmentSerializerOld extends SingleShipmentBeanSerializer {
         json.addProperty("lat", l.getLatitude());
         json.addProperty("long", l.getLongitude());
         json.addProperty("temperature", convertTemperature(l.getTemperature()));
+        json.addProperty("humidity", l.getHumidity());
         json.addProperty("timeISO", l.getTimeIso());
         json.addProperty("time", l.getTime());
         json.addProperty("type", l.getType());

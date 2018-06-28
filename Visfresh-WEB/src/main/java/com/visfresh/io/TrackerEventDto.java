@@ -44,6 +44,10 @@ public class TrackerEventDto {
     private Double latitude;
     private Double longitude;
     private String gateway;
+    /**
+     * Humidity in percents 0-100%
+     */
+    private Integer humidity;
 
     /**
      * Default constructor.
@@ -183,6 +187,18 @@ public class TrackerEventDto {
      */
     public void setGateway(final String gateway) {
         this.gateway = gateway;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

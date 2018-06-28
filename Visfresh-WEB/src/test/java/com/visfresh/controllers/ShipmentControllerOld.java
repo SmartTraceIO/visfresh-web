@@ -635,6 +635,7 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
         lo.setLatitude(event.getLatitude());
         lo.setLongitude(event.getLongitude());
         lo.setTemperature(event.getTemperature());
+        lo.setHumidity(event.getHumidity());
         lo.setTimeIso(timeIsoFmt.format(event.getTime()));
         lo.setTime(prettyFmt.format(event.getTime()));
         lo.setType(eventTypeToString(event.getType()));

@@ -487,18 +487,20 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertTrue(getDiferenceMs(e.getTime(), str[2]) < 61000);
         //temperature
         assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
+        //humidity
+        assertEquals(e.getHumidity() + "%", str[4]);
         //battery
-        assertEquals(Integer.toString(e.getBattery()), str[4]);
+        assertEquals(Integer.toString(e.getBattery()), str[5]);
         //latitude
-        assertEquals(Double.toString(e.getLatitude()), str[5]);
+        assertEquals(Double.toString(e.getLatitude()), str[6]);
         //longitude
-        assertEquals(Double.toString(e.getLongitude()), str[6]);
+        assertEquals(Double.toString(e.getLongitude()), str[7]);
         //device
-        assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
+        assertEquals("\"" + e.getDevice().getImei() + "\"", str[8]);
         //createdon
-        assertTrue(getDiferenceMs(e.getCreatedOn(), str[8]) <  61000);
+        assertTrue(getDiferenceMs(e.getCreatedOn(), str[9]) <  61000);
         //type
-        assertEquals("SwitchedOn", str[9]);
+        assertEquals("SwitchedOn", str[10]);
     }
     @Test
     public void testGetReadingsByShipmentId() throws IOException, RestServiceException {
@@ -572,18 +574,20 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertTrue(getDiferenceMs(e.getTime(), str[2]) < 61000l);
         //temperature
         assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
+        //humidity
+        assertEquals(e.getHumidity() + "%", str[4]);
         //battery
-        assertEquals(Integer.toString(e.getBattery()), str[4]);
+        assertEquals(Integer.toString(e.getBattery()), str[5]);
         //latitude
-        assertEquals(Double.toString(e.getLatitude()), str[5]);
+        assertEquals(Double.toString(e.getLatitude()), str[6]);
         //longitude
-        assertEquals(Double.toString(e.getLongitude()), str[6]);
+        assertEquals(Double.toString(e.getLongitude()), str[7]);
         //device
-        assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
+        assertEquals("\"" + e.getDevice().getImei() + "\"", str[8]);
         //createdon
-        assertTrue(getDiferenceMs(e.getCreatedOn(), str[8]) < 61000l);
+        assertTrue(getDiferenceMs(e.getCreatedOn(), str[9]) < 61000l);
         //type
-        assertEquals("SwitchedOn", str[9]);
+        assertEquals("SwitchedOn", str[10]);
     }
     @Test
     public void testGetReadingsAlerts() throws IOException, RestServiceException {
@@ -608,7 +612,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         final String line = lines[1];
         int index = 0;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 11; i++) {
             index = line.indexOf(',', index + 1);
         }
 
@@ -696,6 +700,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         e.setDevice(d1);
         e.setShipment(null);
         e.setTemperature(11.);
+        e.setHumidity(39);
         e.setTime(date);
         e.setCreatedOn(date);
         e.setType(TrackerEventType.INIT);
