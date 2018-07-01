@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -131,20 +132,28 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         params.put("st1", ShipmentStatus.Ended.name());
         params.put("st2", ShipmentStatus.Arrived.name());
 
-        final String sql = "select * from " + TABLE + " s"
+        final String sql = "select s.id as shipmentId, s.siblings as siblings, "
+                + "d.model as deviceModel"
+                + " from " + TABLE + " s"
+                + " join devices d on s.device = d.imei"
                 + " where"
                 + " s." + STATUS_FIELD + "<> :st1"
                 + " and s." + STATUS_FIELD + "<> :st2"
                 + " and s." + ISTEMPLATE_FIELD + " = false"
                 + " and s.company = :company"
                 + " order by s." + ID_FIELD + " desc";
+
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
 
         final List<ShipmentSiblingInfo> result = new LinkedList<>();
 
         for (final Map<String, Object> row : rows) {
-            final Shipment s = createEntity(row);
-            result.add(new ShipmentSiblingInfo(s));
+            final ShipmentSiblingInfo info = new ShipmentSiblingInfo();
+            info.setId(dbLong(row.get("shipmentId")));
+            info.getSiblings().addAll(parseSiblings((String) row.get("siblings")));
+            info.setBeacon(DeviceModel.valueOf((String) row.get("deviceModel")).isUseGateway());
+
+            result.add(info);
         }
 
         return result;
@@ -157,14 +166,21 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("id", shipmentId);
 
-        final String sql = "select * from " + TABLE + " s"
+        final String sql = "select s.id as shipmentId, s.siblings as siblings, "
+                + "d.model as deviceModel"
+                + " from " + TABLE + " s"
+                + " join devices d on s.device = d.imei"
                 + " where"
                 + " s.id = :id";
 
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
         for (final Map<String, Object> row : rows) {
-            final Shipment s = createEntity(row);
-            return new ShipmentSiblingInfo(s);
+            final ShipmentSiblingInfo info = new ShipmentSiblingInfo();
+            info.setId(dbLong(row.get("shipmentId")));
+            info.getSiblings().addAll(parseSiblings((String) row.get("siblings")));
+            info.setBeacon(DeviceModel.valueOf((String) row.get("deviceModel")).isUseGateway());
+
+            return info;
         }
 
         return null;
@@ -324,17 +340,26 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         }
         e.setDevice(deviceDao.findOne((String) map.get(DEVICE_FIELD)));
         final String siblings = (String) map.get(SIBLINGS_FIELD);
-        if (siblings != null) {
-            for (final String sibling : siblings.split(",")) {
-                e.getSiblings().add(Long.parseLong(sibling));
-            }
-        }
+        e.getSiblings().addAll(parseSiblings(siblings));
         e.setSiblingCount(((Number) map.get(SIBLINGCOUNT_FIELD)).intValue());
         e.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         e.setPoNum(((Number) map.get(PONUM_FIELD)).intValue());
         e.setAssetType((String) map.get(ASSETTYPE_FIELD));
         e.setNearestTracker((String) map.get(NEAREST_DEVICE));
         return e;
+    }
+    /**
+     * @param siblings
+     * @return
+     */
+    private Set<Long> parseSiblings(final String siblings) {
+        final Set<Long> set = new HashSet<>();
+        if (siblings != null) {
+            for (final String sibling : siblings.split(",")) {
+                set.add(Long.parseLong(sibling));
+            }
+        }
+        return set;
     }
     /**
      * @param str

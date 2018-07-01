@@ -353,7 +353,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final LinkedList<ShipmentSiblingInfo> list = new LinkedList<>();
         for (final Shipment s : shipments) {
             if (!s.hasFinalStatus()) {
-                list.add(new ShipmentSiblingInfo(s));
+                list.add(createShipmentSiblingInfo(s));
             }
         }
         return list;
@@ -395,10 +395,21 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
     protected ShipmentSiblingInfo findShipment(final Long id) {
         for (final Shipment s : shipments) {
             if (s.getId().equals(id)) {
-                return new ShipmentSiblingInfo(s);
+                return createShipmentSiblingInfo(s);
             }
         }
         return null;
+    }
+    /**
+     * @param s
+     * @return
+     */
+    private ShipmentSiblingInfo createShipmentSiblingInfo(final Shipment s) {
+        final ShipmentSiblingInfo info = new ShipmentSiblingInfo();
+        info.setBeacon(s.getDevice().getModel().isUseGateway());
+        info.setId(s.getId());
+        info.getSiblings().addAll(s.getSiblings());
+        return info;
     }
     /**
      * @param id shipment ID.

@@ -101,7 +101,6 @@ public class SiblingDetector {
      */
     protected List<StatefullSiblingDetector> createDetecters(final CalculationDirection d) {
         final List<StatefullSiblingDetector> list = new LinkedList<>();
-        list.add(new SiblingDetectorByGateway());
         list.add(new SiblingDetectorByDistance(direction));
         return list;
     }

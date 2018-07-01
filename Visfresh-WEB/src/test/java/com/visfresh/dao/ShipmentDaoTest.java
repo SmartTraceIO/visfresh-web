@@ -485,6 +485,36 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(2, dao.findActiveShipments(c1.getId()).size());
     }
     @Test
+    public void testFindActiveShipmentsFieldsIsBeacon() {
+        //create companies
+        final Shipment s = createShipment(sharedCompany, ShipmentStatus.Default);
+        assertFalse(dao.findActiveShipments(sharedCompany.getId()).get(0).isBeacon());
+
+        final Device d = createDevice("3249087320987324");
+        d.setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(d);
+
+        s.setDevice(d);
+        dao.save(s);
+        assertTrue(dao.findActiveShipments(sharedCompany.getId()).get(0).isBeacon());
+    }
+    @Test
+    public void testFindActiveShipmentsFieldsSiblings() {
+        //create companies
+        final Shipment s1 = createShipment(sharedCompany, ShipmentStatus.Default);
+        final Shipment s2 = createShipment(sharedCompany, ShipmentStatus.Ended);
+
+        s1.getSiblings().clear();
+        s1.getSiblings().add(s2.getId());
+        s1.setSiblingCount(1);
+
+        dao.save(s1);
+
+        final ShipmentSiblingInfo info = dao.findActiveShipments(sharedCompany.getId()).get(0);
+        assertEquals(1, info.getSiblings().size());
+        assertTrue(info.getSiblings().contains(s2.getId()));
+    }
+    @Test
     public void testGetShipmentSiblingInfo() {
         final Company c1 = createCompany("C1");
 
@@ -504,6 +534,26 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(2, info.getSiblings().size());
         assertTrue(info.getSiblings().contains(s2.getId()));
         assertTrue(info.getSiblings().contains(s3.getId()));
+        assertFalse(info.isBeacon());
+    }
+    @Test
+    public void testGetShipmentSiblingInfoIsbeacon() {
+        //create shipments
+        Shipment s1 = createShipment(sharedCompany, ShipmentStatus.InProgress);
+
+        ShipmentSiblingInfo info = dao.getShipmentSiblingInfo(s1.getId());
+        assertFalse(info.isBeacon());
+
+        //test beacon
+        final Device d = createDevice("3249873908745");
+        d.setModel(DeviceModel.BT04);
+        context.getBean(DeviceDao.class).save(d);
+
+        s1.setDevice(d);
+        s1 = dao.save(s1);
+
+        info = dao.getShipmentSiblingInfo(s1.getId());
+        assertTrue(info.isBeacon());
     }
     @Test
     public void testFindActiveShipmentsByImei() {
