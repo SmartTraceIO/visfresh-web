@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
@@ -127,6 +128,72 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         //check sibling count
         assertEquals(1, master.getSiblingCount());
         assertEquals(1, sibling.getSiblingCount());
+    }
+    @Test
+    public void testUnsiblifyIfMasterIsBeacon() {
+        final Shipment master = createShipment(1l);
+        master.getDevice().setModel(DeviceModel.BT04);
+        final Shipment sibling = createShipment(2l);
+
+        //crete master event list
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
+
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+                    t0 + i * dt);
+            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+        }
+
+        setAsSiblings(master, sibling);
+
+        assertTrue(updateSiblings(master.getId(), master.getCompanyId()));
+
+        assertFalse(master.getSiblings().contains(sibling.getId()));
+        assertFalse(sibling.getSiblings().contains(master.getId()));
+
+        //check sibling count
+        assertEquals(0, master.getSiblingCount());
+        assertEquals(0, sibling.getSiblingCount());
+    }
+    @Test
+    public void testUnsiblifyIfSiblingIsBeacon() {
+        final Shipment master = createShipment(1l);
+        final Shipment sibling = createShipment(2l);
+        sibling.getDevice().setModel(DeviceModel.BT04);
+
+        //crete master event list
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
+
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+                    t0 + i * dt);
+            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+        }
+
+        setAsSiblings(master, sibling);
+
+        assertTrue(updateSiblings(master.getId(), master.getCompanyId()));
+
+        assertFalse(master.getSiblings().contains(sibling.getId()));
+        assertFalse(sibling.getSiblings().contains(master.getId()));
+
+        //check sibling count
+        assertEquals(0, master.getSiblingCount());
+        assertEquals(0, sibling.getSiblingCount());
     }
     @Test
     public void testHandleReturnsFalseIfNotSiblings() {

@@ -256,6 +256,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      */
     private boolean unsiblify(final ShipmentSiblingInfo master, final Set<Long> oldSiblings, final List<ShipmentSiblingInfo> shipments,
             final Map<Long, Set<Long>> siblingMap) {
+        final boolean isBeacon = master.isBeacon();
         if (!oldSiblings.isEmpty()) {
             log.debug("Search stopped to be siblings in ("
                     + StringUtils.combine(master.getSiblings(), ",")
@@ -273,10 +274,16 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
                     siblingMap.put(id, sibling.getSiblings());
                 }
 
-                //check is sibling
-                final Iterator<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
-                final Iterator<TrackerEventDto> events = getTrackeEvents(sibling.getId(), direction);
-                if (detector.detectSiblingsState(masterEvents, events) == State.NotSiblings) {
+                //unsiblify beacons.
+                boolean unsiblify = isBeacon || sibling.isBeacon();
+                if (!unsiblify) {
+                    final Iterator<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
+                    final Iterator<TrackerEventDto> events = getTrackeEvents(sibling.getId(), direction);
+                    //check is sibling
+                    unsiblify = detector.detectSiblingsState(masterEvents, events) == State.NotSiblings;
+                }
+
+                if (unsiblify) {
                     siblingMap.get(master.getId()).remove(sibling.getId());
                     siblingMap.get(sibling.getId()).remove(master.getId());
                     updateSiblingInfo(sibling, siblingMap.get(sibling.getId()));
@@ -358,13 +365,20 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         }
 
         //continue only if shipment list is not empty
+        final boolean isBeacon = master.isBeacon();
         if (!shipments.isEmpty()) {
             log.debug("Fetch readings for master shipment " + master.getId());
             for (final ShipmentSiblingInfo s : shipments) {
-                final Iterator<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
-                final Iterator<TrackerEventDto> events = getTrackeEvents(s.getId(), direction);
+                boolean setAsSibling = false;
 
-                if (detector.detectSiblingsState(masterEvents, events) == State.Siblings) {
+                //ignore beacons
+                if (!isBeacon && !s.isBeacon()) {
+                    final Iterator<TrackerEventDto> masterEvents = getTrackeEvents(master.getId(), direction);
+                    final Iterator<TrackerEventDto> events = getTrackeEvents(s.getId(), direction);
+                    setAsSibling = detector.detectSiblingsState(masterEvents, events) == State.Siblings;
+                }
+
+                if (setAsSibling) {
                     siblingMap.get(master.getId()).add(s.getId());
                     siblingMap.get(s.getId()).add(master.getId());
                 }

@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
@@ -34,6 +35,8 @@ public class SiblingDetectionRuleTest extends SiblingDetectionRule {
     }
 
     private Company company;
+    private boolean isSiblingsCleared;
+    private boolean isSiblingDetectionScheduled;
 
     @Before
     public void setUp() {
@@ -77,13 +80,44 @@ public class SiblingDetectionRuleTest extends SiblingDetectionRule {
         final RuleContext context = new RuleContext(e, null);
         assertTrue(accept(context));
         handle(context);
+        assertTrue(isSiblingDetectionScheduled);
+
         assertFalse(accept(context));
+    }
+    @Test
+    public void testBeacon() {
+        final Shipment s = createShipment(7l);
+        s.setStatus(ShipmentStatus.Default);
+        s.getDevice().setModel(DeviceModel.BT04);
+
+        //crete master event list
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        //intersected time
+        final TrackerEvent e = createTrackerEvent(10., 10., t0 );
+        e.setShipment(s);
+
+        final RuleContext context = new RuleContext(e, null);
+        assertTrue(accept(context));
+
+        handle(context);
+        assertFalse(isSiblingDetectionScheduled);
+        assertTrue(isSiblingsCleared);
     }
     /* (non-Javadoc)
      * @see com.visfresh.rules.SiblingDetectionRule#scheduleSiblingDetection(com.visfresh.entities.Shipment, java.util.Date)
      */
     @Override
     protected void scheduleSiblingDetection(final Shipment s, final Date scheduleDate) {
+        isSiblingDetectionScheduled = true;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.SiblingDetectionRule#clearSiblings(com.visfresh.entities.Shipment)
+     */
+    @Override
+    protected void clearSiblings(final Shipment s) {
+        this.isSiblingsCleared = true;
+        s.getSiblings().clear();
+        s.setSiblingCount(0);
     }
     /**
      * @param id shipment ID.

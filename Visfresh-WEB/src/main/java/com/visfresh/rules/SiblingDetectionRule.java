@@ -4,6 +4,7 @@
 package com.visfresh.rules;
 
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -11,6 +12,7 @@ import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.services.SiblingDetectionService;
@@ -27,6 +29,8 @@ public class SiblingDetectionRule implements TrackerEventRule {
     private SiblingDetectionService service;
     @Autowired
     private AbstractRuleEngine engine;
+    @Autowired
+    private ShipmentDao shipmentDao;
 
     /**
      * @param env spring environment.
@@ -64,10 +68,23 @@ public class SiblingDetectionRule implements TrackerEventRule {
     public boolean handle(final RuleContext context) {
         context.setProcessed(this);
         final Shipment s = context.getEvent().getShipment();
-        scheduleSiblingDetection(s, new Date(System.currentTimeMillis() + DETECTION_PAUSE));
+        if (!s.getDevice().getModel().isUseGateway()) {
+            scheduleSiblingDetection(s, new Date(System.currentTimeMillis() + DETECTION_PAUSE));
+        } else {
+            //is beacon then need to clean all siblings
+            s.getSiblings().clear();
+            s.setSiblingCount(0);
+            clearSiblings(s);
+        }
         return false;
     }
 
+    /**
+     * @param s shipment to update siblings.
+     */
+    protected void clearSiblings(final Shipment s) {
+        shipmentDao.updateSiblingInfo(s.getId(), new HashSet<>());
+    }
     /**
      * @param s
      * @param scheduleDate
