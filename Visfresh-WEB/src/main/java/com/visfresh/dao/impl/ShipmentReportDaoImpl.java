@@ -23,6 +23,7 @@ import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
@@ -35,9 +36,15 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.ShortUserInfo;
+import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.entities.ShortUserInfo;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.AlertRuleBean;
+import com.visfresh.io.shipment.TemperatureAlertBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.shipment.ArrivalBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
@@ -139,11 +146,11 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         //add fired alerts
-        bean.getFiredAlertRules().addAll(ruleEngine.getAlertFired(s));
+        bean.getFiredAlertRules().addAll(toRuleBeans(ruleEngine.getAlertFired(s)));
 
         //add notified persons
         final List<Alert> alerts = alertDao.getAlerts(s);
-        bean.getAlerts().addAll(alerts);
+        bean.getAlerts().addAll(toAlertBeans(alerts));
 
         //get notifications
         //notified by alert
@@ -222,6 +229,48 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             sb.append(u.getEmail());
         }
         return sb.toString();
+    }
+    /**
+     * @param rules
+     * @return
+     */
+    private List<AlertRuleBean> toRuleBeans(final List<AlertRule> rules) {
+        final List<AlertRuleBean> beans = new LinkedList<>();
+        for (final AlertRule r : rules) {
+            beans.add(toRuleBean(r));
+        }
+        return beans;
+    }
+    /**
+     * @param r
+     * @return
+     */
+    private AlertRuleBean toRuleBean(final AlertRule r) {
+        if (r instanceof TemperatureRule) {
+            return new TemperatureRuleBean((TemperatureRule) r);
+        }
+        return new AlertRuleBean(r);
+    }
+    /**
+     * @param alerts
+     * @return
+     */
+    private List<AlertBean> toAlertBeans(final List<Alert> alerts) {
+        final List<AlertBean> beans = new LinkedList<>();
+        for (final Alert alert : alerts) {
+            beans.add(toAlertBean(alert));
+        }
+        return beans;
+    }
+    /**
+     * @param alert
+     * @return
+     */
+    private AlertBean toAlertBean(final Alert alert) {
+        if (alert instanceof TemperatureAlert) {
+            return new TemperatureAlertBean((TemperatureAlert) alert);
+        }
+        return new AlertBean(alert);
     }
     /**
      * @param bean

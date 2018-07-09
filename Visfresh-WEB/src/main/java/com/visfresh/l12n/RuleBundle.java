@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.io.shipment.AlertRuleBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -41,6 +43,15 @@ public class RuleBundle {
         return StringUtils.getMessage(str, createReplacementMap(rule, units));
     }
     /**
+     * @param rule
+     * @param units
+     * @return
+     */
+    public String buildDescription(final AlertRuleBean rule, final TemperatureUnits units) {
+        final String str = getBundle().getString(buildKey(rule));
+        return StringUtils.getMessage(str, createReplacementMap(rule, units));
+    }
+    /**
      * @param rule the rule.
      * @return bundle key.
      */
@@ -49,6 +60,20 @@ public class RuleBundle {
         if (rule instanceof TemperatureRule) {
             final TemperatureRule tr = (TemperatureRule) rule;
             if (tr.isCumulativeFlag()) {
+                sb.append(".cumulative");
+            }
+        }
+        return sb.toString();
+    }
+    /**
+     * @param rule the rule.
+     * @return bundle key.
+     */
+    private String buildKey(final AlertRuleBean rule) {
+        final StringBuilder sb = new StringBuilder(rule.getType().name());
+        if (rule instanceof TemperatureRuleBean) {
+            final TemperatureRuleBean tr = (TemperatureRuleBean) rule;
+            if (tr.hasCumulativeFlag()) {
                 sb.append(".cumulative");
             }
         }
@@ -66,6 +91,26 @@ public class RuleBundle {
         map.put("type", buildKey(rule));
         if (rule instanceof TemperatureRule) {
             final TemperatureRule tr = (TemperatureRule) rule;
+            //only temperature alert rules. Other should be returned before.
+            map.put("temperature", LocalizationUtils.getTemperatureString(tr.getTemperature(), units));
+            //append time
+            map.put("ruleperiod", Integer.toString(tr.getTimeOutMinutes()));
+        }
+
+        return map;
+    }
+    /**
+     * @param rule the rule.
+     * @param units temperature units.
+     * @return map of replacements.
+     */
+    private Map<String, String> createReplacementMap(final AlertRuleBean rule,
+            final TemperatureUnits units) {
+        final Map<String, String> map =new HashMap<>();
+
+        map.put("type", buildKey(rule));
+        if (rule instanceof TemperatureRuleBean) {
+            final TemperatureRuleBean tr = (TemperatureRuleBean) rule;
             //only temperature alert rules. Other should be returned before.
             map.put("temperature", LocalizationUtils.getTemperatureString(tr.getTemperature(), units));
             //append time

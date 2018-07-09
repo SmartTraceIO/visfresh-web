@@ -21,8 +21,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
@@ -30,6 +28,8 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.AlertRuleBean;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.AbstractGraphics2DRenderer;
 import com.visfresh.reports.Colors;
@@ -164,9 +164,9 @@ public class ShipmentReportBuilder {
      * @param alerts
      * @return
      */
-    public static List<Alert> filterAlerts(final List<Alert> alerts) {
-        final List<Alert> result = new LinkedList<Alert>();
-        for (final Alert a : alerts) {
+    public static List<AlertBean> filterAlerts(final List<AlertBean> alerts) {
+        final List<AlertBean> result = new LinkedList<>();
+        for (final AlertBean a : alerts) {
             if (a.getType() != AlertType.LightOff && a.getType() != AlertType.LightOn) {
                 result.add(a);
             }
@@ -270,7 +270,7 @@ public class ShipmentReportBuilder {
             final Map<AlertType, BufferedImage> alertImageMap = loadAlertImages();
 
             list.add(Components.gap(1, DEFAULT_PADDING));
-            for (final AlertRule alert: bean.getFiredAlertRules()) {
+            for (final AlertRuleBean alert: bean.getFiredAlertRules()) {
                 //create alert component
                 final HorizontalListBuilder alertView = Components.horizontalList();
                 alertView.setStyle(Styles.style().setLeftPadding(DEFAULT_PADDING));
@@ -286,8 +286,8 @@ public class ShipmentReportBuilder {
                 alertView.add(Components.gap(2, 1));
 
                 //text
-                final TextFieldBuilder<String> text = Components.text(ruleBundle.buildDescription(alert, units))
-                        .setStyle(createStyleByFont(DEFAULT_FONT_SIZE, false)
+                final TextFieldBuilder<String> text = Components.text(ruleBundle.buildDescription(
+                        alert, units)).setStyle(createStyleByFont(DEFAULT_FONT_SIZE, false)
                             .setVerticalTextAlignment(VerticalTextAlignment.MIDDLE));
                 alertView.add(text);
 
@@ -867,7 +867,7 @@ public class ShipmentReportBuilder {
      */
     private ImageBuilder createImageWithAlerts(final ShipmentReportBean bean) {
         final List<AlertType> types = new LinkedList<>();
-        for (final Alert alert: bean.getAlerts()) {
+        for (final AlertBean alert: bean.getAlerts()) {
             final AlertType type = alert.getType();
             switch (type) {
                 case Hot:

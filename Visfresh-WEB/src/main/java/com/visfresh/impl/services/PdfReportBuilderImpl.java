@@ -32,7 +32,7 @@ import com.visfresh.reports.shipment.ShipmentReportBean;
 @Component
 public class PdfReportBuilderImpl implements PdfReportBuilder {
     private static final Logger log = LoggerFactory.getLogger(PdfReportBuilderImpl.class);
-    private static final String APPLICATION_NAME = "reports-1.0.1-app";
+    private static final String APPLICATION_NAME = "reports-1.0.2-app";
 
     private WeakReference<PdfReportBuilder> ref = new WeakReference<PdfReportBuilder>(null);
     private int numUsed;

@@ -8,13 +8,13 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.InterimStop;
-import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.AlertRuleBean;
+import com.visfresh.io.shipment.LocationProfileBean;
 import com.visfresh.reports.TemperatureStats;
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -25,9 +25,9 @@ public class ShipmentReportBean {
     private DeviceModel deviceModel = DeviceModel.SmartTrace;
     private String companyName;
     private int tripCount;
-    private LocationProfile shippedFrom;
+    private LocationProfileBean shippedFrom;
     private final List<InterimStop> interimStops = new LinkedList<>();
-    private LocationProfile shippedTo;
+    private LocationProfileBean shippedTo;
     private Date dateShipped;
     private Date dateArrived;
     private ShipmentStatus status;
@@ -41,8 +41,8 @@ public class ShipmentReportBean {
 
     //temperature history
     private String alertProfile;
-    private final List<AlertRule> firedAlertRules = new LinkedList<>();
-    private final List<Alert> alerts = new LinkedList<>();
+    private final List<AlertRuleBean> firedAlertRules = new LinkedList<>();
+    private final List<AlertBean> alerts = new LinkedList<>();
     private final List<String> whoWasNotifiedByAlert = new LinkedList<>();
     private final List<String> whoReceivedReport = new LinkedList<>();
     private TemperatureStats temperatureStats = new TemperatureStats();
@@ -83,25 +83,25 @@ public class ShipmentReportBean {
     /**
      * @return the shippedFrom
      */
-    public LocationProfile getShippedFrom() {
+    public LocationProfileBean getShippedFrom() {
         return shippedFrom;
     }
     /**
      * @param shippedFrom the shippedFrom to set
      */
-    public void setShippedFrom(final LocationProfile shippedFrom) {
+    public void setShippedFrom(final LocationProfileBean shippedFrom) {
         this.shippedFrom = shippedFrom;
     }
     /**
      * @return the shippedTo
      */
-    public LocationProfile getShippedTo() {
+    public LocationProfileBean getShippedTo() {
         return shippedTo;
     }
     /**
      * @param shippedTo the shippedTo to set
      */
-    public void setShippedTo(final LocationProfile shippedTo) {
+    public void setShippedTo(final LocationProfileBean shippedTo) {
         this.shippedTo = shippedTo;
     }
     /**
@@ -241,13 +241,13 @@ public class ShipmentReportBean {
     /**
      * @return the alertsFired
      */
-    public List<AlertRule> getFiredAlertRules() {
+    public List<AlertRuleBean> getFiredAlertRules() {
         return firedAlertRules;
     }
     /**
      * @return the alerts
      */
-    public List<Alert> getAlerts() {
+    public List<AlertBean> getAlerts() {
         return alerts;
     }
     /**

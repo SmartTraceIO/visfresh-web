@@ -22,17 +22,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.visfresh.entities.Alert;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
-import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.LocationProfileBean;
 import com.visfresh.reports.AbstractGraphics2DRenderer;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.ImagePaintingSupport;
 import com.visfresh.reports.geomap.AbstractGeoMapBuiler;
 import com.visfresh.reports.geomap.GoogleGeoMapBuiler;
-import com.visfresh.reports.geomap.OpenStreetMapBuilder;
 import com.visfresh.utils.EntityUtils;
 
 import net.sf.jasperreports.engine.JRException;
@@ -256,7 +255,7 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
             final Point mapLocation, final int zoom) {
         //draw alerts
         final ImagePaintingSupport support = new ImagePaintingSupport();
-        for (final Alert a : ShipmentReportBuilder.filterAlerts(bean.getAlerts())) {
+        for (final AlertBean a : ShipmentReportBuilder.filterAlerts(bean.getAlerts())) {
             final ShortTrackerEvent e = EntityUtils.getEntity(readings, a.getTrackerEventId());
             if (e != null) {
                 support.addFiredAlerts(e.getTime(), a.getType());
@@ -292,7 +291,7 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
         }
 
         //draw start location
-        final LocationProfile startLocation = bean.getShippedFrom();
+        final LocationProfileBean startLocation = bean.getShippedFrom();
         if (startLocation != null) {
             drawMapImage(g, ImagePaintingSupport.scaleImage(
                     ImagePaintingSupport.loadReportPngImage("tinyShippedFrom"), iconSize),
@@ -300,7 +299,7 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
         }
 
         //draw end location
-        final LocationProfile endLocation = bean.getShippedTo();
+        final LocationProfileBean endLocation = bean.getShippedTo();
         if (endLocation != null) {
             final int size = iconSize - 2;
             final BufferedImage image;
@@ -317,9 +316,9 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
                 shift = (int) Math.round(size * 0.8);
             }
 
-            final int x = Math.round(OpenStreetMapBuilder.lon2position(
+            final int x = Math.round(AbstractGeoMapBuiler.lon2position(
                     endLocation.getLocation().getLongitude(), zoom) - mapLocation.x);
-            final int y = Math.round(OpenStreetMapBuilder.lat2position(
+            final int y = Math.round(AbstractGeoMapBuiler.lat2position(
                     endLocation.getLocation().getLatitude(), zoom) - mapLocation.y);
             g.drawImage(image, x - shift, y - size, null);
         }
@@ -336,9 +335,9 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
         //create path shape
         final GeneralPath path = new GeneralPath();
         for (final Location p : readings) {
-            final int x = Math.round(OpenStreetMapBuilder.lon2position(
+            final int x = Math.round(AbstractGeoMapBuiler.lon2position(
                     p.getLongitude(), zoom) - mapLocation.x);
-            final int y = Math.round(OpenStreetMapBuilder.lat2position(
+            final int y = Math.round(AbstractGeoMapBuiler.lat2position(
                     p.getLatitude(), zoom) - mapLocation.y);
 
             final Point2D cp = path.getCurrentPoint();
@@ -365,9 +364,9 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
     private void drawMapImage(final Graphics2D g, final BufferedImage im,
             final Point mapLocation, final Location loc, final int zoom) {
         final int offset = iconSize / 2;
-        final int x = Math.round(OpenStreetMapBuilder.lon2position(
+        final int x = Math.round(AbstractGeoMapBuiler.lon2position(
                 loc.getLongitude(), zoom) - mapLocation.x);
-        final int y = Math.round(OpenStreetMapBuilder.lat2position(
+        final int y = Math.round(AbstractGeoMapBuiler.lat2position(
                 loc.getLatitude(), zoom) - mapLocation.y);
         g.drawImage(im, x - offset, y - offset, null);
     }
@@ -384,9 +383,9 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
 
         final int size = iconSize + 2;
         final int offset = size / 2;
-        final int x = Math.round(OpenStreetMapBuilder.lon2position(
+        final int x = Math.round(AbstractGeoMapBuiler.lon2position(
                 loc.getLongitude(), zoom) - mapLocation.x) - offset;
-        final int y = Math.round(OpenStreetMapBuilder.lat2position(
+        final int y = Math.round(AbstractGeoMapBuiler.lat2position(
                 loc.getLatitude(), zoom) - mapLocation.y) - offset;
 
         interimStopRenderer.render(g, new Rectangle(x, y, size, size), num);

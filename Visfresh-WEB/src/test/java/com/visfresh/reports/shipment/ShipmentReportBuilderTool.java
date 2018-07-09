@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.visfresh.dao.impl.ShipmentReportDaoImpl;
-import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.InterimStop;
@@ -25,13 +23,9 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
-import com.visfresh.entities.TemperatureAlert;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.AlertProfileBean;
-import com.visfresh.io.shipment.AlertRuleBean;
 import com.visfresh.io.shipment.ArrivalBean;
 import com.visfresh.io.shipment.CorrectiveActionListBean;
 import com.visfresh.io.shipment.InterimStopBean;
@@ -39,8 +33,6 @@ import com.visfresh.io.shipment.LocationProfileBean;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentLocationBean;
-import com.visfresh.io.shipment.TemperatureAlertBean;
-import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.PdfReportBuilderFactory;
@@ -173,10 +165,10 @@ public final class ShipmentReportBuilderTool {
         }
 
         //add fired alerts
-        bean.getFiredAlertRules().addAll(toRules(s.getAlertFired()));
+        bean.getFiredAlertRules().addAll(s.getAlertFired());
 
         //add notified persons
-        bean.getAlerts().addAll(toAlerts(s.getSentAlerts()));
+        bean.getAlerts().addAll(s.getSentAlerts());
 
         //get notifications
         //notified by alert
@@ -261,70 +253,6 @@ public final class ShipmentReportBuilderTool {
         e.setType(bean.getType());
         return e;
     }
-
-    /**
-     * @param beans
-     * @return
-     */
-    private static List<Alert> toAlerts(final List<AlertBean> beans) {
-        final List<Alert> alerts = new LinkedList<>();
-        for (final AlertBean bean : beans) {
-            Alert a;
-            if (bean instanceof TemperatureAlertBean) {
-                final TemperatureAlert ta = new TemperatureAlert();
-                final TemperatureAlertBean tBean = (TemperatureAlertBean) bean;
-
-                ta.setCumulative(tBean.isCumulative());
-                ta.setMinutes(tBean.getMinutes());
-                ta.setRuleId(tBean.getRuleId());
-                ta.setTemperature(tBean.getTemperature());
-
-                a = ta;
-            } else {
-                a = new Alert();
-            }
-
-            a.setDate(bean.getDate());
-            a.setId(bean.getId());
-            a.setTrackerEventId(bean.getTrackerEventId());
-            a.setType(bean.getType());
-
-            alerts.add(a);
-        }
-        return alerts;
-    }
-
-    /**
-     * @param alertFired
-     * @return
-     */
-    private static List<AlertRule> toRules(final List<AlertRuleBean> alertFired) {
-        final List<AlertRule> rules = new LinkedList<>();
-        for (final AlertRuleBean bean : alertFired) {
-            AlertRule r;
-            if (bean instanceof TemperatureRuleBean) {
-                final TemperatureRule tRule = new TemperatureRule();
-                final TemperatureRuleBean tBean = (TemperatureRuleBean) bean;
-
-                tRule.setCorrectiveActions(createCorrectiveActions(tBean.getCorrectiveActions()));
-                tRule.setCumulativeFlag(tBean.hasCumulativeFlag());
-                tRule.setMaxRateMinutes(tBean.getMaxRateMinutes());
-                tRule.setTemperature(tBean.getTemperature());
-                tRule.setTimeOutMinutes(tBean.getTimeOutMinutes());
-
-                r = tRule;
-            } else {
-                r = new AlertRule();
-            }
-
-            r.setId(bean.getId());
-            r.setType(bean.getType());
-
-            rules.add(r);
-        }
-        return rules;
-    }
-
     /**
      * @param bean
      * @return
@@ -338,7 +266,6 @@ public final class ShipmentReportBuilderTool {
         list.getActions().addAll(bean.getActions());
         return list;
     }
-
     /**
      * @param bean
      * @return

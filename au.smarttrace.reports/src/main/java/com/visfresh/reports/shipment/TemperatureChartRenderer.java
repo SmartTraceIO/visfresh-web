@@ -44,12 +44,12 @@ import org.jfree.ui.RectangleInsets;
 
 import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.dao.impl.TimeRanges;
-import com.visfresh.entities.Alert;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.reports.ImagePaintingSupport;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
@@ -126,9 +126,9 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
      * @param timeZone
      * @param renderer
      */
-    protected void addAlertsData(final List<ShortTrackerEvent> readings, final List<Alert> alerts,
+    protected void addAlertsData(final List<ShortTrackerEvent> readings, final List<AlertBean> alerts,
             final ArrivalBean arrival, final TimeZone timeZone, final Color color) {
-        for (final Alert a : alerts) {
+        for (final AlertBean a : alerts) {
             final ShortTrackerEvent e = EntityUtils.getEntity(readings, a.getTrackerEventId());
             if (e != null) {
                 support.addFiredAlerts(e.getTime(), a.getType());
