@@ -39,6 +39,7 @@ public class DataSourceTransactionManagerImpl extends DataSourceTransactionManag
         config.setJdbcUrl(env.getProperty("dataSource.url"));
         config.setUsername(env.getProperty("dataSource.username"));
         config.setPassword(env.getProperty("dataSource.password"));
+        config.setMaximumPoolSize(Integer.parseInt(env.getProperty("dataSource.numConnections", "3")));
         return new HikariDataSource(config);
     }
 }
