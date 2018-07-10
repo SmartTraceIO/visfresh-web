@@ -3,7 +3,6 @@
  */
 package com.visfresh.dao.impl;
 
-import java.util.Collection;
 import java.util.Date;
 
 import com.visfresh.entities.Shipment;
@@ -42,21 +41,33 @@ public abstract class AbstractTemperatureStatsCollector {
         summt += t;
         summt2 += t * t;
 
-        final long eventTime = e.getTime().getTime();
+        final long eventTime = getTime(e);
+        updateTotalTime(e);
 
-        final TimeRanges tr = getTimeRanges(e);
-        tr.addTime(eventTime);
-
-        final TrackerEvent last = getPreviousEvent(e);
+        final TrackerEvent last = getPreviousEventFor(e);
         if (last != null) {
             if (last.getTemperature() > upperTemperatureLimit) {
-                this.hotTime += eventTime - last.getTime().getTime();
+                this.hotTime += eventTime - getTime(last);
             } else if (last.getTemperature() < lowerTemperatureLimit) {
-                this.coldTime += eventTime - last.getTime().getTime();
+                this.coldTime += eventTime - getTime(last);
             }
         }
 
         saveAsLastEvent(e);
+    }
+
+    /**
+     * @param e
+     * @param eventTime
+     */
+    protected abstract void updateTotalTime(final TrackerEvent e);
+
+    /**
+     * @param e
+     * @return
+     */
+    protected long getTime(final TrackerEvent e) {
+        return e.getTime().getTime();
     }
     /**
      * @param e
@@ -99,10 +110,7 @@ public abstract class AbstractTemperatureStatsCollector {
             stats.setTimeAboveUpperLimit(hotTime);
             stats.setTimeBelowLowerLimit(coldTime);
 
-            long totalTime = 0;
-            for (final TimeRanges tr : getCollectedTimeRanges()) {
-                totalTime += tr.getTotalTime();
-            }
+            final long totalTime = getTotalTime();
             stats.setTotalTime(totalTime);
         } else {
             stats.setAvgTemperature(0.);
@@ -116,11 +124,10 @@ public abstract class AbstractTemperatureStatsCollector {
 
         return stats;
     }
-
     /**
-     * @return all collected time ranges.
+     * @return
      */
-    protected abstract Collection<TimeRanges> getCollectedTimeRanges();
+    protected abstract long getTotalTime();
     /**
      * @param e tracer event.
      */
@@ -129,12 +136,7 @@ public abstract class AbstractTemperatureStatsCollector {
      * @param e tacker event.
      * @return previous event for given tracker event.
      */
-    protected abstract TrackerEvent getPreviousEvent(final TrackerEvent e);
-    /**
-     * @param e tracker event.
-     * @return time ranges.
-     */
-    protected abstract TimeRanges getTimeRanges(final TrackerEvent e);
+    protected abstract TrackerEvent getPreviousEventFor(final TrackerEvent e);
 
     /**
      * @return the n

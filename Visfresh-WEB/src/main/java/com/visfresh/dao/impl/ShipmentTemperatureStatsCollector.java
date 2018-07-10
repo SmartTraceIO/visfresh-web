@@ -3,10 +3,6 @@
  */
 package com.visfresh.dao.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -14,7 +10,7 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 public class ShipmentTemperatureStatsCollector extends AbstractTemperatureStatsCollector {
-    protected TimeRanges timeRanges;
+    protected TimeRanges timeRanges = new TimeRanges();
     protected TrackerEvent lastEvent;
 
     /**
@@ -35,30 +31,23 @@ public class ShipmentTemperatureStatsCollector extends AbstractTemperatureStatsC
      * @see com.visfresh.dao.impl.AbstractTemperatureStatsCollector#getPreviousEvent(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    protected TrackerEvent getPreviousEvent(final TrackerEvent e) {
+    protected TrackerEvent getPreviousEventFor(final TrackerEvent e) {
         return this.lastEvent;
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.AbstractTemperatureStatsCollector#getSavedTimeRanges(com.visfresh.entities.TrackerEvent)
+    /**
+     * @param e
+     * @param eventTime
      */
     @Override
-    protected TimeRanges getTimeRanges(final TrackerEvent e) {
-        if (timeRanges == null) {
-            timeRanges = new TimeRanges();
-        }
-        return this.timeRanges;
+    protected void updateTotalTime(final TrackerEvent e) {
+        timeRanges.addTime(getTime(e));
     }
-
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.AbstractTemperatureStatsCollector#getCollectedTimeRanges()
+     * @see com.visfresh.dao.impl.AbstractTemperatureStatsCollector#getTotalTime()
      */
     @Override
-    protected Collection<TimeRanges> getCollectedTimeRanges() {
-        if (timeRanges == null) {
-            return new LinkedList<TimeRanges>();
-        }
-        return Collections.singletonList(timeRanges);
+    protected long getTotalTime() {
+        return timeRanges.getTotalTime();
     }
     /**
      * @return the lastEvent

@@ -3,7 +3,6 @@
  */
 package com.visfresh.dao.impl;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,15 +37,14 @@ public class AlertProfileTemperatureStatsCollector extends AbstractTemperatureSt
      * @return previous event for given tracker event.
      */
     @Override
-    protected TrackerEvent getPreviousEvent(final TrackerEvent e) {
+    protected TrackerEvent getPreviousEventFor(final TrackerEvent e) {
         return lastEvents.get(e.getShipment().getId());
     }
     /**
      * @param e tracker event.
      * @return time ranges.
      */
-    @Override
-    protected TimeRanges getTimeRanges(final TrackerEvent e) {
+    private TimeRanges getTimeRanges(final TrackerEvent e) {
         final Long shipmentId = e.getShipment().getId();
 
         TimeRanges tr = timeRanges.get(shipmentId);
@@ -56,14 +54,26 @@ public class AlertProfileTemperatureStatsCollector extends AbstractTemperatureSt
         }
         return tr;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.AbstractStatsCollector#getCollectedTimeRanges()
+    /**
+     * @param e
+     * @param eventTime
      */
     @Override
-    protected Collection<TimeRanges> getCollectedTimeRanges() {
-        return timeRanges.values();
+    protected void updateTotalTime(final TrackerEvent e) {
+        final TimeRanges tr = getTimeRanges(e);
+        tr.addTime(getTime(e));
     }
-
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.AbstractTemperatureStatsCollector#getTotalTime()
+     */
+    @Override
+    protected long getTotalTime() {
+        long totalTime = 0;
+        for (final TimeRanges tr : timeRanges.values()) {
+            totalTime += tr.getTotalTime();
+        }
+        return totalTime;
+    }
     public Set<Long> getDetectedShipments() {
         return new HashSet<>(lastEvents.keySet());
     }
