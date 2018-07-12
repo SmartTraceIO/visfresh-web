@@ -1,0 +1,81 @@
+/**
+ *
+ */
+package au.smarttrace.eel.rawdata;
+
+/**
+ * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
+ *
+ */
+public class InstructionPackage extends AbstractPackage {
+    public enum InstructionType {
+        DeviceCommand(0x01),//0x01: Indicate that instruction content is a device command
+        Other(-1);//Other: Reserved
+
+        private final int value;
+
+        /**
+         * @param value numeric value.
+         */
+        private InstructionType(final int value) {
+            this.value = value;
+        }
+
+        public static InstructionType valueOf(final int value) {
+            for (final InstructionType pid : values()) {
+                if (pid.value == value) {
+                    return pid;
+                }
+            }
+            return Other;
+        }
+    }
+
+    private InstructionType type;
+    private long uid;
+    private String instruction;
+
+    /**
+     * Default constructor.
+     */
+    public InstructionPackage() {
+        super();
+    }
+
+    /**
+     * @param t
+     */
+    public void setType(final InstructionType t) {
+        this.type = t;
+    }
+    /**
+     * @return the type
+     */
+    public InstructionType getType() {
+        return type;
+    }
+    /**
+     * @param uid
+     */
+    public void setUid(final long uid) {
+        this.uid = uid;
+    }
+    /**
+     * @return the uid
+     */
+    public long getUid() {
+        return uid;
+    }
+    /**
+     * @param str
+     */
+    public void setInstruction(final String str) {
+        this.instruction = str;
+    }
+    /**
+     * @return the instruction
+     */
+    public String getInstruction() {
+        return instruction;
+    }
+}
