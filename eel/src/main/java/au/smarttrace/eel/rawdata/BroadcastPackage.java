@@ -29,6 +29,12 @@ public class BroadcastPackage extends AbstractPackage {
             }
             return Other;
         }
+        /**
+         * @return the value
+         */
+        public int getValue() {
+            return value;
+        }
     }
 
     private MessageType type;

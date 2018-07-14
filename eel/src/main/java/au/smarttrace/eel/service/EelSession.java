@@ -6,7 +6,7 @@ package au.smarttrace.eel.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
+import java.net.DatagramPacket;
 
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -29,12 +29,12 @@ public class EelSession implements Runnable {
     /**
      * Socket.
      */
-    private Socket socket;
+    private DatagramPacket socket;
 
     /**
      * @param so socket.
      */
-    public EelSession(final Socket so, final RawMessageHandler handler) {
+    public EelSession(final DatagramPacket so, final RawMessageHandler handler) {
         this.socket = so;
         this.handler = handler;
     }
@@ -44,20 +44,16 @@ public class EelSession implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            processConnection(socket.getInputStream(), socket.getOutputStream());
-        } catch (final IncorrectPacketLengthException e) {
-            log.error("Failed to read message body, expected: "
-                    + e.getExpected() + " bytes, actual: " + e.getActual().length
-                    + ", received message as text: " + new String(e.getActual()));
-
-        } catch(final Exception e) {
-            log.error("Error while processing incomming connection", e);
-        } finally {
-            try {
-                socket.close();
-            } catch (final IOException e) {}
-        }
+//        try {
+//            processConnection(socket.getData());
+//        } catch (final IncorrectPacketLengthException e) {
+//            log.error("Failed to read message body, expected: "
+//                    + e.getExpected() + " bytes, actual: " + e.getActual().length
+//                    + ", received message as text: " + new String(e.getActual()));
+//
+//        } catch(final Exception e) {
+//            log.error("Error while processing incomming connection", e);
+//        }
     }
 
     /**

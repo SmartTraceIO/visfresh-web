@@ -3,20 +3,27 @@
  */
 package au.smarttrace.eel.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.GregorianCalendar;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import au.smarttrace.eel.IncorrectPacketLengthException;
+import au.smarttrace.eel.rawdata.EelMessage;
+import au.smarttrace.eel.rawdata.ImmediatelyResponder;
+import au.smarttrace.eel.rawdata.MessageParser;
+import au.smarttrace.eel.rawdata.MessageWriter;
 import au.smarttrace.eel.rawdata.RawMessageHandler;
 
 /**
@@ -25,15 +32,18 @@ import au.smarttrace.eel.rawdata.RawMessageHandler;
  */
 @Component
 public class EelService {
+    /**
+     *
+     */
+    private static final int MAX_PACKET_SIZE = 1200;
     private static final int DEFAULT_THREAD_POOL_SIZE = 100;
-    private static final int DEFAULT_TCP_TIMEOUT = 10000;
     public static final long MIN_ALLOWED_TIME = new GregorianCalendar(2018, 0, 1).getTimeInMillis();
 
     private static final Logger log = LoggerFactory.getLogger(EelService.class);
 
-    private ServerSocket server;
+    private DatagramSocket server;
+
     private final int port;
-    private final int socketTimeOut;
     private final int maxTreadCount;
     private int numThreads;
     private volatile boolean isStopped;
@@ -41,6 +51,11 @@ public class EelService {
 
     @Autowired
     private RawMessageHandler handler;
+    @Autowired
+    private ImmediatelyResponder immediatelyResponder;
+
+    private final MessageParser parser = new MessageParser();
+    private final MessageWriter writer = new MessageWriter();
 
     /**
      * Default constructor.
@@ -49,25 +64,23 @@ public class EelService {
     public EelService(final Environment env) {
         this(
             env.getProperty("eel.port", Integer.class, 3434),
-            env.getProperty("eel.tcp.timeout", Integer.class, DEFAULT_TCP_TIMEOUT),
-            env.getProperty("eel.tcp.maxthreads", Integer.class, DEFAULT_THREAD_POOL_SIZE)
+            env.getProperty("eel.udp.maxthreads", Integer.class, DEFAULT_THREAD_POOL_SIZE)
         );
     }
     /**
      * @param port TCP port for listen.
      */
     public EelService(final int port) {
-        this(port, DEFAULT_TCP_TIMEOUT, DEFAULT_THREAD_POOL_SIZE);
+        this(port, DEFAULT_THREAD_POOL_SIZE);
     }
     /**
      * @param port
      * @param socketTimeOut
      * @param maxTreadCount
      */
-    protected EelService(final int port, final int socketTimeOut, final int maxTreadCount) {
+    protected EelService(final int port, final int maxTreadCount) {
         super();
         this.port = port;
-        this.socketTimeOut = socketTimeOut;
         this.maxTreadCount = maxTreadCount;
     }
 
@@ -99,28 +112,57 @@ public class EelService {
             }
 
             try {
-                server = new ServerSocket(port);
+                server = new DatagramSocket(port);
+
                 while (true) {
                     synchronized (lock) {
                         if (isStopped) {
                             break;
                         }
                     }
-                    processConnection(server.accept());
+
+                    final byte[] buff = new byte[MAX_PACKET_SIZE];
+                    final DatagramPacket pckt = new DatagramPacket(buff, buff.length);
+                    server.receive(pckt);
+
+                    processData(pckt.getData());
                 }
             } catch (final Exception e) {
                 if (!isStopped) {
-                    log.error("Server socket crushed", e);
+                    log.error("UDP server crushed", e);
                 }
             }
         }
     }
 
     /**
+     * @param dataGramPacketBuffer
+     * @throws IOException
+     * @throws IncorrectPacketLengthException
+     */
+    private void processData(final byte[] dataGramPacketBuffer)
+            throws IOException, IncorrectPacketLengthException {
+        final byte[] data = parser.readMessageData(new ByteArrayInputStream(dataGramPacketBuffer));
+        log.debug("Message has recieved: " + Hex.encodeHexString(data));
+
+        final EelMessage msg = parser.parseMessage(data);
+
+        //need respond immediately.
+        if (immediatelyResponder != null) {
+            final EelMessage response = immediatelyResponder.respond(msg);
+            final byte[] buff = writer.writeMessage(response);
+            final DatagramPacket pckt = new DatagramPacket(buff, buff.length, server.getRemoteSocketAddress());
+            server.send(pckt);
+        }
+
+        //process message asynchronously.
+
+    }
+    /**
      * @param s socket.
      * @throws IOException
      */
-    private void processConnection(final Socket s) throws IOException {
+    private void processConnection(final DatagramPacket s) throws IOException {
         synchronized (lock) {
             while (numThreads >= maxTreadCount) {
                 //wait of num threads
@@ -138,7 +180,6 @@ public class EelService {
             numThreads++;
         }
 
-        s.setSoTimeout(socketTimeOut);
         final Thread t = new Thread(new EelSession(s, handler), "TT-18 Conneection thread"){
             /* (non-Javadoc)
              * @see java.lang.Thread#run()
@@ -150,11 +191,6 @@ public class EelService {
                 } finally {
                     synchronized (lock) {
                         numThreads--;
-                    }
-                    try {
-                        s.close();
-                    } catch (final IOException e) {
-                        log.error("Socket closing error", e);
                     }
                 }
             }
@@ -170,11 +206,7 @@ public class EelService {
                 isStopped = true;
                 lock.notifyAll();
             }
-            try {
-                server.close();
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
+            server.close();
         }
     }
     /**

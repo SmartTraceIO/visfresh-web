@@ -31,6 +31,12 @@ public class LoginPackage extends AbstractPackage {
             }
             return Undefined;
         }
+        /**
+         * @return the value
+         */
+        public int getValue() {
+            return value;
+        }
     }
 
     // IMEI 8 Device IMEI

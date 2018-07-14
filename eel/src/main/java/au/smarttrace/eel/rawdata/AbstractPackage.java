@@ -36,6 +36,12 @@ public abstract class AbstractPackage {
 
             throw new RuntimeException("Unexpected package identifier " + value);
         }
+        /**
+         * @return the value
+         */
+        public int getValue() {
+            return value;
+        }
     }
 
     // Mark 2 0x67 0x67

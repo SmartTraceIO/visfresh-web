@@ -19,11 +19,6 @@ public class DevicePosition {
     private GpsData gpsData;
     private final List<GsmStationSignal> towerSignals = new LinkedList<>();
     private final List<WiFiStationSignal> wiFiSignals = new LinkedList<>();
-    /**
-     * This field is not a part of location package. Once used for
-     * correct calculate an offset after parsing of location package.
-     */
-    private int dataSize;
 
     /**
      * Default constructor.
@@ -79,17 +74,5 @@ public class DevicePosition {
      */
     public List<WiFiStationSignal> getWiFiSignals() {
         return wiFiSignals;
-    }
-    /**
-     * @return the dataSize
-     */
-    public int getDataSize() {
-        return dataSize;
-    }
-    /**
-     * @param dataSize the dataSize to set
-     */
-    public void setDataSize(final int dataSize) {
-        this.dataSize = dataSize;
     }
 }

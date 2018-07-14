@@ -67,7 +67,7 @@ public class ParamSetPackage extends AbstractPackage {
     /**
      * @return the shecksum
      */
-    public int getShecksum() {
+    public int getChecksum() {
         return shecksum;
     }
     /**

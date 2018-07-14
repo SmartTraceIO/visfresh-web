@@ -44,7 +44,12 @@ public class WarningPackage extends AbstractPackage {
             }
             throw new RuntimeException("Unexpected package identifier " + value);
         }
-
+        /**
+         * @return the value
+         */
+        public int getValue() {
+            return value;
+        }
     }
 
     private DevicePosition location;
