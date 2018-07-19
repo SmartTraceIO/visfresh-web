@@ -10,7 +10,7 @@ import java.util.List;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class LocationPackage extends AbstractPackage {
+public class LocationPackageBody implements PackageBody {
     // Location N Device position, see Section 3.6 POSITION
     private DevicePosition location;
     // Status 2 Device status, see Section 3.5 STATUS
@@ -40,7 +40,7 @@ public class LocationPackage extends AbstractPackage {
     /**
      * Default constructor.
      */
-    public LocationPackage() {
+    public LocationPackageBody() {
         super();
     }
 

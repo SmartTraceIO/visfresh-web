@@ -7,13 +7,13 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class HeartbeatPackage extends AbstractPackage {
+public class HeartbeatPackageBody implements PackageBody {
     private Status status;
 
     /**
      * Default constructor.
      */
-    public HeartbeatPackage() {
+    public HeartbeatPackageBody() {
         super();
     }
 

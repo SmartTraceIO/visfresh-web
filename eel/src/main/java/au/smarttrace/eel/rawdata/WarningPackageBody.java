@@ -7,7 +7,7 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class WarningPackage extends AbstractPackage {
+public class WarningPackageBody implements PackageBody {
     public enum WarningType {
         Sos(0x02),//0x02 SOS
         ExternalPowerCutOff(0x01),//0x01 External power cut-off
@@ -59,7 +59,7 @@ public class WarningPackage extends AbstractPackage {
     /**
      * Default constructor.
      */
-    public WarningPackage() {
+    public WarningPackageBody() {
         super();
     }
 

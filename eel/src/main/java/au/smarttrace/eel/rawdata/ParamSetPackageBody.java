@@ -7,7 +7,7 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ParamSetPackage extends AbstractPackage {
+public class ParamSetPackageBody implements PackageBody {
     private int version;
     private int originalSize;
     private int compressedSize;
@@ -18,7 +18,7 @@ public class ParamSetPackage extends AbstractPackage {
     /**
      * Default constructor.
      */
-    public ParamSetPackage() {
+    public ParamSetPackageBody() {
         super();
     }
 

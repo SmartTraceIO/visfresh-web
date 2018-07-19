@@ -7,7 +7,7 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class BroadcastPackage extends AbstractPackage {
+public class BroadcastPackage implements PackageBody {
     public enum MessageType {
         SendToRecipient(0x01),//0x01: Indicate that instruction content is a device command
         Other(-1);//Other: Reserved

@@ -23,7 +23,7 @@ public class EelMessage {
     private String imei;
 
     //package.
-    private final List<AbstractPackage> packages = new LinkedList<>();
+    private final List<EelPackage> packages = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -83,7 +83,7 @@ public class EelMessage {
     /**
      * @return the packages
      */
-    public List<AbstractPackage> getPackages() {
+    public List<EelPackage> getPackages() {
         return packages;
     }
 }

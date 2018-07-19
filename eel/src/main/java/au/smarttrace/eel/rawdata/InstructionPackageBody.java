@@ -7,7 +7,7 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class InstructionPackage extends AbstractPackage {
+public class InstructionPackageBody implements PackageBody {
     public enum InstructionType {
         DeviceCommand(0x01),//0x01: Indicate that instruction content is a device command
         Other(-1);//Other: Reserved
@@ -44,7 +44,7 @@ public class InstructionPackage extends AbstractPackage {
     /**
      * Default constructor.
      */
-    public InstructionPackage() {
+    public InstructionPackageBody() {
         super();
     }
 

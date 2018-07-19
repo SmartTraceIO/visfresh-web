@@ -7,7 +7,7 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class AbstractPackage {
+public class PackageHeader {
     public enum PackageIdentifier {
         Login(0x01),
         Heartbeat(0x03),
@@ -56,7 +56,7 @@ public abstract class AbstractPackage {
     /**
      * Default constructor.
      */
-    public AbstractPackage() {
+    public PackageHeader() {
         super();
     }
 

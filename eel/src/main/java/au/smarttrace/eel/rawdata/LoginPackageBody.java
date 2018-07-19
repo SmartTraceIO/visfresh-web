@@ -7,7 +7,7 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class LoginPackage extends AbstractPackage {
+public class LoginPackageBody implements PackageBody {
 
     public enum Language {
         Chinese(0x00),
@@ -61,7 +61,7 @@ public class LoginPackage extends AbstractPackage {
     /**
      * Default constructor.
      */
-    public LoginPackage() {
+    public LoginPackageBody() {
         super();
     }
 

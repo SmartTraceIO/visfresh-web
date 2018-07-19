@@ -7,7 +7,7 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MessagePackage extends AbstractPackage {
+public class MessagePackageBody implements PackageBody {
     private DevicePosition location;
     private String phoneNumber;
     private String message;
@@ -15,7 +15,7 @@ public class MessagePackage extends AbstractPackage {
     /**
      * Default constructor.
      */
-    public MessagePackage() {
+    public MessagePackageBody() {
         super();
     }
 

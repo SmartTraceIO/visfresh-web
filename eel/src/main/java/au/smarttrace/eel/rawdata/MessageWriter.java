@@ -15,15 +15,12 @@ import org.apache.commons.codec.binary.Hex;
  *
  */
 public class MessageWriter {
-    private static final String MARK = "6767";
-
     /**
      * Default constructor.
      */
     public MessageWriter() {
         super();
     }
-
 
     /**
      * @param response
@@ -47,7 +44,7 @@ public class MessageWriter {
         final WriteBuffer bodyBuff = new WriteBuffer(bout);
 
         bodyBuff.writeImei(msg.getImei());
-        for (final AbstractPackage p : msg.getPackages()) {
+        for (final EelPackage p : msg.getPackages()) {
             writePackage(p, bodyBuff);
         }
 
@@ -60,48 +57,51 @@ public class MessageWriter {
         msgBuff.writeTwo(calculateCheckSumm(body));
         out.write(body);
     }
-
     /**
      * @param buff
      * @param offget
      * @return
      */
-    protected void writePackage(final AbstractPackage p, final WriteBuffer buff) {
+    protected void writePackage(final EelPackage msg, final WriteBuffer buff) {
+        final PackageBody p = msg.getBody();
+
         final ByteArrayOutputStream pckgOut = new ByteArrayOutputStream();
         final WriteBuffer pckgBuff = new WriteBuffer(pckgOut);
 
-        pckgBuff.writeTwo(p.getSequence());
-        switch (p.getPid()) {
-            case Login:
-                writeLoginPackage((LoginPackage) p, pckgBuff);
-                break;
-            case Heartbeat:
-                writeHeartbeatPackage((HeartbeatPackage) p, pckgBuff);
-                break;
-            case Location:
-                writeLocationPackage((LocationPackage) p, pckgBuff);
-                break;
-            case Warning:
-                writeWarningPackage((WarningPackage) p, pckgBuff);
-                break;
-            case Message:
-                writeMessagePackage((MessagePackage) p, pckgBuff);
-                break;
-            case ParamSet:
-                writeParamSetPackage((ParamSetPackage) p, pckgBuff);
-                break;
-            case Instruction:
-                writeInstructionPackage((InstructionPackage) p, pckgBuff);
-                break;
-            case Broadcast:
-                writeBroadcastPackage((BroadcastPackage) p, pckgBuff);
-                break;
-                default:
-                    throw new RuntimeException("Unhandled package " + p.getPid());
+        pckgBuff.writeTwo(msg.getHeader().getSequence());
+        if (p instanceof LoginPackageBody) {
+            writeLoginPackage((LoginPackageBody) p, pckgBuff);
+        } else if (p instanceof HeartbeatPackageBody) {
+            writeHeartbeatPackage((HeartbeatPackageBody) p, pckgBuff);
+        } else if (p instanceof LocationPackageBody) {
+            writeLocationPackage((LocationPackageBody) p, pckgBuff);
+        } else if (p instanceof WarningPackageBody) {
+            writeWarningPackage((WarningPackageBody) p, pckgBuff);
+        } else if (p instanceof MessagePackageBody) {
+            writeMessagePackage((MessagePackageBody) p, pckgBuff);
+        } else if (p instanceof ParamSetPackageBody) {
+            writeParamSetPackage((ParamSetPackageBody) p, pckgBuff);
+        } else if (p instanceof InstructionPackageBody) {
+            writeInstructionPackage((InstructionPackageBody) p, pckgBuff);
+        } else if (p instanceof BroadcastPackage) {
+            writeBroadcastPackage((BroadcastPackage) p, pckgBuff);
+        } else if (p instanceof LoginPackageResponse) {
+            writeLoginPackageResponse((LoginPackageResponse) p, pckgBuff);
+        } else if (p instanceof DefaultPackageResponseBody) {
+            writeDefaultPackageResponse((DefaultPackageResponseBody) p, pckgBuff);
+        } else if (p instanceof WarningPackageResponse) {
+            writeWarningPackageResponse((WarningPackageResponse) p, pckgBuff);
+        } else if (p instanceof MessagePackageResponse) {
+            writeMessagePackageResponse((MessagePackageResponse) p, pckgBuff);
+        } else if (p instanceof ParamSetPackageResponse) {
+            writeParamSetPackageResponse((ParamSetPackageResponse) p, pckgBuff);
+        } else {
+            throw new RuntimeException("Unhandled package " + p.getClass().getName());
         }
 
-        buff.writeHexString(MARK, 2);
-        buff.writeOne(p.getPid().getValue());
+        final PackageHeader header = msg.getHeader();
+        buff.writeHexString(header.getMark(), 2);
+        buff.writeOne(header.getPid().getValue());
 
         final byte[] data = pckgOut.toByteArray();
         buff.writeTwo(data.length + 2);
@@ -116,7 +116,7 @@ public class MessageWriter {
         //Content N Message content --- String
         buff.writeAllAsString(p.getContent());
     }
-    protected void writeInstructionPackage(final InstructionPackage p, final WriteBuffer buff) {
+    protected void writeInstructionPackage(final InstructionPackageBody p, final WriteBuffer buff) {
         //Type 1 Instruction type (see note 1) --- Unsigned 8 bits integer
         buff.writeOne(p.getType().getValue());
         //UID 4 Instruction UID (see note 2) --- Unsigned 32 bits integer
@@ -125,7 +125,7 @@ public class MessageWriter {
         //Content N Instruction content --- String
         buff.writeAllAsString(p.getInstruction());
     }
-    protected void writeParamSetPackage(final ParamSetPackage p, final WriteBuffer buff) {
+    protected void writeParamSetPackage(final ParamSetPackageBody p, final WriteBuffer buff) {
         //PS Ver 2 Param-set (see note 1) version --- Unsigned 16 bits integer (e.g. 0x0001: V1)
         buff.writeTwo(p.getVersion());
         //PS OSize 2 Param-set original size --- Unsigned 16 bits integer
@@ -140,7 +140,7 @@ public class MessageWriter {
         //Data N Uploading data
         buff.writeAllAsBytes(p.getData());
     }
-    protected void writeMessagePackage(final MessagePackage p, final WriteBuffer buff) {
+    protected void writeMessagePackage(final MessagePackageBody p, final WriteBuffer buff) {
         //Location N Device position, see Section 3.6 POSITION
         writeDevicePosition(p.getLocation(), buff);
 
@@ -150,7 +150,7 @@ public class MessageWriter {
         //Message content --- String
         buff.writeAllAsString(p.getMessage());
     }
-    private WarningPackage writeWarningPackage(final WarningPackage p, final WriteBuffer buff) {
+    private WarningPackageBody writeWarningPackage(final WarningPackageBody p, final WriteBuffer buff) {
         //Location N Device position, see Section 3.6 POSITION
         writeDevicePosition(p.getLocation(), buff);
 
@@ -165,7 +165,7 @@ public class MessageWriter {
      * @param contentOffset
      * @return
      */
-    protected void writeLoginPackage(final LoginPackage p, final WriteBuffer buff) {
+    protected void writeLoginPackage(final LoginPackageBody p, final WriteBuffer buff) {
         //IMEI 8 Device IMEI
         buff.writeImei(p.getImei());
         //Language 1 Device language: 0x00 --- Chinese; 0x01 --- English; Other --- Undefined
@@ -185,11 +185,11 @@ public class MessageWriter {
         //PS Sum16 2 Param-set checksum (see note 3) --- Unsigned 16 bits integer
         buff.writeTwo(p.getPsChecksum());
     }
-    protected void writeHeartbeatPackage(final HeartbeatPackage p, final WriteBuffer buff) {
+    protected void writeHeartbeatPackage(final HeartbeatPackageBody p, final WriteBuffer buff) {
         //Status 2 Device status, see Section 3.5 STATUS
         buff.writeTwo(p.getStatus().getStatus());
     }
-    protected void writeLocationPackage(final LocationPackage p, final WriteBuffer buff) {
+    protected void writeLocationPackage(final LocationPackageBody p, final WriteBuffer buff) {
         writeDevicePosition(p.getLocation(), buff);
 
         //Status 2 Device status, see Section 3.5 STATUS
@@ -220,7 +220,66 @@ public class MessageWriter {
             writeBeacon(b, buff);
         }
     }
-    protected BeaconData writeBeacon(final BeaconData b, final WriteBuffer buff) {
+    protected void writeLoginPackageResponse(final LoginPackageResponse r, final WriteBuffer buff) {
+        //Time 4 Current time (UTC) final in the final server
+        buff.writeFour(r.getCurrentTimeUtc());
+        //Version 2 final Protocol version (see note 1) --- 0x01: default
+        buff.writeTwo(r.getProtocolVersion());
+
+        int paramSetActionMask = 0;
+        //Bit0: 1 --- Tell device to upload the Param-set immediately.
+        //0 --- Do not upload it now.
+        if (r.shouldUploadParamSetImmediately()) {
+            paramSetActionMask |= 1;
+        }
+        //Bit1: 1 --- Tell device to upload the Param-set if changed in the future.
+        //0 --- Do not upload it in the
+        if (r.shouldUploadParamSetInFuture()) {
+            paramSetActionMask |= (1 << 1);
+        }
+
+        //PS Action 1 Param-set action mask (see note 2)
+        buff.writeOne(paramSetActionMask);
+    }
+    /**
+     * @param p
+     * @param pckgBuff
+     */
+    protected void writeDefaultPackageResponse(final DefaultPackageResponseBody p, final WriteBuffer pckgBuff) {
+        // nothing to write. Only common values.
+    }
+    /**
+     * @param p
+     * @param pckgBuff
+     */
+    protected void writeWarningPackageResponse(final WarningPackageResponse p, final WriteBuffer pckgBuff) {
+        // Content N Warning content --- String
+        if (p.getContent() != null) {
+            pckgBuff.writeAllAsString(p.getContent());
+        }
+    }
+    /**
+     * @param p
+     * @param pckgBuff
+     */
+    private void writeMessagePackageResponse(final MessagePackageResponse p, final WriteBuffer pckgBuff) {
+        //21 Phone number --- String
+        pckgBuff.writeString(p.getPhoneNumber(), 21);
+        //N Result content --- String
+        if (p.getContent() != null) {
+            pckgBuff.writeAllAsString(p.getContent());
+        }
+    }
+    /**
+     * @param p
+     * @param pckgBuff
+     */
+    private void writeParamSetPackageResponse(final ParamSetPackageResponse p, final WriteBuffer pckgBuff) {
+        //Next 1 Indicate whether next block is sent --- 0: Do not send 1: Send
+        final int next = p.shouldSendNext() ? 1 : 0;
+        pckgBuff.writeOne(next);
+    }
+    protected void writeBeacon(final BeaconData b, final WriteBuffer buff) {
         //Address 6 The Becaon device Bluetooth address (in big endian)
         try {
             buff.writeBytes(Hex.decodeHex(b.getAddress().toCharArray()), 6);
@@ -235,7 +294,6 @@ public class MessageWriter {
         buff.writeTwo(b.getBattery());
         //Temperature 2 Sensor temperature (in (1/256)C) --- Unsigned 16 bits integer
         buff.writeTwo(b.getTemperature());
-        return b;
     }
     protected void writeDevicePosition(final DevicePosition dp, final WriteBuffer buff) {
         // time 4 The event time (UTC) when position data is collected

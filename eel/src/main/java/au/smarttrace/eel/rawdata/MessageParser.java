@@ -10,11 +10,11 @@ import java.io.InputStream;
 import org.apache.commons.codec.binary.Hex;
 
 import au.smarttrace.eel.IncorrectPacketLengthException;
-import au.smarttrace.eel.rawdata.AbstractPackage.PackageIdentifier;
 import au.smarttrace.eel.rawdata.BroadcastPackage.MessageType;
-import au.smarttrace.eel.rawdata.InstructionPackage.InstructionType;
-import au.smarttrace.eel.rawdata.LoginPackage.Language;
-import au.smarttrace.eel.rawdata.WarningPackage.WarningType;
+import au.smarttrace.eel.rawdata.InstructionPackageBody.InstructionType;
+import au.smarttrace.eel.rawdata.LoginPackageBody.Language;
+import au.smarttrace.eel.rawdata.PackageHeader.PackageIdentifier;
+import au.smarttrace.eel.rawdata.WarningPackageBody.WarningType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -91,7 +91,7 @@ public class MessageParser {
 
         // read packages
         while (buff.hasData()) {
-            final AbstractPackage pckg = readPackage(buff);
+            final EelPackage pckg = readIncommingPackage(buff);
             msg.getPackages().add(pckg);
         }
 
@@ -102,60 +102,67 @@ public class MessageParser {
      * @param offset
      * @return
      */
-    protected AbstractPackage readPackage(final ReadBuffer buff) {
-//        Mark 2 0x67 0x67
-//        PID 1 Package identifier
-//        Size 2 Package size from next byte to end --- Unsigned 16 bits integer
-//        Sequence 2 Package sequence number --- Unsigned 16 bits integer
-//        Content N Package content
-        final String mark = buff.readHexString(2);
-        final PackageIdentifier pid = PackageIdentifier.valueOf(buff.readOne());
-        final int size = buff.readTwo() - 2;
-        final int sequence = buff.readTwo();
+    protected EelPackage readIncommingPackage(final ReadBuffer buff) {
+        final PackageHeader header = readHeader(buff);
+        final ReadBuffer pckgBuff = buff.readToNewBuffer(header.getSize());
 
-        final ReadBuffer pckgBuff = buff.readToNewBuffer(size);
+        PackageBody body;
 
-        AbstractPackage p;
-
-        switch (pid) {
+        switch (header.getPid()) {
             case Login:
-                p = parseLoginPackage(pckgBuff);
+                body = parseLoginPackage(pckgBuff);
                 break;
             case Heartbeat:
-                p = parseHeartbeatPackage(pckgBuff);
+                body = parseHeartbeatPackage(pckgBuff);
                 break;
             case Location:
-                p = parseLocationPackage(pckgBuff);
+                body = parseLocationPackage(pckgBuff);
                 break;
             case Warning:
-                p = parseWarningPackage(pckgBuff);
+                body = parseWarningPackage(pckgBuff);
                 break;
             case Message:
-                p = parseMessagePackage(pckgBuff);
+                body = parseMessagePackage(pckgBuff);
                 break;
             case ParamSet:
-                p = parseParamSetPackage(pckgBuff);
+                body = parseParamSetPackage(pckgBuff);
                 break;
             case Instruction:
-                p = parseInstructionPackage(pckgBuff);
+                body = parseInstructionPackageResponse(pckgBuff);
                 break;
             case Broadcast:
-                p = parseBroadcastPackage(pckgBuff);
+                body = parseBroadcastPackage(pckgBuff);
                 break;
                 default:
-                    throw new RuntimeException("Unhandled package " + pid);
+                    throw new RuntimeException("Unhandled package " + header.getPid());
         }
 
         if (pckgBuff.hasData()) {
             throw new RuntimeException("Not all data readen");
         }
 
-        p.setMark(mark);
-        p.setPid(pid);
-        p.setSize(size);
-        p.setSequence(sequence);
+        final EelPackage p = new EelPackage();
+        p.setHeader(header);
+        p.setBody(body);
 
         return p;
+    }
+    /**
+     * @param buff
+     * @return
+     */
+    protected PackageHeader readHeader(final ReadBuffer buff) {
+        //        Mark 2 0x67 0x67
+        //        PID 1 Package identifier
+        //        Size 2 Package size from next byte to end --- Unsigned 16 bits integer
+        //        Sequence 2 Package sequence number --- Unsigned 16 bits integer
+        //        Content N Package content
+        final PackageHeader header = new PackageHeader();
+        header.setMark(buff.readHexString(2));
+        header.setPid(PackageIdentifier.valueOf(buff.readOne()));
+        header.setSize(buff.readTwo() - 2);
+        header.setSequence(buff.readTwo());
+        return header;
     }
     protected BroadcastPackage parseBroadcastPackage(final ReadBuffer buff) {
         final BroadcastPackage p = new BroadcastPackage();
@@ -168,8 +175,21 @@ public class MessageParser {
         p.setContent(buff.readAllAsString());
         return p;
     }
-    protected InstructionPackage parseInstructionPackage(final ReadBuffer buff) {
-        final InstructionPackage p = new InstructionPackage();
+    protected InstructionPackageResponseBody parseInstructionPackageResponse(final ReadBuffer buff) {
+        final InstructionPackageResponseBody p = new InstructionPackageResponseBody();
+
+        //Type 1 Instruction type (see note 1) --- Unsigned 8 bits integer
+        p.setType(InstructionType.valueOf(buff.readOne()));
+        //UID 4 Instruction UID (see note 2) --- Unsigned 32 bits integer
+        p.setUid((int) buff.readFour());
+
+        //Content N Instruction content --- String
+        p.setInstructionResult(buff.readAllAsString());
+
+        return p;
+    }
+    protected InstructionPackageBody parseInstructionPackage(final ReadBuffer buff) {
+        final InstructionPackageBody p = new InstructionPackageBody();
 
         //Type 1 Instruction type (see note 1) --- Unsigned 8 bits integer
         p.setType(InstructionType.valueOf(buff.readOne()));
@@ -180,8 +200,8 @@ public class MessageParser {
         p.setInstruction(buff.readAllAsString());
         return p;
     }
-    protected ParamSetPackage parseParamSetPackage(final ReadBuffer buff) {
-        final ParamSetPackage p = new ParamSetPackage();
+    protected ParamSetPackageBody parseParamSetPackage(final ReadBuffer buff) {
+        final ParamSetPackageBody p = new ParamSetPackageBody();
         //PS Ver 2 Param-set (see note 1) version --- Unsigned 16 bits integer (e.g. 0x0001: V1)
         p.setVersion(buff.readTwo());
         //PS OSize 2 Param-set original size --- Unsigned 16 bits integer
@@ -197,8 +217,8 @@ public class MessageParser {
         p.setData(buff.readAllAsBytes());
         return p;
     }
-    protected MessagePackage parseMessagePackage(final ReadBuffer buff) {
-        final MessagePackage p = new MessagePackage();
+    protected MessagePackageBody parseMessagePackage(final ReadBuffer buff) {
+        final MessagePackageBody p = new MessagePackageBody();
 
         //Location N Device position, see Section 3.6 POSITION
         final DevicePosition pos = parseDevicePosition(buff);
@@ -211,8 +231,8 @@ public class MessageParser {
         p.setMessage(buff.readAllAsString());
         return p;
     }
-    private WarningPackage parseWarningPackage(final ReadBuffer buff) {
-        final WarningPackage p = new WarningPackage();
+    private WarningPackageBody parseWarningPackage(final ReadBuffer buff) {
+        final WarningPackageBody p = new WarningPackageBody();
         //Location N Device position, see Section 3.6 POSITION
         final DevicePosition pos = parseDevicePosition(buff);
         p.setLocation(pos);
@@ -228,8 +248,8 @@ public class MessageParser {
      * @param contentOffset
      * @return
      */
-    protected LoginPackage parseLoginPackage(final ReadBuffer buff) {
-        final LoginPackage p = new LoginPackage();
+    protected LoginPackageBody parseLoginPackage(final ReadBuffer buff) {
+        final LoginPackageBody p = new LoginPackageBody();
         //IMEI 8 Device IMEI
         p.setImei(buff.readImei());
         //Language 1 Device language: 0x00 --- Chinese; 0x01 --- English; Other --- Undefined
@@ -251,8 +271,8 @@ public class MessageParser {
 
         return p;
     }
-    protected HeartbeatPackage parseHeartbeatPackage(final ReadBuffer buff) {
-        final HeartbeatPackage p = new HeartbeatPackage();
+    protected HeartbeatPackageBody parseHeartbeatPackage(final ReadBuffer buff) {
+        final HeartbeatPackageBody p = new HeartbeatPackageBody();
         //Status 2 Device status, see Section 3.5 STATUS
         p.setStatus(new Status(buff.readTwo()));
         return p;
@@ -263,8 +283,8 @@ public class MessageParser {
      * @param size
      * @return
      */
-    protected LocationPackage parseLocationPackage(final ReadBuffer buff) {
-        final LocationPackage p = new LocationPackage();
+    protected LocationPackageBody parseLocationPackage(final ReadBuffer buff) {
+        final LocationPackageBody p = new LocationPackageBody();
 
         final DevicePosition pos = parseDevicePosition(buff);
         p.setLocation(pos);
