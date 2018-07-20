@@ -30,6 +30,6 @@ public class RawMessageHandlerImpl implements EelMessageHandler {
     @Override
     public void handleMessage(final EelMessage msg) {
         log.debug("EEl message received IMEI: " + msg.getImei()
-            + "\nNumber of packages: " + msg.getPackages());
+            + "\nNumber of packages: " + msg.getPackages().size());
     }
 }
