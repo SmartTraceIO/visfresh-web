@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.GregorianCalendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -91,7 +92,7 @@ public class EelService {
      * @param socketTimeOut
      * @param maxTreadCount
      */
-    protected EelService(final int port) {
+    public EelService(final int port) {
         super();
         this.port = port;
     }
@@ -119,6 +120,12 @@ public class EelService {
 
     protected void runServer() {
         log.debug("TT-18 Server has started");
+        try {
+            server = new DatagramSocket(port);
+        } catch (final SocketException exc) {
+            log.error("Failed to start UPD server", exc);
+            return;
+        }
 
         while (true) {
             synchronized (lock) {
@@ -128,8 +135,6 @@ public class EelService {
             }
 
             try {
-                server = new DatagramSocket(port);
-
                 while (true) {
                     synchronized (lock) {
                         if (isStopped) {
@@ -144,7 +149,11 @@ public class EelService {
                         break;
                     }
 
-                    processData(pckt.getData());
+                    try {
+                        processData(pckt);
+                    } catch (final Exception e) {
+                        log.error("Failed to process data", e);
+                    }
                 }
             } catch (final Exception e) {
                 if (!isStopped) {
@@ -159,8 +168,9 @@ public class EelService {
      * @throws IOException
      * @throws IncorrectPacketLengthException
      */
-    private void processData(final byte[] dataGramPacketBuffer)
+    private void processData(final DatagramPacket packet)
             throws IOException, IncorrectPacketLengthException {
+        final byte[] dataGramPacketBuffer = packet.getData();
         final byte[] data = parser.readMessageData(new ByteArrayInputStream(dataGramPacketBuffer));
         log.debug("Message has recieved: " + Hex.encodeHexString(data));
 
@@ -170,7 +180,8 @@ public class EelService {
         if (immediatelyResponder != null) {
             final EelMessage response = immediatelyResponder.respond(msg);
             final byte[] buff = writer.writeMessage(response);
-            final DatagramPacket pckt = new DatagramPacket(buff, buff.length, server.getRemoteSocketAddress());
+            final DatagramPacket pckt = new DatagramPacket(buff, buff.length,
+                    packet.getAddress(), packet.getPort());
             server.send(pckt);
         } else {
             log.warn("Immediately responder is not set");
@@ -225,5 +236,11 @@ public class EelService {
      */
     public ImmediatelyResponder getImmediatelyResponder() {
         return immediatelyResponder;
+    }
+    /**
+     * @return the port
+     */
+    public int getPort() {
+        return port;
     }
 }

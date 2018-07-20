@@ -15,11 +15,11 @@ import au.smarttrace.eel.rawdata.LocationPackageBody;
 import au.smarttrace.eel.rawdata.LoginPackageBody;
 import au.smarttrace.eel.rawdata.LoginPackageResponse;
 import au.smarttrace.eel.rawdata.MessagePackageBody;
-import au.smarttrace.eel.rawdata.MessagePackageResponse;
+import au.smarttrace.eel.rawdata.MessagePackageResponseBody;
 import au.smarttrace.eel.rawdata.PackageBody;
 import au.smarttrace.eel.rawdata.PackageHeader;
 import au.smarttrace.eel.rawdata.ParamSetPackageBody;
-import au.smarttrace.eel.rawdata.ParamSetPackageResponse;
+import au.smarttrace.eel.rawdata.ParamSetPackageResponseBody;
 import au.smarttrace.eel.rawdata.WarningPackageBody;
 import au.smarttrace.eel.rawdata.WarningPackageResponse;
 
@@ -101,8 +101,8 @@ public class ImmediatelyResponderImpl implements ImmediatelyResponder {
      * @param p
      * @return
      */
-    private ParamSetPackageResponse respondToParamSetPackage(final ParamSetPackageBody p) {
-        final ParamSetPackageResponse r = new ParamSetPackageResponse();
+    private ParamSetPackageResponseBody respondToParamSetPackage(final ParamSetPackageBody p) {
+        final ParamSetPackageResponseBody r = new ParamSetPackageResponseBody();
         r.setShouldSendNext(false); //not yet can handle the param set
         return r;
     }
@@ -125,8 +125,8 @@ public class ImmediatelyResponderImpl implements ImmediatelyResponder {
      * @param p
      * @return
      */
-    protected MessagePackageResponse respondToMessagePackage(final MessagePackageBody p) {
-        final MessagePackageResponse r = new MessagePackageResponse();
+    protected MessagePackageResponseBody respondToMessagePackage(final MessagePackageBody p) {
+        final MessagePackageResponseBody r = new MessagePackageResponseBody();
         r.setPhoneNumber(p.getPhoneNumber());
         //r.setContent(content); nothing for now
         return r;

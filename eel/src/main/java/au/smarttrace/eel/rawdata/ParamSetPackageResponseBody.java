@@ -7,13 +7,13 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ParamSetPackageResponse implements PackageBody {
+public class ParamSetPackageResponseBody implements PackageBody {
     private boolean shouldSendNext;
 
     /**
      * Default constructor.
      */
-    public ParamSetPackageResponse() {
+    public ParamSetPackageResponseBody() {
         super();
     }
 

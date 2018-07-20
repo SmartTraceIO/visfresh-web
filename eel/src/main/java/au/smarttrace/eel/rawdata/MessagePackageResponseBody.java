@@ -7,14 +7,14 @@ package au.smarttrace.eel.rawdata;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MessagePackageResponse implements PackageBody {
+public class MessagePackageResponseBody implements PackageBody {
     private String phoneNumber;
     private String content;
 
     /**
      * Default constructor.
      */
-    public MessagePackageResponse() {
+    public MessagePackageResponseBody() {
         super();
     }
 

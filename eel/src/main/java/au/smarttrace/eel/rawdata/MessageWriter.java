@@ -43,68 +43,91 @@ public class MessageWriter {
         final ByteArrayOutputStream bout = new ByteArrayOutputStream();
         final WriteBuffer bodyBuff = new WriteBuffer(bout);
 
-        bodyBuff.writeImei(msg.getImei());
         for (final EelPackage p : msg.getPackages()) {
             writePackage(p, bodyBuff);
         }
+        final byte[] body = bout.toByteArray();
+        final byte[] imeiBytes = imeiToBytes(msg.getImei());
 
         // header
         final WriteBuffer msgBuff = new WriteBuffer(out);
+        //Mark 2 'EL'
         msgBuff.writeHexString(msg.getMark(), 2);
-        msgBuff.writeTwo(msg.getSize() + 2);
+        //Size 2 Datagram size from next byte to end
+        final int size = body.length + 2 + imeiBytes.length;
+        msgBuff.writeTwo(size); //body length + checksum + IMEI.
+        msg.setSize(size);
+        //Checksum 2 Datagram checksum (see note 1) from next byte to end
+        final int checkSum = calculateCheckSumm(imeiBytes, body);
+        msgBuff.writeTwo(checkSum);
+        msg.setCheckSumm(checkSum);
+        //IMEI 8 Device IMEI
+        msgBuff.writeBytes(imeiBytes, imeiBytes.length);
 
-        final byte[] body = bout.toByteArray();
-        msgBuff.writeTwo(calculateCheckSumm(body));
         out.write(body);
     }
+    /**
+     * @param imei
+     * @return
+     */
+    private byte[] imeiToBytes(final String imei) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new WriteBuffer(out).writeImei(imei);
+        return out.toByteArray();
+    }
+
     /**
      * @param buff
      * @param offget
      * @return
      */
     protected void writePackage(final EelPackage msg, final WriteBuffer buff) {
-        final PackageBody p = msg.getBody();
+        final PackageBody body = msg.getBody();
+        final ByteArrayOutputStream bodyOut = new ByteArrayOutputStream();
+        final WriteBuffer bodyBuffer = new WriteBuffer(bodyOut);
 
-        final ByteArrayOutputStream pckgOut = new ByteArrayOutputStream();
-        final WriteBuffer pckgBuff = new WriteBuffer(pckgOut);
-
-        pckgBuff.writeTwo(msg.getHeader().getSequence());
-        if (p instanceof LoginPackageBody) {
-            writeLoginPackage((LoginPackageBody) p, pckgBuff);
-        } else if (p instanceof HeartbeatPackageBody) {
-            writeHeartbeatPackage((HeartbeatPackageBody) p, pckgBuff);
-        } else if (p instanceof LocationPackageBody) {
-            writeLocationPackage((LocationPackageBody) p, pckgBuff);
-        } else if (p instanceof WarningPackageBody) {
-            writeWarningPackage((WarningPackageBody) p, pckgBuff);
-        } else if (p instanceof MessagePackageBody) {
-            writeMessagePackage((MessagePackageBody) p, pckgBuff);
-        } else if (p instanceof ParamSetPackageBody) {
-            writeParamSetPackage((ParamSetPackageBody) p, pckgBuff);
-        } else if (p instanceof InstructionPackageBody) {
-            writeInstructionPackage((InstructionPackageBody) p, pckgBuff);
-        } else if (p instanceof BroadcastPackage) {
-            writeBroadcastPackage((BroadcastPackage) p, pckgBuff);
-        } else if (p instanceof LoginPackageResponse) {
-            writeLoginPackageResponse((LoginPackageResponse) p, pckgBuff);
-        } else if (p instanceof DefaultPackageResponseBody) {
-            writeDefaultPackageResponse((DefaultPackageResponseBody) p, pckgBuff);
-        } else if (p instanceof WarningPackageResponse) {
-            writeWarningPackageResponse((WarningPackageResponse) p, pckgBuff);
-        } else if (p instanceof MessagePackageResponse) {
-            writeMessagePackageResponse((MessagePackageResponse) p, pckgBuff);
-        } else if (p instanceof ParamSetPackageResponse) {
-            writeParamSetPackageResponse((ParamSetPackageResponse) p, pckgBuff);
+        if (body instanceof LoginPackageBody) {
+            writeLoginPackage((LoginPackageBody) body, bodyBuffer);
+        } else if (body instanceof HeartbeatPackageBody) {
+            writeHeartbeatPackage((HeartbeatPackageBody) body, bodyBuffer);
+        } else if (body instanceof LocationPackageBody) {
+            writeLocationPackage((LocationPackageBody) body, bodyBuffer);
+        } else if (body instanceof WarningPackageBody) {
+            writeWarningPackage((WarningPackageBody) body, bodyBuffer);
+        } else if (body instanceof MessagePackageBody) {
+            writeMessagePackage((MessagePackageBody) body, bodyBuffer);
+        } else if (body instanceof ParamSetPackageBody) {
+            writeParamSetPackage((ParamSetPackageBody) body, bodyBuffer);
+        } else if (body instanceof InstructionPackageBody) {
+            writeInstructionPackage((InstructionPackageBody) body, bodyBuffer);
+        } else if (body instanceof BroadcastPackage) {
+            writeBroadcastPackage((BroadcastPackage) body, bodyBuffer);
+        } else if (body instanceof LoginPackageResponse) {
+            writeLoginPackageResponse((LoginPackageResponse) body, bodyBuffer);
+        } else if (body instanceof DefaultPackageResponseBody) {
+            writeDefaultPackageResponse((DefaultPackageResponseBody) body, bodyBuffer);
+        } else if (body instanceof WarningPackageResponse) {
+            writeWarningPackageResponse((WarningPackageResponse) body, bodyBuffer);
+        } else if (body instanceof MessagePackageResponseBody) {
+            writeMessagePackageResponse((MessagePackageResponseBody) body, bodyBuffer);
+        } else if (body instanceof ParamSetPackageResponseBody) {
+            writeParamSetPackageResponse((ParamSetPackageResponseBody) body, bodyBuffer);
         } else {
-            throw new RuntimeException("Unhandled package " + p.getClass().getName());
+            throw new RuntimeException("Unhandled package " + body.getClass().getName());
         }
 
+        final byte[] data = bodyOut.toByteArray();
         final PackageHeader header = msg.getHeader();
+        //Mark 2 0x67 0x67
         buff.writeHexString(header.getMark(), 2);
+        //PID 1 Package identifier
         buff.writeOne(header.getPid().getValue());
+        //Size 2 Package size from next byte to end --- Unsigned 16 bits integer
+        buff.writeTwo(data.length + 2); //data size  + sequence number
+        //Sequence 2 Package sequence number --- Unsigned 16 bits integer
+        buff.writeTwo(msg.getHeader().getSequence());
 
-        final byte[] data = pckgOut.toByteArray();
-        buff.writeTwo(data.length + 2);
+        //Content N Package content
         buff.writeBytes(data, data.length);
     }
     protected void writeBroadcastPackage(final BroadcastPackage p, final WriteBuffer buff) {
@@ -262,7 +285,7 @@ public class MessageWriter {
      * @param p
      * @param pckgBuff
      */
-    private void writeMessagePackageResponse(final MessagePackageResponse p, final WriteBuffer pckgBuff) {
+    private void writeMessagePackageResponse(final MessagePackageResponseBody p, final WriteBuffer pckgBuff) {
         //21 Phone number --- String
         pckgBuff.writeString(p.getPhoneNumber(), 21);
         //N Result content --- String
@@ -274,7 +297,7 @@ public class MessageWriter {
      * @param p
      * @param pckgBuff
      */
-    private void writeParamSetPackageResponse(final ParamSetPackageResponse p, final WriteBuffer pckgBuff) {
+    private void writeParamSetPackageResponse(final ParamSetPackageResponseBody p, final WriteBuffer pckgBuff) {
         //Next 1 Indicate whether next block is sent --- 0: Do not send 1: Send
         final int next = p.shouldSendNext() ? 1 : 0;
         pckgBuff.writeOne(next);
@@ -386,10 +409,12 @@ public class MessageWriter {
      * @param body
      * @return
      */
-    private int calculateCheckSumm(final byte[] body) {
+    private int calculateCheckSumm(final byte[]... bodies) {
         short sum16 = 0;
-        for (final byte b : body) {
-            sum16 = (short) ((0xFF & (sum16 << 1) | (sum16 >> 15)) + b);
+        for (final byte[] body : bodies) {
+            for (final byte b : body) {
+                sum16 = (short) ((0xFF & (sum16 << 1) | (sum16 >> 15)) + b);
+            }
         }
         return sum16;
     }

@@ -7,11 +7,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
 
+import au.smarttrace.eel.IncorrectPacketLengthException;
 import au.smarttrace.eel.rawdata.InstructionPackageBody.InstructionType;
+import au.smarttrace.eel.rawdata.PackageHeader.PackageIdentifier;
 import au.smarttrace.eel.rawdata.WarningPackageBody.WarningType;
 
 /**
@@ -87,7 +92,7 @@ public class MessageParserTest extends MessageParser {
         final byte[] bytes = Hex.decodeHex(("676780000F5788014C754C7576657273696F6E23").toCharArray());
 
         final ReadBuffer buff = new ReadBuffer(bytes);
-        final PackageHeader header = readHeader(buff);
+        final PackageHeader header = readPackageHeader(buff);
         final ReadBuffer pckgBuff = buff.readToNewBuffer(header.getSize());
 
         final InstructionPackageBody p = parseInstructionPackage(pckgBuff);
@@ -100,6 +105,75 @@ public class MessageParserTest extends MessageParser {
         final byte[] bytes = Hex.decodeHex(("").toCharArray());
         final BroadcastPackage p = (BroadcastPackage) readPackage(bytes);
         assertNotNull(p);
+    }
+    @Test
+    public void testReadFullMessage() {
+        final String mark = "6868";
+        final String imei = "2390870987987";
+        final int sequence = 17;
+
+        final EelMessage msg = new EelMessage();
+        msg.setMark(mark);
+        msg.setImei(imei);
+
+        //add one package for test
+        final EelPackage pack = new EelPackage();
+        msg.getPackages().add(pack);
+
+        final HeartbeatPackageBody body = new HeartbeatPackageBody();
+        body.setStatus(new Status(1));
+        pack.setBody(body);
+
+        final PackageHeader h = new PackageHeader();
+        h.setMark(mark);
+        h.setPid(PackageIdentifier.Heartbeat);
+        h.setSequence(sequence);
+        pack.setHeader(h);
+
+        final byte[] bytes = new MessageWriter().writeMessage(msg);
+        final EelMessage m = new MessageParser().parseMessage(bytes);
+
+        //check message
+        assertEquals(mark, m.getMark());
+        assertEquals(imei, m.getImei());
+
+        final EelPackage p = m.getPackages().get(0);
+        //check header
+        assertEquals(mark, p.getHeader().getMark());
+        assertEquals(PackageIdentifier.Heartbeat, p.getHeader().getPid());
+        assertEquals(sequence, p.getHeader().getSequence());
+
+        //check body
+        final HeartbeatPackageBody b = (HeartbeatPackageBody) p.getBody();
+        assertTrue(b.getStatus().isGpsFixed());
+    }
+    @Test
+    public void testReadMessageFromStream() throws IOException, IncorrectPacketLengthException {
+        final EelMessage msg = new EelMessage();
+        msg.setMark("6767");
+        msg.setImei("2390870987987");
+
+        //add one package for test
+        final EelPackage pack = new EelPackage();
+        msg.getPackages().add(pack);
+
+        final HeartbeatPackageBody body = new HeartbeatPackageBody();
+        body.setStatus(new Status(1));
+        pack.setBody(body);
+
+        final PackageHeader h = new PackageHeader();
+        h.setMark("6767");
+        h.setPid(PackageIdentifier.Heartbeat);
+        h.setSequence(17);
+        pack.setHeader(h);
+
+        final byte[] bytes = new MessageWriter().writeMessage(msg);
+        final MessageParser parser = new MessageParser();
+        final byte[] received = parser.readMessageData(new ByteArrayInputStream(bytes));
+        final EelMessage m = parser.parseMessage(received);
+
+        //check message
+        assertNotNull(m);
     }
     /**
      * @param bytes

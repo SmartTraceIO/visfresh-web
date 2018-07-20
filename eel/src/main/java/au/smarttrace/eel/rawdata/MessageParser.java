@@ -21,7 +21,7 @@ import au.smarttrace.eel.rawdata.WarningPackageBody.WarningType;
  *
  */
 public class MessageParser {
-    private static final int HEADER_SIZE = 7;
+    private static final int HEADER_SIZE = 14;
 
     /**
      * Reads only data from one message from stream. Not more extra bytes.
@@ -32,17 +32,12 @@ public class MessageParser {
      */
     public byte[] readMessageData(final InputStream in) throws IOException, IncorrectPacketLengthException {
         final byte[] header = new byte[HEADER_SIZE];
-        int size;
-        if ((size = in.read(header)) < header.length) {
-            if (size == -1) {
-                //correct behavior, not next data.
-                return null;
-            }
+        if ((in.read(header)) < header.length) {
             throw new EOFException("Failed to read header data");
         }
 
-        final ReadBuffer tmp = new ReadBuffer(header, 0, 2);
-        final int len = tmp.readTwo();
+        final ReadBuffer tmp = new ReadBuffer(header, 2, 2);
+        final int len = tmp.readTwo() - 2 - 8; //-checksum - IMEI, because already read
 
         final byte[] msg = new byte[len + header.length];
         //copy header
@@ -82,12 +77,7 @@ public class MessageParser {
     public EelMessage parseMessage(final byte[] bytes) {
         final ReadBuffer buff = new ReadBuffer(bytes);
 
-        final EelMessage msg = new EelMessage();
-        // header
-        msg.setMark(buff.readHexString(2));
-        msg.setSize(buff.readTwo());
-        msg.setCheckSumm(buff.readTwo());
-        msg.setImei(buff.readImei());
+        final EelMessage msg = readMessageWithoutPackages(buff);
 
         // read packages
         while (buff.hasData()) {
@@ -99,11 +89,38 @@ public class MessageParser {
     }
     /**
      * @param buff
+     * @return
+     */
+    public EelMessage readMessageWithoutPackages(final ReadBuffer buff) {
+        final EelMessage msg = new EelMessage();
+        // header
+        msg.setMark(buff.readHexString(2));
+        msg.setSize(buff.readTwo());
+        msg.setCheckSumm(buff.readTwo());
+        msg.setImei(buff.readImei());
+        return msg;
+    }
+    /**
+     * @param buff
      * @param offset
      * @return
      */
     protected EelPackage readIncommingPackage(final ReadBuffer buff) {
-        final PackageHeader header = readHeader(buff);
+        final PackageHeader header = readPackageHeader(buff);
+        final PackageBody body = readIncomingPackageBody(buff, header);
+
+        final EelPackage p = new EelPackage();
+        p.setHeader(header);
+        p.setBody(body);
+
+        return p;
+    }
+    /**
+     * @param buff
+     * @param header
+     * @return
+     */
+    protected PackageBody readIncomingPackageBody(final ReadBuffer buff, final PackageHeader header) {
         final ReadBuffer pckgBuff = buff.readToNewBuffer(header.getSize());
 
         PackageBody body;
@@ -140,18 +157,13 @@ public class MessageParser {
         if (pckgBuff.hasData()) {
             throw new RuntimeException("Not all data readen");
         }
-
-        final EelPackage p = new EelPackage();
-        p.setHeader(header);
-        p.setBody(body);
-
-        return p;
+        return body;
     }
     /**
      * @param buff
      * @return
      */
-    protected PackageHeader readHeader(final ReadBuffer buff) {
+    public PackageHeader readPackageHeader(final ReadBuffer buff) {
         //        Mark 2 0x67 0x67
         //        PID 1 Package identifier
         //        Size 2 Package size from next byte to end --- Unsigned 16 bits integer
@@ -275,6 +287,10 @@ public class MessageParser {
         final HeartbeatPackageBody p = new HeartbeatPackageBody();
         //Status 2 Device status, see Section 3.5 STATUS
         p.setStatus(new Status(buff.readTwo()));
+        return p;
+    }
+    public DefaultPackageResponseBody parseDefaultPackageResponseBody(final ReadBuffer buff) {
+        final DefaultPackageResponseBody p = new DefaultPackageResponseBody();
         return p;
     }
     /**

@@ -55,11 +55,16 @@ public class WriteBuffer {
         writeBsdString(imei, 8);
     }
     private void writeBsdString(final String str, final int len) {
-        final char[] buff = createCharArray(str, len);
+        final char[] buff = createCharArray(str, (str.length() + 1) / 2, '0');
+        final int size = buff.length / 2;
 
         //write buffer
         try {
-            for (int i = 0; i < len; i++) {
+            for (int i = len - size; i > 0; i--) {
+                out.write(0);
+            }
+
+            for (int i = 0; i < size; i++) {
                 final int b = ((buff[2 * i] - '0') << 4) | (buff[2 * i + 1] - '0');
                 out.write(b);
             }
@@ -67,13 +72,13 @@ public class WriteBuffer {
         }
     }
     public void writeHexString(final String str, final int len) {
-        final char[] buff = createCharArray(str, len);
+        final char[] buff = createCharArray(str, len, '0');
 
         //write buffer
         try {
             for (int i = 0; i < len; i++) {
                 final String tmp = new String(buff, i * 2, 2);
-                out.write(Integer.parseInt(tmp));
+                out.write(Integer.parseInt(tmp, 16));
             }
         } catch (final IOException e) {
         }
@@ -84,7 +89,7 @@ public class WriteBuffer {
      * @param len
      * @return
      */
-    protected char[] createCharArray(final String str, final int len) {
+    protected char[] createCharArray(final String str, final int len, final char zeroSymbol) {
         if (str.length() > len * 2) {
             throw new RuntimeException("String size " + str.length()
                 + " is more than requested buffer size " + len);
@@ -92,7 +97,7 @@ public class WriteBuffer {
         }
 
         final char[] buff = new char[len * 2];
-        Arrays.fill(buff, '0');
+        Arrays.fill(buff, zeroSymbol);
 
         //copy string to buffer
         final int offset = buff.length - str.length();
@@ -106,7 +111,7 @@ public class WriteBuffer {
         Arrays.fill(buff, (byte) ' ');
 
         final int offset = len - str.length();
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < str.length(); i++) {
             buff[offset + i] = (byte) str.charAt(i);
         }
 

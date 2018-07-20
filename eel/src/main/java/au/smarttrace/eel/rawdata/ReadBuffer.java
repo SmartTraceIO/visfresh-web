@@ -87,7 +87,17 @@ public class ReadBuffer {
      * @return
      */
     public String readImei() {
-        return readBsdString(8, false);
+        final String imei = readBsdString(8, false);
+        //cut zero symbols from end
+        int offset = 0;
+        while (imei.charAt(offset) == '0') {
+            offset++;
+        }
+        if (offset > 0) {
+            return imei.substring(offset);
+        }
+
+        return imei;
     }
 
     /**
