@@ -5,7 +5,6 @@ package au.smarttrace.eel.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import au.smarttrace.eel.rawdata.EelMessage;
@@ -21,7 +20,6 @@ public class RawMessageHandlerImpl implements EelMessageHandler {
     /**
      * Default constructor.
      */
-    @Autowired
     public RawMessageHandlerImpl() {
         super();
     }
