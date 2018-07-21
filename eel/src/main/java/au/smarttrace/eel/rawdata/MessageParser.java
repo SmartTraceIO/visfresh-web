@@ -96,7 +96,7 @@ public class MessageParser {
         // header
         msg.setMark(buff.readHexString(2));
         msg.setSize(buff.readTwo());
-        msg.setCheckSumm(buff.readTwo());
+        msg.setCheckSum(buff.readTwo());
         msg.setImei(buff.readImei());
         return msg;
     }

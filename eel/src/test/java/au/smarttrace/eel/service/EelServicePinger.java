@@ -29,7 +29,7 @@ public final class EelServicePinger {
      *
      */
     private static final int PORT = 3434;
-    private static final String HOST = "smarttrace.com.au";
+    private static final String HOST = "www.stf.smarttrace.com.au";
 
     /**
      * Default constructor.

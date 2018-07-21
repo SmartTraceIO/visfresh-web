@@ -107,6 +107,36 @@ public class MessageParserTest extends MessageParser {
         assertNotNull(p);
     }
     @Test
+    public void testParseRealRawMessageData() throws DecoderException {
+        final byte[] bytes = Hex.decodeHex(("454c0027f339035254407466497"
+                + "167670100180001035254407466497101280207120700010432005bd8eb").toCharArray());
+        final MessageParser parser = new MessageParser();
+        final EelMessage msg = parser.parseMessage(bytes);
+        assertNotNull(msg);
+    }
+    @Test
+    public void testCheckSum() throws DecoderException {
+        final byte[] bytes = Hex.decodeHex(("454c0027f339035254407466497"
+                + "167670100180001035254407466497101280207120700010432005bd8eb").toCharArray());
+
+        //header without IMEI
+        final byte[] header = new byte[6];
+        //body with IMEI
+        final byte[] body = new byte[bytes.length - header.length];
+
+        System.arraycopy(bytes, 0, header, 0, header.length);
+        System.arraycopy(bytes, header.length, body, 0, body.length);
+
+        //get origin checksum
+        final ReadBuffer headerBuffer = new ReadBuffer(header);
+        headerBuffer.readTwo();
+        headerBuffer.readTwo();
+        final int originChecksum = headerBuffer.readTwo();
+
+        final int checkSum = MessageWriter.calculateCheckSum(body);
+        assertEquals(originChecksum, checkSum);
+    }
+    @Test
     public void testReadFullMessage() {
         final String mark = "6868";
         final String imei = "2390870987987";

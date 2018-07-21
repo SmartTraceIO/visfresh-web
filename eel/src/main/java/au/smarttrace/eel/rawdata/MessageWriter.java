@@ -58,13 +58,13 @@ public class MessageWriter {
         msgBuff.writeTwo(size); //body length + checksum + IMEI.
         msg.setSize(size);
         //Checksum 2 Datagram checksum (see note 1) from next byte to end
-        final int checkSum = calculateCheckSumm(imeiBytes, body);
+        final int checkSum = calculateCheckSum(imeiBytes, body);
         msgBuff.writeTwo(checkSum);
-        msg.setCheckSumm(checkSum);
+        msg.setCheckSum(checkSum);
         //IMEI 8 Device IMEI
         msgBuff.writeBytes(imeiBytes, imeiBytes.length);
 
-        out.write(body);
+        msgBuff.writeBytes(body, body.length);
     }
     /**
      * @param imei
@@ -409,11 +409,11 @@ public class MessageWriter {
      * @param body
      * @return
      */
-    private int calculateCheckSumm(final byte[]... bodies) {
-        short sum16 = 0;
+    public static int calculateCheckSum(final byte[]... bodies) {
+        int sum16 = 0;
         for (final byte[] body : bodies) {
             for (final byte b : body) {
-                sum16 = (short) ((0xFF & (sum16 << 1) | (sum16 >> 15)) + b);
+                sum16 = 0xFFFF & (((sum16 << 1) | (sum16 >> 15)) + (0xFF & b));
             }
         }
         return sum16;

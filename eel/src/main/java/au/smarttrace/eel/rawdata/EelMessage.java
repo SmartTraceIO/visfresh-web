@@ -18,7 +18,7 @@ public class EelMessage {
     // Size 2 Datagram size from next byte to end
     private int size;
     // Checksum 2 Datagram checksum (see note 1) from next byte to end
-    private int checkSumm;
+    private int checkSum;
     //IMEI 8 Device IMEI
     private String imei;
 
@@ -57,16 +57,16 @@ public class EelMessage {
         this.size = size;
     }
     /**
-     * @return the checkSumm
+     * @return the checkSum
      */
-    public int getCheckSumm() {
-        return checkSumm;
+    public int getCheckSum() {
+        return checkSum;
     }
     /**
-     * @param checkSumm the checkSumm to set
+     * @param checkSum the checkSum to set
      */
-    public void setCheckSumm(final int checkSumm) {
-        this.checkSumm = checkSumm;
+    public void setCheckSum(final int checkSum) {
+        this.checkSum = checkSum;
     }
     /**
      * @return the imei
