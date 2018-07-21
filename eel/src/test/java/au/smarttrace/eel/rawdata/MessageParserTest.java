@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -135,6 +136,15 @@ public class MessageParserTest extends MessageParser {
 
         final int checkSum = MessageWriter.calculateCheckSum(body);
         assertEquals(originChecksum, checkSum);
+    }
+    @Test
+    public void testLoginMessageEqualsByOrigin() throws DecoderException {
+        final byte[] bytes = Hex.decodeHex(("454c0027f339035254407466497"
+                + "167670100180001035254407466497101280207120700010432005bd8eb").toCharArray());
+        final EelMessage msg = new MessageParser().parseMessage(bytes);
+        final byte[] bytesNew = new MessageWriter().writeMessage(msg);
+
+        assertTrue(Arrays.equals(bytes, bytesNew));
     }
     @Test
     public void testReadFullMessage() {
