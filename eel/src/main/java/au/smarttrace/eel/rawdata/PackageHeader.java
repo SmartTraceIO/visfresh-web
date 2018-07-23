@@ -16,7 +16,8 @@ public class PackageHeader {
         Message(0x16),
         ParamSet(0x1B),
         Instruction(0x80),
-        Broadcast(0x81);
+        Broadcast(0x81),
+        Undefined(-1);
 
         private final int value;
 
@@ -52,6 +53,8 @@ public class PackageHeader {
     private int size;
     //Sequence 2 Package sequence number --- Unsigned 16 bits integer
     private int sequence;
+    //only for undefined packages.
+    private int pidOriginValue;
 
     /**
      * Default constructor.
@@ -107,5 +110,20 @@ public class PackageHeader {
      */
     public void setSequence(final int sequence) {
         this.sequence = sequence;
+    }
+    public static void main(final String[] args) {
+        System.out.println(Integer.toHexString(26));
+    }
+    /**
+     * @return the pidOriginValue
+     */
+    public int getPidOriginValue() {
+        return pidOriginValue;
+    }
+    /**
+     * @param pidOriginValue the pidOriginValue to set
+     */
+    public void setPidOriginValue(final int pidOriginValue) {
+        this.pidOriginValue = pidOriginValue;
     }
 }

@@ -8,6 +8,11 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+
+import au.smarttrace.eel.Utils;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -165,5 +170,19 @@ public class WriteBuffer {
             out.write(bytes);
         } catch (final IOException e) {
         }
+    }
+    /**
+     * @param address
+     */
+    public void writeBeaconAddress(final String address) {
+        //Address 6 The Becaon device Bluetooth address (in big endian)
+        byte[] bytes;
+        try {
+            bytes = Hex.decodeHex(address.toCharArray());
+        } catch (final DecoderException e) {
+            throw new RuntimeException(e);
+        }
+        Utils.revertBytes(bytes);
+        writeBytes(bytes);
     }
 }

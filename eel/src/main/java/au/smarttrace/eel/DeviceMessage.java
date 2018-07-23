@@ -4,6 +4,8 @@
 package au.smarttrace.eel;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -42,6 +44,10 @@ public class DeviceMessage {
     private String message;
 
     private Location location;
+
+    private final List<StationSignal> stationSignals = new LinkedList<>();
+
+    private String type = "AUT";
 
     /**
      * Default constructor.
@@ -180,5 +186,23 @@ public class DeviceMessage {
      */
     public void setHumidity(final Integer humidity) {
         this.humidity = humidity;
+    }
+    /**
+     * @return the stationSignals
+     */
+    public List<StationSignal> getStationSignals() {
+        return stationSignals;
+    }
+    /**
+     * @return
+     */
+    public String getType() {
+        return type;
+    }
+    /**
+     * @param type the type to set
+     */
+    public void setType(final String type) {
+        this.type = type;
     }
 }

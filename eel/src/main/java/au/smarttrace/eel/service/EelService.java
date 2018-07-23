@@ -111,7 +111,7 @@ public class EelService {
             @Override
             public void run() {
                 runServer();
-                log.debug("TT-18 server has stopped");
+                log.debug("EEL server has stopped");
             }
         };
 
@@ -119,7 +119,7 @@ public class EelService {
     }
 
     protected void runServer() {
-        log.debug("TT-18 Server has started");
+        log.debug("EEL Server has started");
         try {
             server = new DatagramSocket(port);
         } catch (final SocketException exc) {

@@ -20,6 +20,7 @@ import au.smarttrace.eel.rawdata.PackageBody;
 import au.smarttrace.eel.rawdata.PackageHeader;
 import au.smarttrace.eel.rawdata.ParamSetPackageBody;
 import au.smarttrace.eel.rawdata.ParamSetPackageResponseBody;
+import au.smarttrace.eel.rawdata.UndefinedPackageBody;
 import au.smarttrace.eel.rawdata.WarningPackageBody;
 import au.smarttrace.eel.rawdata.WarningPackageResponse;
 
@@ -91,6 +92,8 @@ public class ImmediatelyResponderImpl implements ImmediatelyResponder {
             resp = respondToInstructionPackageResponse((InstructionPackageResponseBody) p);
         } else if (p instanceof DefaultPackageResponseBody) {
             resp = respondToBroadcastPackageResponse((DefaultPackageResponseBody) p);
+        } else if (p instanceof UndefinedPackageBody) {
+            resp = null;
         } else {
             throw new RuntimeException("Unhandled package " + p.getClass().getName());
         }
@@ -140,7 +143,6 @@ public class ImmediatelyResponderImpl implements ImmediatelyResponder {
         r.setContent("Warning received: " + p.getWarningType());
         return r;
     }
-
     /**
      * @param p
      * @return

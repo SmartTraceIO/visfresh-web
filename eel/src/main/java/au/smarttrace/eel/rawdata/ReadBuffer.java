@@ -5,6 +5,10 @@ package au.smarttrace.eel.rawdata;
 
 import java.util.Arrays;
 
+import org.apache.commons.codec.binary.Hex;
+
+import au.smarttrace.eel.Utils;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -99,7 +103,15 @@ public class ReadBuffer {
 
         return imei;
     }
-
+    /**
+     * @return
+     */
+    public String readBeaconAddress() {
+        //Address 6 The Becaon device Bluetooth address (in big endian)
+        final byte[] bytes = readBytes(6);
+        Utils.revertBytes(bytes);
+        return new String(Hex.encodeHex(bytes, false));
+    }
     /**
      * @param bytes
      *            bytes.
@@ -111,7 +123,7 @@ public class ReadBuffer {
      *            cutting of leading zero symbol.
      * @return string converted from BCD format.
      */
-    private String readBsdString(final int len, final boolean cutLeadingZero) {
+    public String readBsdString(final int len, final boolean cutLeadingZero) {
         checkAvailable(len);
         final char[] chars = new char[len * 2];
         for (int i = 0; i < len; i++) {

@@ -7,9 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -100,8 +97,8 @@ public class MessageWriter {
             writeParamSetPackage((ParamSetPackageBody) body, bodyBuffer);
         } else if (body instanceof InstructionPackageBody) {
             writeInstructionPackage((InstructionPackageBody) body, bodyBuffer);
-        } else if (body instanceof BroadcastPackage) {
-            writeBroadcastPackage((BroadcastPackage) body, bodyBuffer);
+        } else if (body instanceof BroadcastPackageBody) {
+            writeBroadcastPackage((BroadcastPackageBody) body, bodyBuffer);
         } else if (body instanceof LoginPackageResponse) {
             writeLoginPackageResponse((LoginPackageResponse) body, bodyBuffer);
         } else if (body instanceof DefaultPackageResponseBody) {
@@ -130,7 +127,7 @@ public class MessageWriter {
         //Content N Package content
         buff.writeBytes(data, data.length);
     }
-    protected void writeBroadcastPackage(final BroadcastPackage p, final WriteBuffer buff) {
+    protected void writeBroadcastPackage(final BroadcastPackageBody p, final WriteBuffer buff) {
         //Type 1 Broadcast type (see note 1) --- Unsigned 8 bits integer
         buff.writeOne(p.getType().getValue());
         //Number 21 Phone number (see note 2) --- String
@@ -304,11 +301,7 @@ public class MessageWriter {
     }
     protected void writeBeacon(final BeaconData b, final WriteBuffer buff) {
         //Address 6 The Becaon device Bluetooth address (in big endian)
-        try {
-            buff.writeBytes(Hex.decodeHex(b.getAddress().toCharArray()), 6);
-        } catch (final DecoderException e) {
-            throw new RuntimeException("Unable to decode beacon address " + b.getAddress(), e);
-        }
+        buff.writeBeaconAddress(b.getAddress());
         //Tppe 1
         buff.writeOne(b.getTppe());
         //RSSI 1 Bluetooth signal level --- Signed 8 bits integer (in dB)

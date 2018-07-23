@@ -24,6 +24,7 @@ public class EelMessage {
 
     //package.
     private final List<EelPackage> packages = new LinkedList<>();
+    private byte[] rawData;
 
     /**
      * Default constructor.
@@ -85,5 +86,17 @@ public class EelMessage {
      */
     public List<EelPackage> getPackages() {
         return packages;
+    }
+    /**
+     * @return
+     */
+    public byte[] getRawData() {
+        return rawData;
+    }
+    /**
+     * @param rawData the rawData to set
+     */
+    public void setRawData(final byte[] rawData) {
+        this.rawData = rawData;
     }
 }

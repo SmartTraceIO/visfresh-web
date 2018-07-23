@@ -7,10 +7,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.codec.binary.Hex;
-
 import au.smarttrace.eel.IncorrectPacketLengthException;
-import au.smarttrace.eel.rawdata.BroadcastPackage.MessageType;
+import au.smarttrace.eel.rawdata.BroadcastPackageBody.MessageType;
 import au.smarttrace.eel.rawdata.InstructionPackageBody.InstructionType;
 import au.smarttrace.eel.rawdata.LoginPackageBody.Language;
 import au.smarttrace.eel.rawdata.PackageHeader.PackageIdentifier;
@@ -78,6 +76,7 @@ public class MessageParser {
         final ReadBuffer buff = new ReadBuffer(bytes);
 
         final EelMessage msg = readMessageWithoutPackages(buff);
+        msg.setRawData(bytes);
 
         // read packages
         while (buff.hasData()) {
@@ -150,6 +149,9 @@ public class MessageParser {
             case Broadcast:
                 body = parseBroadcastPackage(pckgBuff);
                 break;
+            case Undefined:
+                body = parseUndefinedPackage(pckgBuff);
+                break;
                 default:
                     throw new RuntimeException("Unhandled package " + header.getPid());
         }
@@ -171,13 +173,24 @@ public class MessageParser {
         //        Content N Package content
         final PackageHeader header = new PackageHeader();
         header.setMark(buff.readHexString(2));
-        header.setPid(PackageIdentifier.valueOf(buff.readOne()));
+        final int pid = buff.readOne();
+        try {
+            header.setPid(PackageIdentifier.valueOf(pid));
+        } catch (final Exception e) {
+            header.setPid(PackageIdentifier.Undefined);
+            header.setPidOriginValue(pid);
+        }
         header.setSize(buff.readTwo() - 2);
         header.setSequence(buff.readTwo());
         return header;
     }
-    protected BroadcastPackage parseBroadcastPackage(final ReadBuffer buff) {
-        final BroadcastPackage p = new BroadcastPackage();
+    private UndefinedPackageBody parseUndefinedPackage(final ReadBuffer pckgBuff) {
+        final UndefinedPackageBody p = new UndefinedPackageBody();
+        p.setRawData(pckgBuff.readAllAsBytes());
+        return p;
+    }
+    protected BroadcastPackageBody parseBroadcastPackage(final ReadBuffer buff) {
+        final BroadcastPackageBody p = new BroadcastPackageBody();
         //Type 1 Broadcast type (see note 1) --- Unsigned 8 bits integer
         p.setType(MessageType.valueOf(buff.readOne()));
         //Number 21 Phone number (see note 2) --- String
@@ -326,11 +339,13 @@ public class MessageParser {
         //2 Sensor Accelerometer Z axis(in g)--- Unsigned 16 bits integer
         p.setzAcceleration(buff.readTwo());
 
-        final int beaconCount = buff.readOne();
-        p.setBeaconVersion(buff.readOne());
+        if (buff.hasData()) {
+            final int beaconCount = buff.readOne();
+            p.setBeaconVersion(buff.readOne());
 
-        for (int i = 0; i < beaconCount; i++) {
-            p.getBeacons().add(parseBeacon(buff));
+            for (int i = 0; i < beaconCount; i++) {
+                p.getBeacons().add(parseBeacon(buff));
+            }
         }
 
         return p;
@@ -338,7 +353,7 @@ public class MessageParser {
     protected BeaconData parseBeacon(final ReadBuffer buff) {
         final BeaconData b = new BeaconData();
         //Address 6 The Becaon device Bluetooth address (in big endian)
-        b.setAddress(Hex.encodeHexString(buff.readBytes(6)));
+        b.setAddress(buff.readBeaconAddress());
         //Tppe 1
         b.setTppe((byte) buff.readOne());
         //RSSI 1 Bluetooth signal level --- Signed 8 bits integer (in dB)
