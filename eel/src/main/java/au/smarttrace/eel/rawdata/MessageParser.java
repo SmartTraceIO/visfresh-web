@@ -425,11 +425,13 @@ public class MessageParser {
         final GsmStationSignal s = new GsmStationSignal();
         s.setMcc(mcc);
         s.setMnc(mnc);
-        //LAC 2 Same as definition in BSID0
+
+        //LAC 2 Location Area Code --- Unsigned 16 bits integer
         s.setLac(buff.readTwo());
-        //CI 4 Same as definition in BSID0
-        s.setCid((int) buff.readFour());
-        //RxLev 1 Same as definition in BSID0
+        //CI 4 Cell ID with RNC --- Unsigned 32 bits integer
+        s.setRnc(buff.readTwo());
+        s.setCid(buff.readTwo());
+        //RxLev 1 Cell signal level --- Unsigned 8 bits integer (0: -110dB 1:-109dB 2:-108dB ...110: 0dB)
         s.setRxLevel(buff.readOne());
         return s;
     }

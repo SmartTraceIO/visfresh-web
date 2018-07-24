@@ -148,21 +148,6 @@ public class MessageParserTest extends MessageParser {
         final EelMessage msg = parser.parseMessage(bytes);
         assertNotNull(msg);
     }
-//    @Test
-//    public void testParseMessage() throws DecoderException {
-//        final byte[] bytes = Hex.decodeHex(
-//                ("454c008b8bc9035254407466496367671a002600015b469a0000000007"
-//                + "00000002000000040000016d0000000700000002000000040000016d6"
-//                + "7671a002600015b47eb800000000700000002000000040000016d0000"
-//                + "000000000000000000000000000067671a002600035685c1800000002"
-//                + "40000001600000019000007720000001d000000130000001400000604").toCharArray());
-//        final MessageParser parser = new MessageParser();
-//        final EelMessage msg = parser.parseMessage(bytes);
-//        for (final EelPackage p : msg.getPackages()) {
-//            System.out.println("PID: " + p.getHeader().getPid() + " (" + p.getHeader().getPidOriginValue() + ")");
-//        }
-//        assertNotNull(msg);
-//    }
     @Test
     public void testCheckSum() throws DecoderException {
         final byte[] bytes = Hex.decodeHex(("454c0027f339035254407466497"

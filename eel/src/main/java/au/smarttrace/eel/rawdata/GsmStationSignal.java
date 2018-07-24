@@ -18,6 +18,7 @@ public class GsmStationSignal {
     private int cid;
     //RxLev Cell signal level --- Unsigned 8 bits integer (0: -110dB 1:-109dB 2:-108dB ...110: 0dB)
     private int rxLevel;
+    private int rnc;
 
     /**
      * Default constructor.
@@ -85,5 +86,30 @@ public class GsmStationSignal {
      */
     public void setRxLevel(final int rxLevel) {
         this.rxLevel = rxLevel;
+    }
+    /**
+     * @param rnc
+     */
+    public void setRnc(final int rnc) {
+        this.rnc = rnc;
+    }
+    /**
+     * @return the rnc
+     */
+    public int getRnc() {
+        return rnc;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("MCC: " + getMcc());
+        sb.append(", MNC: " + getMnc());
+        sb.append(", LAC: " + getLac());
+        sb.append(", CID: " + getCid());
+        sb.append(", RX Level: " + getRxLevel());
+        return sb.toString();
     }
 }

@@ -100,4 +100,18 @@ public class GpsData {
     public void setSatellites(final int satellites) {
         this.satellites = satellites;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Lat: " + getLatitude());
+        sb.append(", Lon: " + getLongitude());
+        sb.append(", Alt: " + getAltitude());
+        sb.append(", Speed: " + getSpeed());
+        sb.append(", Cource: " + getCourse());
+        sb.append(", Satelites: " + getSatellites());
+        return sb.toString();
+    }
 }

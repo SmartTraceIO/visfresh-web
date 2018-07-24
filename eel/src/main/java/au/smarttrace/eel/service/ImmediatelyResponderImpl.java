@@ -93,7 +93,7 @@ public class ImmediatelyResponderImpl implements ImmediatelyResponder {
         } else if (p instanceof DefaultPackageResponseBody) {
             resp = respondToBroadcastPackageResponse((DefaultPackageResponseBody) p);
         } else if (p instanceof UndefinedPackageBody) {
-            resp = null;
+            resp = new DefaultPackageResponseBody();
         } else {
             throw new RuntimeException("Unhandled package " + p.getClass().getName());
         }

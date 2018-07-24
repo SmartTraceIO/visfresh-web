@@ -386,7 +386,8 @@ public class MessageWriter {
         //LAC 2 Same as definition in BSID0
         buff.writeTwo(s.getLac());
         //CI 4 Same as definition in BSID0
-        buff.writeFour(s.getCid());
+        buff.writeTwo(s.getRnc());
+        buff.writeTwo(s.getCid());
         //RxLev 1 Same as definition in BSID0
         buff.writeOne(s.getRxLevel());
     }
