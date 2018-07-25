@@ -52,6 +52,7 @@ public class DeviceMessage {
     private String message;
     private String typeString;
     private Integer humidity;
+    private RadioType radio;
 
     /**
      * Default constructor.
@@ -223,5 +224,27 @@ public class DeviceMessage {
      */
     public Integer getHumidity() {
         return humidity;
+    }
+    /**
+     * @return the radio
+     */
+    public RadioType getRadio() {
+        return radio;
+    }
+    /**
+     * @param radio the radio to set
+     */
+    public void setRadio(final RadioType radio) {
+        this.radio = radio;
+    }
+    /**
+     * @param radio
+     */
+    public void setRadio(final String radio) {
+        if (radio == null) {
+            this.radio = null;
+        } else {
+            setRadio(RadioType.valueOf(radio));
+        }
     }
 }

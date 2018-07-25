@@ -72,7 +72,8 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
      * @throws RetryableException exception.
      */
     private void processMessage(final DeviceMessage m) throws RetryableException {
-        final Location location = getLocationService().getLocation(m.getImei(), m.getStations());
+        final Location location = getLocationService().getLocation(m.getImei(),
+                m.getRadio() == null ? null : m.getRadio().name(), m.getStations());
         check00(location);
 
         log.debug("Location (" + location + ") has detected for message " + m);

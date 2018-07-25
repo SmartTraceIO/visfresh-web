@@ -6,6 +6,8 @@ package com.visfresh.dispatcher;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageParser;
 import com.visfresh.Location;
+import com.visfresh.RadioType;
+import com.visfresh.StationSignal;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -22,10 +24,33 @@ public class UnwiredLabsLocationServiceTool {
     }
 
     public static void main(final String[] args) throws RetryableException {
+        //{
+        //    "token": "a93bb2c1f9699a",
+        //    "radio": "lte",
+        //    "mcc": 505,
+        //    "mnc": 1,
+        //    "cells": [{
+        //        "lac": 65534,
+        //        "cid": 133237004,
+        //        "psc": 0
+        //    }],
+        //    "address": 1
+        //}
         final DeviceMessage msg = parseDeviceMessage();
+        msg.setImei("352544074664971");
+        msg.setRadio(RadioType.lte);
+        final StationSignal sig = new StationSignal();
+//        MCC: 505, MNC: 1, LAC: 65534, CID: 133237005, RX Level: 15
+        sig.setMcc(505);
+        sig.setMnc(1);
+        sig.setCi(133237005);
+        sig.setLac(65534);
+        sig.setLevel(15);
+        msg.getStations().add(sig);
 
         final UnwiredLabsLocationService svc = createClient();
-        final Location location = svc.getLocation(msg.getImei(), msg.getStations());
+        final Location location = svc.getLocation(msg.getImei(),
+                msg.getRadio() == null ? null : msg.getRadio().name(), msg.getStations());
         System.out.println(location);
     }
 

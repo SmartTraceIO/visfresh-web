@@ -13,5 +13,5 @@ import com.visfresh.StationSignal;
  *
  */
 public interface LocationService {
-    Location getLocation(String imei, List<StationSignal> stations) throws RetryableException;
+    Location getLocation(String imei, String radio, List<StationSignal> stations) throws RetryableException;
 }

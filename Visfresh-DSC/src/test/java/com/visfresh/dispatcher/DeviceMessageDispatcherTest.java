@@ -135,7 +135,7 @@ public class DeviceMessageDispatcherTest extends DeviceMessageDispatcher
      * @see com.visfresh.dispatcher.LocationService#getLocation(java.lang.String, java.util.List)
      */
     @Override
-    public Location getLocation(final String imei, final List<StationSignal> stations)
+    public Location getLocation(final String imei, String radio, final List<StationSignal> stations)
             throws RetryableException {
         final List<Location> locs = locations.get(imei);
         if (locs != null && locs.size() > 0) {

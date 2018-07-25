@@ -57,7 +57,7 @@ public class UnwiredLabsLocationService implements LocationService {
      * @see com.visfresh.dispatcher.LocationService#getLocation(java.util.List)
      */
     @Override
-    public Location getLocation(final String imei, final List<StationSignal> stations)
+    public Location getLocation(final String imei, String radio, final List<StationSignal> stations)
             throws RetryableException {
         if (stations.size() == 0) {
             final RetryableException exc = new RetryableException("The number of stations can't be 0");
@@ -65,7 +65,7 @@ public class UnwiredLabsLocationService implements LocationService {
             throw exc;
         }
 
-        final JsonObject req = buildRequest(imei, stations);
+        final JsonObject req = buildRequest(imei, radio, stations);
 
         //read response
         String response;
@@ -166,7 +166,7 @@ public class UnwiredLabsLocationService implements LocationService {
      * @param stations
      * @return
      */
-    protected JsonObject buildRequest(final String imei, final List<StationSignal> stations) {
+    protected JsonObject buildRequest(final String imei, final String radio, final List<StationSignal> stations) {
         final JsonObject req= new JsonObject();
         //{
         //    "token": "939828b28b7f32",
@@ -181,7 +181,7 @@ public class UnwiredLabsLocationService implements LocationService {
         //}
         req.addProperty("id", generateId(imei));
         req.addProperty("token", getToken());
-        req.addProperty("radio", "gsm");
+        req.addProperty("radio", radio == null ? "gsm" : radio);
         req.addProperty("mcc", stations.get(0).getMcc());
         req.addProperty("mnc", stations.get(0).getMnc());
 

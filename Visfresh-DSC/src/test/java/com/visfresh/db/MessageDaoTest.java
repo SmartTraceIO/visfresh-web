@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageParser;
 import com.visfresh.DeviceMessageType;
+import com.visfresh.RadioType;
 import com.visfresh.StationSignal;
 import com.visfresh.spring.mock.JUnitConfig;
 
@@ -72,6 +73,7 @@ public class MessageDaoTest extends TestCase {
         final Date retryOn = new Date(System.currentTimeMillis() + 11111111L);
         final int numRetry = 135;
         final int humidity = 99;
+        final RadioType radio = RadioType.lte;
 
         //add first station
         final StationSignal s1 = new StationSignal();
@@ -97,6 +99,7 @@ public class MessageDaoTest extends TestCase {
         message.setHumidity(humidity);
         message.setTime(time);
         message.setType(type);
+        message.setRadio(radio);
         message.setNumberOfRetry(numRetry);
         message.setRetryOn(retryOn);
 
@@ -112,6 +115,7 @@ public class MessageDaoTest extends TestCase {
         assertEquals(battery, row.get(MessageDao.BATTERY_FIELD));
         assertEquals(humidity, ((Number) row.get(MessageDao.HUMIDITY_FIELD)).intValue());
         assertEquals(imei, row.get(MessageDao.IMEI_FIELD));
+        assertEquals(radio.name(), row.get(MessageDao.RADIO_FIELD));
         assertEquals(Double.toString(temperature), "" + row.get(MessageDao.TEMPERATURE_FIELD));
 
         final String dateFormat = "yyyyMMdd HHmm";

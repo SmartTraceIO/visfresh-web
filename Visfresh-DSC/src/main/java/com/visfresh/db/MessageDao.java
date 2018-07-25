@@ -27,6 +27,7 @@ import com.visfresh.StationSignal;
 @Component
 public class MessageDao {
     //fields
+    public static final String RADIO_FIELD = "radio";
     public static final String ID_FIELD = "id";
     public static final String NUMRETRY_FIELD = "numretry";
     public static final String RETRYON_FIELD = "retryon";
@@ -121,6 +122,7 @@ public class MessageDao {
             if (humidity != null) {
                 msg.setHumidity(humidity.intValue());
             }
+            msg.setRadio((String) map.get(RADIO_FIELD));
             msg.setTemperature((Float) map.get(TEMPERATURE_FIELD));
             msg.setRetryOn(new Date(((Date) map.get(RETRYON_FIELD)).getTime()));
             msg.setNumberOfRetry((Integer) map.get(NUMRETRY_FIELD));
@@ -160,6 +162,7 @@ public class MessageDao {
 
         //stations varchar(256) NOT NULL,
         params.put(STATIONS_FIELD, sb.toString());
+        params.put(RADIO_FIELD, msg.getRadio() == null ? null : msg.getRadio().name());
 
         final GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update("INSERT INTO "
@@ -173,8 +176,10 @@ public class MessageDao {
             + ", " + NUMRETRY_FIELD
             + ", " + RETRYON_FIELD
             + ", " + STATIONS_FIELD
+            + ", " + RADIO_FIELD
             + ") "
-            + "VALUES(:imei, :type, :time, :battery, :humidity, :temperature, :numretry, :readyon, :stations)"
+            + "VALUES(:imei, :type, :time, :battery, :humidity, :temperature, :numretry, :readyon,"
+            + " :stations, :radio)"
             , new MapSqlParameterSource(params), holder);
 
         msg.setId(holder.getKey().longValue());
@@ -195,8 +200,10 @@ public class MessageDao {
         //battery int NOT NULL,
         map.put("battery", msg.getBattery());
         map.put("humidity", msg.getHumidity());
+        map.put("humidity", msg.getHumidity());
         //temperature float NOT NULL,
         map.put("temperature", new Float(msg.getTemperature()));
+        map.put("radio", msg.getRadio() == null ? null : msg.getRadio().name());
         //current retry number.
         map.put("numretry", msg.getNumberOfRetry());
         //the ready time.

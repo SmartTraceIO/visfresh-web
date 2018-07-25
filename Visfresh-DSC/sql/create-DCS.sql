@@ -12,6 +12,7 @@ CREATE TABLE devicemsg (
   numretry int not null default 0,
   stations varchar(256) NOT NULL,
   humidity TINYINT,
+  radio varchar(15),
   PRIMARY KEY (id)
 );
 
@@ -21,3 +22,5 @@ create table snapshoots (
   signature varchar(255) not null,
   primary key (imei, signature)
 );
+
+alter table devicemsg add column radio varchar(15);
