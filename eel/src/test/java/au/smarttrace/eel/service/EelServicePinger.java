@@ -51,6 +51,7 @@ public final class EelServicePinger {
         }
     }
 
+    @SuppressWarnings("unused")
     private static void sendServicePing() throws Exception {
         final String mark = "6868";
         final String imei = "2390870987987";

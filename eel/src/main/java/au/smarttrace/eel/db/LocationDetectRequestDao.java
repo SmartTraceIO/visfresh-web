@@ -59,8 +59,8 @@ public class LocationDetectRequestDao {
 
         final GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbc.update("INSERT INTO devicemsg"
-            + "(imei, type, time, battery, temperature, numretry, retryon, stations, humidity) "
-            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations, :humidity)"
+            + "(imei, type, time, battery, temperature, numretry, retryon, stations, humidity, radio) "
+            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :stations, :humidity, :radio)"
             , new MapSqlParameterSource(params), holder);
 
         msg.setId(holder.getKey().longValue());
@@ -88,6 +88,7 @@ public class LocationDetectRequestDao {
         map.put("numretry", 0);
         //the ready time.
         map.put("readyon", new Date());
+        map.put("radio", msg.isLte() ? "lte" : "gsm");
 
         return map;
     }

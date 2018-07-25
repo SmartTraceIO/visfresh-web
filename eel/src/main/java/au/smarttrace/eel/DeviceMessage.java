@@ -205,4 +205,15 @@ public class DeviceMessage {
     public void setType(final String type) {
         this.type = type;
     }
+
+    /**
+     * @return
+     */
+    public boolean isLte() {
+        if (stationSignals.size() > 0) {
+            final StationSignal sig = stationSignals.get(0);
+            return (sig.getCi() >> 16) > 0;
+        }
+        return false;
+    }
 }

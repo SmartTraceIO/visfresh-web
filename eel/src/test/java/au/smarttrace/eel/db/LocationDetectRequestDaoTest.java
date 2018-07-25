@@ -80,6 +80,7 @@ public class LocationDetectRequestDaoTest {
         //| retryon     | timestamp    | NO   |     | CURRENT_TIMESTAMP |                |
         //| numretry    | int(11)      | NO   |     | 0                 |                |
         //| stations    | varchar(256) | NO   |     | NULL              |                |
+        //| radio       | varchar(16)  | YES  |     | NULL              |                |
         final List<Map<String, Object>> rows = support.getJdbc().queryForList("select * from devicemsg", new HashMap<>());
         assertEquals(1, rows.size());
 
@@ -92,6 +93,7 @@ public class LocationDetectRequestDaoTest {
         assertTrue(row.get("temperature") instanceof Number);
         assertNull(row.get("processor"));
         assertTrue(row.get("retryon") instanceof Date);
+        assertEquals("gsm", row.get("radio"));
         assertEquals(msg.getBattery(), ((Number) row.get("battery")).intValue());
         assertFalse(parseStationSignals((String) row.get("stations")).isEmpty());
     }
