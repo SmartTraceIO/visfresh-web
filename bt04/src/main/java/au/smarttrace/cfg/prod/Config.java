@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import au.smarttrace.bt04.Bt04Service;
 import au.smarttrace.cfg.JdbcConfig;
@@ -21,6 +22,7 @@ import au.smarttrace.email.EmailSender;
 @ComponentScan(basePackageClasses = {
         EmailSender.class,
         Bt04Service.class})
+@EnableScheduling
 @PropertySource("classpath:/application.properties")
 public class Config {
     /**
