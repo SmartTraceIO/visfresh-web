@@ -63,6 +63,10 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
      */
     @Override
     public void handleMessage(final EelMessage eelMessage) {
+        log.debug("Message for " + eelMessage.getImei()
+            + " has received. Packages: " + eelMessage.getPackages());
+        log.debug("Raw data:\n" + encodeHexString(eelMessage.getRawData()));
+
         final Map<String, Boolean> beaconCache = new HashMap<>();
         final List<DeviceMessage> msgs = new LinkedList<>();
 
@@ -130,6 +134,17 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
                 log.debug("Beacon " + m.getImei() + " channel has locked by another gateway");
             }
         }
+    }
+
+    /**
+     * @param rawData
+     * @return
+     */
+    private String encodeHexString(final byte[] rawData) {
+        if (rawData != null) {
+            return Hex.encodeHexString(rawData);
+        }
+        return null;
     }
 
     /**
@@ -249,8 +264,11 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
      */
     protected void sendMessage(final DeviceMessage msg) {
         if (msg.getLocation() != null) {
+            log.debug("Message for " + msg.getImei() + " have resolved location");
             messageDao.sendSystemMessageFor(msg);
         } else {
+            log.debug("Message for " + msg.getImei()
+                + " have not resolved location, stations signals: " + msg.getStationSignals());
             locationDetectRequestDao.sendRequest(msg);
         }
     }

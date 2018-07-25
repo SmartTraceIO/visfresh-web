@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,7 +171,6 @@ public class EelService {
             throws IOException, IncorrectPacketLengthException {
         final byte[] dataGramPacketBuffer = packet.getData();
         final byte[] data = parser.readMessageData(new ByteArrayInputStream(dataGramPacketBuffer));
-        log.debug("Message has recieved: " + Hex.encodeHexString(data));
 
         final EelMessage msg = parser.parseMessage(data);
 

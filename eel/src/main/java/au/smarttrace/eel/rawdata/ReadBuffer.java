@@ -37,7 +37,7 @@ public class ReadBuffer {
         super();
         this.data = data;
         this.offset = offset;
-        if (offset >= data.length) {
+        if (offset > data.length) {
             throw new ArrayIndexOutOfBoundsException("byte lenght " + data.length + " less then offset " + offset);
         }
         this.endExclusive = offset + size;

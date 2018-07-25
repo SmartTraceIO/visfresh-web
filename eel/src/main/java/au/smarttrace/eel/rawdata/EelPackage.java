@@ -42,4 +42,11 @@ public class EelPackage {
     public void setBody(final PackageBody body) {
         this.body = body;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getHeader() + "";
+    }
 }

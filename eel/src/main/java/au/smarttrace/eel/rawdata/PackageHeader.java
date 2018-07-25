@@ -126,4 +126,15 @@ public class PackageHeader {
     public void setPidOriginValue(final int pidOriginValue) {
         this.pidOriginValue = pidOriginValue;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder(getPid().name());
+        if (getPid() == PackageIdentifier.Undefined) {
+            sb.append(" (originValue: 0x").append(Integer.toHexString(getPidOriginValue())).append(')');
+        }
+        return sb.toString();
+    }
 }

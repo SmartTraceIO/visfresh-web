@@ -429,8 +429,7 @@ public class MessageParser {
         //LAC 2 Location Area Code --- Unsigned 16 bits integer
         s.setLac(buff.readTwo());
         //CI 4 Cell ID with RNC --- Unsigned 32 bits integer
-        s.setRnc(buff.readTwo());
-        s.setCid(buff.readTwo());
+        s.setCid((int) buff.readFour());
         //RxLev 1 Cell signal level --- Unsigned 8 bits integer (0: -110dB 1:-109dB 2:-108dB ...110: 0dB)
         s.setRxLevel(buff.readOne());
         return s;
