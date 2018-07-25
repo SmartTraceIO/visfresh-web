@@ -251,6 +251,8 @@ public abstract class AbstractDispatcher {
                 }
             }
         }
+
+        log.debug("Dispatcher has stoped");
     }
 
     /**

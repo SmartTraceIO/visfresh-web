@@ -10,8 +10,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class UnwiredLabsLocationService implements LocationService {
      * @see com.visfresh.dispatcher.LocationService#getLocation(java.util.List)
      */
     @Override
-    public Location getLocation(final String imei, String radio, final List<StationSignal> stations)
+    public Location getLocation(final String imei, final String radio, final List<StationSignal> stations)
             throws RetryableException {
         if (stations.size() == 0) {
             final RetryableException exc = new RetryableException("The number of stations can't be 0");
@@ -71,9 +71,11 @@ public class UnwiredLabsLocationService implements LocationService {
         String response;
         try {
             //send request.
-            final URLConnection con = new URL(getUrl()).openConnection();
+            final HttpURLConnection con = (HttpURLConnection) new URL(getUrl()).openConnection();
             con.setDoOutput(true);
             con.setDoInput(true);
+            con.setConnectTimeout(10000);
+            con.setReadTimeout(15000);
 
             //write request
             final Writer out = new OutputStreamWriter(con.getOutputStream(), "UTF-8");
@@ -215,16 +217,22 @@ public class UnwiredLabsLocationService implements LocationService {
      * @param imei IMEI code for given device.
      * @return uique ID for given device.
      */
-    private String generateId(final String imei) {
+    private static String generateId(final String imei) {
         final StringBuilder sb = new StringBuilder();
-        for (int i = 1; i < imei.length() - 1; i++) {
-            final int cipher = imei.charAt(i) - '0';
-            sb.append((char) ('0' + (9 - cipher)));
+        final int imeiLength = imei.length();
+        for (int i = 1; i < imeiLength - 1; i++) {
+            final char ch = imei.charAt(i);
+            if (ch >= '0' && ch <='9') {
+                final int cipher = ch - '0';
+                sb.append((char) ('0' + (9 - cipher)));
+            } else {
+                sb.append(ch);
+            }
         }
 
         //remove leading '0'
         while (sb.length() > 1 && sb.charAt(0) == '0') {
-            sb.delete(0, 0);
+            sb.delete(0, 1);
         }
 
         return sb.toString();

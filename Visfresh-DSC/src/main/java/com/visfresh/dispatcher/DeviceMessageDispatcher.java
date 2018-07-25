@@ -39,7 +39,7 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
     public DeviceMessageDispatcher(final Environment env) {
         super();
 
-        setBatchLimit(Integer.parseInt(env.getProperty("deviceMessages.batchLimit", "0")));
+        setBatchLimit(Integer.parseInt(env.getProperty("deviceMessages.batchLimit", "10")));
         setInactiveTimeOut(Integer.parseInt(env.getProperty("deviceMessages.inactiveTimeOut", "15000")));
         setProcessorId(env.getProperty("deviceMessages.processorId", "device-msg"));
         setRetryLimit(Integer.parseInt(env.getProperty("deviceMessages.retryLimit", "7")));
