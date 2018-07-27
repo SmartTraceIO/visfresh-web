@@ -118,7 +118,11 @@ public class MessageWriter {
         //Mark 2 0x67 0x67
         buff.writeHexString(header.getMark(), 2);
         //PID 1 Package identifier
-        buff.writeOne(header.getPid().getValue());
+        if (header.getPid() == null) {
+            buff.writeOne(header.getPidOriginValue());
+        } else {
+            buff.writeOne(header.getPid().getValue());
+        }
         //Size 2 Package size from next byte to end --- Unsigned 16 bits integer
         buff.writeTwo(data.length + 2); //data size  + sequence number
         //Sequence 2 Package sequence number --- Unsigned 16 bits integer

@@ -55,9 +55,11 @@ public class ImmediatelyResponderImpl implements ImmediatelyResponder {
             final PackageBody respBody = respondeTo(p.getBody());
             if (respBody != null) {
                 final PackageHeader h = new PackageHeader();
-                h.setMark(p.getHeader().getMark());
-                h.setPid(p.getHeader().getPid());
-                h.setSequence(p.getHeader().getSequence());
+                final PackageHeader reqHeader = p.getHeader();
+                h.setMark(reqHeader.getMark());
+                h.setPid(reqHeader.getPid());
+                h.setPidOriginValue(reqHeader.getPidOriginValue());
+                h.setSequence(reqHeader.getSequence());
 
                 final EelPackage resp = new EelPackage();
                 resp.setBody(respBody);
@@ -95,7 +97,8 @@ public class ImmediatelyResponderImpl implements ImmediatelyResponder {
         } else if (p instanceof UndefinedPackageBody) {
             resp = new DefaultPackageResponseBody();
         } else {
-            throw new RuntimeException("Unhandled package " + p.getClass().getName());
+            throw new RuntimeException("Unhandled package body "
+                    + ((p == null) ? null : p.getClass().getName()));
         }
 
         return resp;

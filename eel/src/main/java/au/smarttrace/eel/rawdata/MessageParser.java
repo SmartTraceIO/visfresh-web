@@ -124,36 +124,43 @@ public class MessageParser {
 
         PackageBody body;
 
-        switch (header.getPid()) {
-            case Login:
-                body = parseLoginPackage(pckgBuff);
-                break;
-            case Heartbeat:
-                body = parseHeartbeatPackage(pckgBuff);
-                break;
-            case Location:
-                body = parseLocationPackage(pckgBuff);
-                break;
-            case Warning:
-                body = parseWarningPackage(pckgBuff);
-                break;
-            case Message:
-                body = parseMessagePackage(pckgBuff);
-                break;
-            case ParamSet:
-                body = parseParamSetPackage(pckgBuff);
-                break;
-            case Instruction:
-                body = parseInstructionPackageResponse(pckgBuff);
-                break;
-            case Broadcast:
-                body = parseBroadcastPackage(pckgBuff);
-                break;
-            case Undefined:
-                body = parseUndefinedPackage(pckgBuff);
-                break;
-                default:
-                    throw new RuntimeException("Unhandled package " + header.getPid());
+        if (header.getPid() != null) {
+            switch (header.getPid()) {
+                case Login:
+                    body = parseLoginPackage(pckgBuff);
+                    break;
+                case Heartbeat:
+                    body = parseHeartbeatPackage(pckgBuff);
+                    break;
+                case Location:
+                    body = parseLocationPackage(pckgBuff);
+                    break;
+                case Warning:
+                    body = parseWarningPackage(pckgBuff);
+                    break;
+                case Message:
+                    body = parseMessagePackage(pckgBuff);
+                    break;
+                case ParamSet:
+                    body = parseParamSetPackage(pckgBuff);
+                    break;
+                case Instruction:
+                    body = parseInstructionPackageResponse(pckgBuff);
+                    break;
+                case Broadcast:
+                    body = parseBroadcastPackage(pckgBuff);
+                    break;
+                case _0x1a:
+                    body = parseUndefinedPackage(pckgBuff);
+                    break;
+                case _0xff:
+                    body = null;
+                    break;
+                    default:
+                        throw new RuntimeException("Unhandled package " + header.getPid());
+            }
+        } else {
+            body = parseUndefinedPackage(pckgBuff);
         }
 
         if (pckgBuff.hasData()) {
@@ -177,9 +184,9 @@ public class MessageParser {
         try {
             header.setPid(PackageIdentifier.valueOf(pid));
         } catch (final Exception e) {
-            header.setPid(PackageIdentifier.Undefined);
-            header.setPidOriginValue(pid);
+            header.setPid(null);
         }
+        header.setPidOriginValue(pid);
         header.setSize(buff.readTwo() - 2);
         header.setSequence(buff.readTwo());
         return header;

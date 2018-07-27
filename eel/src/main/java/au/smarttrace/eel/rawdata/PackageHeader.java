@@ -17,7 +17,8 @@ public class PackageHeader {
         ParamSet(0x1B),
         Instruction(0x80),
         Broadcast(0x81),
-        Undefined(-1);
+        _0x1a(0x1a),
+        _0xff(0xFF); //my issue. It is answer to my incorrect package with 0xFF. TODO remove after clean
 
         private final int value;
 
@@ -111,9 +112,6 @@ public class PackageHeader {
     public void setSequence(final int sequence) {
         this.sequence = sequence;
     }
-    public static void main(final String[] args) {
-        System.out.println(Integer.toHexString(26));
-    }
     /**
      * @return the pidOriginValue
      */
@@ -131,9 +129,11 @@ public class PackageHeader {
      */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(getPid().name());
-        if (getPid() == PackageIdentifier.Undefined) {
-            sb.append(" (originValue: 0x").append(Integer.toHexString(getPidOriginValue())).append(')');
+        final StringBuilder sb = new StringBuilder();
+        if (getPid() == null) {
+            sb.append("0x").append(Integer.toHexString(getPidOriginValue()));
+        } else {
+            sb.append(getPid().name());
         }
         return sb.toString();
     }

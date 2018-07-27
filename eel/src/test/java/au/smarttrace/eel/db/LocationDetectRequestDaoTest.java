@@ -89,11 +89,11 @@ public class LocationDetectRequestDaoTest {
         assertEquals(msg.getImei(), row.get("imei"));
         assertEquals("AUT", row.get("type"));
         assertTrue(row.get("time") instanceof Date);
-        assertTrue(row.get("battery") instanceof Number);
         assertTrue(row.get("temperature") instanceof Number);
         assertNull(row.get("processor"));
         assertTrue(row.get("retryon") instanceof Date);
         assertEquals("gsm", row.get("radio"));
+        assertEquals(msg.getGateway(), row.get("gateway"));
         assertEquals(msg.getBattery(), ((Number) row.get("battery")).intValue());
         assertFalse(parseStationSignals((String) row.get("stations")).isEmpty());
     }
