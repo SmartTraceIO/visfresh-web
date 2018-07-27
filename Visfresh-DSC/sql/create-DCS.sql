@@ -2,7 +2,7 @@ drop TABLE if exists devicemsg;
 CREATE TABLE devicemsg (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   imei varchar(15) NOT NULL,
-  beacon varchar(15),
+  gateway varchar(15),
   type varchar(4) NOT NULL,
   time datetime NOT NULL,
   battery int NOT NULL,
@@ -15,6 +15,9 @@ CREATE TABLE devicemsg (
   radio varchar(15),
   PRIMARY KEY (id)
 );
+
+alter table devicemsg drop column beacon;
+alter table devicemsg add column gateway varchar(15);
 
 drop table if exists snapshoots;
 create table snapshoots (

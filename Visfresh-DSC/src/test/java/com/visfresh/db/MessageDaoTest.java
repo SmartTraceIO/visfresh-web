@@ -74,6 +74,7 @@ public class MessageDaoTest extends TestCase {
         final int numRetry = 135;
         final int humidity = 99;
         final RadioType radio = RadioType.lte;
+        final String gateway = "1234566789";
 
         //add first station
         final StationSignal s1 = new StationSignal();
@@ -102,6 +103,7 @@ public class MessageDaoTest extends TestCase {
         message.setRadio(radio);
         message.setNumberOfRetry(numRetry);
         message.setRetryOn(retryOn);
+        message.setGateway(gateway);
 
         dao.create(message);
 
@@ -125,6 +127,7 @@ public class MessageDaoTest extends TestCase {
                 format((Date) row.get(MessageDao.RETRYON_FIELD), dateFormat));
         assertEquals(numRetry, row.get(MessageDao.NUMRETRY_FIELD));
         assertEquals(type.toString(), row.get(MessageDao.TYPE_FIELD));
+        assertEquals(gateway, row.get(MessageDao.GATEWAY_FIELD));
 
         //Assert stations
         final String encodedStations = (String) row.get(MessageDao.STATIONS_FIELD);

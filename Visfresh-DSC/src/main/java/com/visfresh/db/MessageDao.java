@@ -41,6 +41,7 @@ public class MessageDao {
     public static final String LATITUDE_FIELD = "latitude";
     public static final String PROCESSOR_FIELD = "processor";
     public static final String HUMIDITY_FIELD = "humidity";
+    public static final String GATEWAY_FIELD = "gateway";
 
     //tables
     public static final String TABLE = "devicemsg";
@@ -125,6 +126,7 @@ public class MessageDao {
             msg.setRadio((String) map.get(RADIO_FIELD));
             msg.setTemperature((Float) map.get(TEMPERATURE_FIELD));
             msg.setRetryOn(new Date(((Date) map.get(RETRYON_FIELD)).getTime()));
+            msg.setGateway((String) map.get(GATEWAY_FIELD));
             msg.setNumberOfRetry((Integer) map.get(NUMRETRY_FIELD));
 
             //parse station signals
@@ -162,7 +164,6 @@ public class MessageDao {
 
         //stations varchar(256) NOT NULL,
         params.put(STATIONS_FIELD, sb.toString());
-        params.put(RADIO_FIELD, msg.getRadio() == null ? null : msg.getRadio().name());
 
         final GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update("INSERT INTO "
@@ -177,9 +178,10 @@ public class MessageDao {
             + ", " + RETRYON_FIELD
             + ", " + STATIONS_FIELD
             + ", " + RADIO_FIELD
+            + ", " + GATEWAY_FIELD
             + ") "
             + "VALUES(:imei, :type, :time, :battery, :humidity, :temperature, :numretry, :readyon,"
-            + " :stations, :radio)"
+            + " :stations, :radio, :gateway)"
             , new MapSqlParameterSource(params), holder);
 
         msg.setId(holder.getKey().longValue());
@@ -208,6 +210,8 @@ public class MessageDao {
         map.put("numretry", msg.getNumberOfRetry());
         //the ready time.
         map.put("readyon", msg.getRetryOn());
+        map.put(RADIO_FIELD, msg.getRadio() == null ? null : msg.getRadio().name());
+        map.put("gateway", msg.getGateway());
 
         return map;
     }
