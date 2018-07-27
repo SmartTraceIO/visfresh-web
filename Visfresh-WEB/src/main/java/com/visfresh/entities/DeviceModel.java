@@ -10,7 +10,9 @@ package com.visfresh.entities;
 public enum DeviceModel {
     SmartTrace,
     TT18,
-    BT04(true);
+    BT04(true),
+    TEEL, //EEL tracker
+    BEEL(true); // EEL beacon
 
     private final boolean usesGateway;
 
