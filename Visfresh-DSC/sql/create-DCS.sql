@@ -16,9 +16,6 @@ CREATE TABLE devicemsg (
   PRIMARY KEY (id)
 );
 
-alter table devicemsg drop column beacon;
-alter table devicemsg add column gateway varchar(15);
-
 drop table if exists snapshoots;
 create table snapshoots (
   imei varchar(15) NOT NULL,
