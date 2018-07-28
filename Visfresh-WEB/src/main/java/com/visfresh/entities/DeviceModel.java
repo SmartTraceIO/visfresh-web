@@ -11,8 +11,10 @@ public enum DeviceModel {
     SmartTrace,
     TT18,
     BT04(true),
-    TEEL, //EEL tracker
-    BEEL(true); // EEL beacon
+    TEEL, //TODO remove
+    BEEL(true), // TODO remove
+    STF2, // is EEL tracker
+    STB1(true); //is EEL beacon
 
     private final boolean usesGateway;
 
