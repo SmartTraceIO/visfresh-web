@@ -17,6 +17,16 @@ public class Location {
     }
 
     /**
+     * @param lat
+     * @param lon
+     */
+    public Location(final double lat, final double lon) {
+        super();
+        setLatitude(lat);
+        setLongitude(lon);
+    }
+
+    /**
      * @return the latitude
      */
     public double getLatitude() {

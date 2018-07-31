@@ -20,8 +20,8 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonObject;
 
 import au.smarttrace.eel.DeviceMessage;
-import au.smarttrace.eel.Location;
 import au.smarttrace.eel.SystemMessage;
+import au.smarttrace.geolocation.Location;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

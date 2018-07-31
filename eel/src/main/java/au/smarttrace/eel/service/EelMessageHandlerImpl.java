@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import au.smarttrace.eel.Beacon;
 import au.smarttrace.eel.DeviceMessage;
 import au.smarttrace.eel.GatewayBinding;
-import au.smarttrace.eel.Location;
 import au.smarttrace.eel.db.BeaconDao;
 import au.smarttrace.eel.db.SystemMessageDao;
 import au.smarttrace.eel.rawdata.BeaconData;
@@ -39,7 +38,9 @@ import au.smarttrace.eel.rawdata.EelPackage;
 import au.smarttrace.eel.rawdata.GsmStationSignal;
 import au.smarttrace.eel.rawdata.LocationPackageBody;
 import au.smarttrace.geolocation.GeoLocationRequest;
+import au.smarttrace.geolocation.Location;
 import au.smarttrace.geolocation.RequestStatus;
+import au.smarttrace.geolocation.impl.RetryableEvent;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
 import au.smarttrace.json.ObjectMapperFactory;
@@ -80,21 +81,41 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
         unwiredLabsHelper = UnwiredLabsService.createHelper(jdbc);
     }
 
-    @Scheduled
+    @Scheduled(fixedDelay = 10000l)
     public void handleResolvedLocations() {
-        final List<GeoLocationRequest> requests = getProcessedRequests(SENDER);
-        for (final GeoLocationRequest req : requests) {
-            if (req.getStatus() == RequestStatus.success) {
-                try {
-                    final LocationDetectRequest r = json.readValue(
-                            req.getSender(), LocationDetectRequest.class);
-                    sendResolvedMessages(r.getImei(), r.getMessages());
-                } catch (final IOException e) {
-                    log.error("Failed to send resolved message to system", e);
+        final List<RetryableEvent> requests = getProcessedRequests(SENDER);
+        for (final RetryableEvent e : requests) {
+            final GeoLocationRequest req = e.getRequest();
+            try {
+                if (req.getStatus() == RequestStatus.success) {
+                    try {
+                        final LocationDetectRequest r = json.readValue(
+                                req.getUserData(), LocationDetectRequest.class);
+                        final Location loc = json.readValue(req.getBuffer(), Location.class);
+
+                        //set location to messages
+                        for (final DeviceMessage m : r.getMessages()) {
+                            m.setLocation(loc);
+                        }
+
+                        sendResolvedMessages(r.getImei(), r.getMessages());
+                    } catch (final IOException exc) {
+                        log.error("Failed to send resolved message to system", exc);
+                    }
                 }
+            } finally {
+                deleteEvent(e);
             }
         }
     }
+    /**
+     * @param e
+     */
+    private void deleteEvent(final RetryableEvent e) {
+        unwiredLabsHelper.deleteRequest(e);
+
+    }
+
     /* (non-Javadoc)
      * @see au.smarttrace.eel.service.EelMessageHandler#handleMessage(au.smarttrace.eel.rawdata.EelMessage)
      */
@@ -342,7 +363,7 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
      * @param sender
      * @return
      */
-    protected List<GeoLocationRequest> getProcessedRequests(final String sender) {
+    protected List<RetryableEvent> getProcessedRequests(final String sender) {
         return unwiredLabsHelper.getProcessedRequests(sender);
     }
     /**

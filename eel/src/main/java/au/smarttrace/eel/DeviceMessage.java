@@ -5,6 +5,8 @@ package au.smarttrace.eel;
 
 import java.util.Date;
 
+import au.smarttrace.geolocation.Location;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *

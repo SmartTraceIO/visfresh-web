@@ -22,10 +22,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import au.smarttrace.eel.DeviceMessage;
-import au.smarttrace.eel.Location;
 import au.smarttrace.eel.SystemMessage;
 import au.smarttrace.eel.db.junit.DaoTest;
 import au.smarttrace.eel.db.junit.DaoTestRunner;
+import au.smarttrace.geolocation.Location;
 import junit.framework.TestCase;
 
 /**

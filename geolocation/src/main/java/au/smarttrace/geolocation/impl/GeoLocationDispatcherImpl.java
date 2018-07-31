@@ -222,6 +222,7 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
         }
 
         if (types.isEmpty()) {
+            log.debug("Not services registered to process requests.");
             return 0;
         }
 
@@ -275,9 +276,9 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
         }
 
         if (s != null) {
+            log.debug("Process geo location request " + req);
             return s.requestLocation(req);
         } else {
-
             return null;
         }
     }
@@ -286,7 +287,9 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
      * @return
      */
     protected List<RetryableEvent> getRetryableEventsForProcess(final Set<ServiceType> types) {
-        return dao.getRetryableEventsForProcess(new Date(), types);
+        final List<RetryableEvent> rs = dao.getRetryableEventsForProcess(new Date(), types);
+        log.debug(rs.size() + " request selected to process");
+        return rs;
     }
     /**
      * @param r

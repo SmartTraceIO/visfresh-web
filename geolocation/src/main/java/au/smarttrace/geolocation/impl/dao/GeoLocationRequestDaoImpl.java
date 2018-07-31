@@ -3,7 +3,6 @@
  */
 package au.smarttrace.geolocation.impl.dao;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -38,12 +37,11 @@ public class GeoLocationRequestDaoImpl implements GeoLocationRequestDao {
      * @see au.smarttrace.geolocation.GeoLocationRequestDao#getProcessedRequests()
      */
     @Override
-    public List<GeoLocationRequest> getProcessedRequests(String requestor) {
-        final List<RetryableEvent> events = dao.getProcessedRequests(requestor);
-        final List<GeoLocationRequest> requests = new LinkedList<>();
-        for (final RetryableEvent e : events) {
-            requests.add(e.getRequest());
-        }
-        return requests;
+    public List<RetryableEvent> getProcessedRequests(final String requestor) {
+        return dao.getProcessedRequests(requestor);
+    }
+    @Override
+    public void deleteRequest(final RetryableEvent e) {
+        dao.deleteRequest(e);
     }
 }

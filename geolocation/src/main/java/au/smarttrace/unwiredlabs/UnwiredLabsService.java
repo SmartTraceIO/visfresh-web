@@ -14,6 +14,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +32,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import au.smarttrace.geolocation.GeoLocationDispatcher;
 import au.smarttrace.geolocation.GeoLocationService;
 import au.smarttrace.geolocation.GeoLocationServiceException;
 import au.smarttrace.geolocation.Location;
+import au.smarttrace.geolocation.ServiceType;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
 import au.smarttrace.json.ObjectMapperFactory;
@@ -48,6 +53,9 @@ public class UnwiredLabsService implements GeoLocationService {
     private String token;
     private static final ObjectMapper objectMapper = ObjectMapperFactory.craeteObjectMapper();
 
+    @Autowired
+    private GeoLocationDispatcher dispatcher;
+
     /**
      * Default constructor.
      */
@@ -63,6 +71,17 @@ public class UnwiredLabsService implements GeoLocationService {
     protected UnwiredLabsService() {
         super();
     }
+
+    @PostConstruct
+    public void initialize() {
+        dispatcher.setGeoLocationService(ServiceType.UnwiredLabs, this);
+        log.debug("UnwiredLabs service has initialized");
+    }
+    @PreDestroy
+    public void destroy() {
+        dispatcher.setGeoLocationService(ServiceType.UnwiredLabs, null);
+    }
+
 
     /* (non-Javadoc)
      * @see au.smarttrace.geolocation.GeoLocationService#requestLocation(java.lang.String)

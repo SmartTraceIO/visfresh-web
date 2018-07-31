@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import au.smarttrace.geolocation.impl.RetryableEvent;
 import au.smarttrace.geolocation.impl.dao.GeoLocationRequestDaoImpl;
 
 /**
@@ -24,5 +25,6 @@ public interface GeoLocationRequestDao {
     }
 
     void saveRequest(GeoLocationRequest req);
-    List<GeoLocationRequest> getProcessedRequests(String requestor);
+    List<RetryableEvent> getProcessedRequests(String requestor);
+    void deleteRequest(RetryableEvent e);
 }

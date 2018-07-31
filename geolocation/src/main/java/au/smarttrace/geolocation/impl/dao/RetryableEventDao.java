@@ -202,4 +202,13 @@ public class RetryableEventDao {
         e.setRequest(req);
         return e;
     }
+
+    /**
+     * @param e
+     */
+    public void deleteRequest(final RetryableEvent e) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("id", e.getId());
+        jdbc.update("delete locationrequests where id = :id", params);
+    }
 }

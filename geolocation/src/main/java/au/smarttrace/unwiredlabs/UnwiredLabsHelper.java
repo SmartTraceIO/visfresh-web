@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import au.smarttrace.geolocation.GeoLocationRequest;
 import au.smarttrace.geolocation.GeoLocationRequestDao;
 import au.smarttrace.geolocation.ServiceType;
+import au.smarttrace.geolocation.impl.RetryableEvent;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.json.ObjectMapperFactory;
 
@@ -41,7 +42,10 @@ public class UnwiredLabsHelper {
         req.setUserData(userData);
         dao.saveRequest(req);
     }
-    public List<GeoLocationRequest> getProcessedRequests(final String sender) {
+    public List<RetryableEvent> getProcessedRequests(final String sender) {
         return dao.getProcessedRequests(sender);
+    }
+    public void deleteRequest(final RetryableEvent e) {
+        dao.deleteRequest(e);
     }
 }
