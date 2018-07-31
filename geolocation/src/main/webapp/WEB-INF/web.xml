@@ -6,6 +6,6 @@
 	<display-name>SmartTrace Asynchronous geolocations</display-name>
  
 	<listener>
-		<listener-class>au.smarttrace.geolocation.ApplicationInitializer</listener-class>
+		<listener-class>au.smarttrace.geolocation.init.ApplicationInitializer</listener-class>
 	</listener>
 </web-app>

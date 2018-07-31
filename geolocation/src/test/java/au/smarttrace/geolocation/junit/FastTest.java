@@ -1,12 +1,11 @@
 /**
- * 
+ *
  */
-package au.smarttrace.geolocation.impl;
+package au.smarttrace.geolocation.junit;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public enum ServiceType {
-
+public interface FastTest {
 }

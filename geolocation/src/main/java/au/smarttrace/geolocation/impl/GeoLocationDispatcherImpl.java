@@ -5,10 +5,12 @@ package au.smarttrace.geolocation.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +21,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +33,9 @@ import org.springframework.stereotype.Component;
 import au.smarttrace.geolocation.GeoLocationDispatcher;
 import au.smarttrace.geolocation.GeoLocationService;
 import au.smarttrace.geolocation.GeoLocationServiceException;
+import au.smarttrace.geolocation.RequestStatus;
+import au.smarttrace.geolocation.ServiceType;
+import au.smarttrace.geolocation.impl.dao.RetryableEventDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,7 +51,7 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
     private ThreadFactory threadFactory = new ThreadFactory() {
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix = "eel-msg-thread-";
+        private final String namePrefix = "geolocation-thread-";
 
         {
             final SecurityManager s = System.getSecurityManager();
@@ -59,10 +67,6 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
         }
     };
 
-    /**
-     * Processor ID.
-     */
-    private String processorId;
     /**
      * Select messages limit.
      */
@@ -84,7 +88,7 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
      * Message DAO.
      */
     @Autowired
-    protected MessageDao dao;
+    protected RetryableEventDao dao;
     /**
      * Thread for asynchronous launch
      */
@@ -95,7 +99,7 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
     /**
      * Default constructor..
      */
-    public GeoLocationDispatcherImpl() {
+    protected GeoLocationDispatcherImpl() {
         super();
     }
 
@@ -105,15 +109,21 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
 
         setBatchLimit(Integer.parseInt(env.getProperty("dispatcher.batchLimit", "10")));
         setInactiveTimeOut(Integer.parseInt(env.getProperty("dispatcher.inactiveTimeOut", "15000")));
-        setProcessorId(env.getProperty("dispatcher.processorId", "device-msg"));
         setRetryLimit(Integer.parseInt(env.getProperty("dispatcher.retryLimit", "7")));
         setRetryTimeOut(Integer.parseInt(env.getProperty("dispatcher.retryTimeOut", "300000")));
     }
 
+    @PostConstruct
     public void start() {
         this.executor = Executors.newCachedThreadPool(threadFactory);
+        startDispatcherThread();
+    }
 
-        new Thread("processor-" + getProcessorId()) {
+    /**
+     * Starts dispatcher thread.
+     */
+    protected void startDispatcherThread() {
+        new Thread("geo-locatino-dispatcher") {
             /*
              * (non-Javadoc)
              *
@@ -141,7 +151,7 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
                     }
                 }
             } catch (final InterruptedException e) {
-                log.warn("Dispatcher " + getProcessorId() + " thread is interrupted");
+                log.warn("Geo location dispatcher is interrupted");
                 break;
             } catch (final Throwable e) {
                 log.error("Global exception during dispatch of messaegs", e);
@@ -161,19 +171,6 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
      */
     public void setInactiveTimeOut(final long inactiveTimeOut) {
         this.inactiveTimeOut = inactiveTimeOut;
-    }
-    /**
-     * @param id
-     * @return
-     */
-    public String setProcessorId(final String id) {
-        return this.processorId = id;
-    }
-    /**
-     * @return the processorId
-     */
-    public String getProcessorId() {
-        return processorId;
     }
     /**
      * @return the limit
@@ -219,26 +216,35 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
      * @return number of processed messages.
      */
     public int processMessages() {
-        final List<GeoLocationRequest> msgs = getGeoLocationRequestsForProcess();
+        Set<ServiceType> types;
+        synchronized (services) {
+            types = new HashSet<>(services.keySet());
+        }
+
+        if (types.isEmpty()) {
+            return 0;
+        }
+
+        final List<RetryableEvent> msgs = getRetryableEventsForProcess(types);
 
         if (msgs.size() > 0) {
             final List<Callable<String>> tasks = new LinkedList<>();
-            for (final GeoLocationRequest r : msgs) {
+            for (final RetryableEvent r : msgs) {
                 tasks.add(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return processRequest(r.getType(), r.getBuffer());
+                        return processRequest(r.getRequest().getType(), r.getRequest().getBuffer());
                     }
                 });
             }
 
             try {
                 final List<Future<String>> results = executor.invokeAll(tasks);
-                final Iterator<GeoLocationRequest> geoIter = msgs.iterator();
+                final Iterator<RetryableEvent> geoIter = msgs.iterator();
                 final Iterator<Future<String>> resIter = results.iterator();
 
                 while (resIter.hasNext()) {
-                    final GeoLocationRequest r = geoIter.next();
+                    final RetryableEvent r = geoIter.next();
                     final Future<String> f = resIter.next();
 
                     try {
@@ -279,23 +285,23 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
     /**
      * @return
      */
-    protected List<GeoLocationRequest> getGeoLocationRequestsForProcess() {
-        return dao.getGeoLocationRequestsForProcess(new Date());
+    protected List<RetryableEvent> getRetryableEventsForProcess(final Set<ServiceType> types) {
+        return dao.getRetryableEventsForProcess(new Date(), types);
     }
     /**
      * @param r
      * @param response
      */
-    private void handleSuccess(final GeoLocationRequest r, final String response) {
-        r.setStatus(RequestStatus.success);
-        r.setBuffer(response);
+    private void handleSuccess(final RetryableEvent r, final String response) {
+        r.getRequest().setStatus(RequestStatus.success);
+        r.getRequest().setBuffer(response);
         dao.save(r);
     }
     /**
      * @param msg the message.
      * @param e the exception.
      */
-    protected void handleError(final GeoLocationRequest msg, final Throwable e) {
+    protected void handleError(final RetryableEvent msg, final Throwable e) {
         if (e instanceof GeoLocationServiceException && ((GeoLocationServiceException) e).canRetry()) {
             final GeoLocationServiceException re = (GeoLocationServiceException) e;
             final int retryLimit = re.getNumberOfRetry() > -1 ? re.getNumberOfRetry() : getRetryLimit();
@@ -321,24 +327,24 @@ public class GeoLocationDispatcherImpl implements GeoLocationDispatcher {
      * @param msg
      * @param e
      */
-    private void stopProcessingByError(final GeoLocationRequest msg, final Throwable e) {
+    private void stopProcessingByError(final RetryableEvent msg, final Throwable e) {
         dao.saveStatus(msg, RequestStatus.error);
     }
     /**
      * @param msg
      */
-    protected void saveForRetry(final GeoLocationRequest msg) {
-        dao.saveForRetry(msg);
+    protected void saveForRetry(final RetryableEvent msg) {
+        dao.updateRetryValues(msg);
     }
 
     /**
      * @param msg the message.
      */
-    protected void handleSuccess(final GeoLocationRequest msg) {
-        log.debug("The request " + msg.getId() + " successfully processed by "
-                + getProcessorId());
+    protected void handleSuccess(final RetryableEvent msg) {
+        log.debug("The request " + msg.getId() + " successfully processed");
     }
 
+    @PreDestroy
     public void stop() {
         isStoped.set(true);
 

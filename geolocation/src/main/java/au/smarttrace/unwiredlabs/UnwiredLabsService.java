@@ -18,8 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -27,6 +31,7 @@ import com.google.gson.JsonParser;
 
 import au.smarttrace.geolocation.GeoLocationService;
 import au.smarttrace.geolocation.GeoLocationServiceException;
+import au.smarttrace.geolocation.Location;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
 import au.smarttrace.json.ObjectMapperFactory;
@@ -41,7 +46,7 @@ public class UnwiredLabsService implements GeoLocationService {
 
     private String url;
     private String token;
-    private final ObjectMapper objectMapper = ObjectMapperFactory.craeteObjectMapper();
+    private static final ObjectMapper objectMapper = ObjectMapperFactory.craeteObjectMapper();
 
     /**
      * Default constructor.
@@ -65,12 +70,30 @@ public class UnwiredLabsService implements GeoLocationService {
     @Override
     public String requestLocation(final String request) throws GeoLocationServiceException {
         try {
-            final GsmLocationResolvingRequest req = objectMapper.readValue(
-                    request, GsmLocationResolvingRequest.class);
+            final GsmLocationResolvingRequest req = parseRequest(request);
             final Location loc = getLocation(req.getImei(), req.getRadio(), req.getStations());
             return objectMapper.writeValueAsString(loc);
         } catch (final IOException e) {
             throw new GeoLocationServiceException("Serialization or parsing failed for " + request, e);
+        }
+    }
+    /**
+     * @param request
+     * @return
+     * @throws IOException
+     * @throws JsonParseException
+     * @throws JsonMappingException
+     */
+    public static GsmLocationResolvingRequest parseRequest(final String request)
+            throws IOException, JsonParseException, JsonMappingException {
+        return objectMapper.readValue(
+                request, GsmLocationResolvingRequest.class);
+    }
+    public static String crateGeoLocationRequest(final GsmLocationResolvingRequest r) {
+        try {
+            return objectMapper.writeValueAsString(r);
+        } catch (final JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
     /* (non-Javadoc)
@@ -233,6 +256,8 @@ public class UnwiredLabsService implements GeoLocationService {
         return req;
     }
 
+
+
     /**
      * @param imei IMEI code for given device.
      * @return uique ID for given device.
@@ -289,5 +314,12 @@ public class UnwiredLabsService implements GeoLocationService {
      */
     public String getToken() {
         return token;
+    }
+    /**
+     * @param jdbc JDBC template.
+     * @return UnwiredLabs helper.
+     */
+    public static UnwiredLabsHelper createHelper(final NamedParameterJdbcTemplate jdbc) {
+        return new UnwiredLabsHelper(jdbc);
     }
 }

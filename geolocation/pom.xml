@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>au.smarttrace</groupId>
 	<artifactId>geolocation</artifactId>
-	<version>0.0.1</version>
+	<version>1.0.0</version>
 	<packaging>war</packaging>
 	<name>Location resolvers</name>
 	<description>Asynchronous location resolvers. Given project installs both war and jar maven dependencies</description>
@@ -121,7 +121,7 @@
 					<goal>package</goal>
 				</goals>
 				<configuration>
-					<warName>eel</warName>
+					<warName>geolocation</warName>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -169,7 +169,7 @@
 							<groupId>${project.groupId}</groupId>
 							<version>${project.version}</version>
 							<file>
-								${project.build.directory}/eel.war
+								${project.build.directory}/geolocation.war
 							</file>
 						</configuration>
 					</execution>

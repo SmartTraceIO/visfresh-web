@@ -11,19 +11,18 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import au.smarttrace.geolocation.impl.GeoLocationDispatcherImpl;
 import au.smarttrace.geolocation.init.JdbcConfig;
-import au.smarttrace.unwiredlabs.UnwiredLabsService;
+import au.smarttrace.unwiredlabs.UnwiredLabsInit;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
-@Import(JdbcConfig.class)
+@Import({JdbcConfig.class, UnwiredLabsInit.class})
 @ComponentScan(basePackageClasses = {
-        GeoLocationDispatcherImpl.class,
-        UnwiredLabsService.class})
+        GeoLocationDispatcherImpl.class})
 @EnableScheduling
-@PropertySource({"classpath:/app.properties"})
+@PropertySource({"classpath:/geo.app.properties"})
 public class Config {
     /**
      *
