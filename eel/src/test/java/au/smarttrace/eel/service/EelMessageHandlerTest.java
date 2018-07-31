@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,11 +21,12 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import au.smarttrace.eel.Beacon;
 import au.smarttrace.eel.DeviceMessage;
 import au.smarttrace.eel.GatewayBinding;
 import au.smarttrace.eel.Location;
-import au.smarttrace.eel.StationSignal;
 import au.smarttrace.eel.rawdata.BeaconData;
 import au.smarttrace.eel.rawdata.DevicePosition;
 import au.smarttrace.eel.rawdata.EelMessage;
@@ -34,6 +36,9 @@ import au.smarttrace.eel.rawdata.GsmStationSignal;
 import au.smarttrace.eel.rawdata.LocationPackageBody;
 import au.smarttrace.eel.rawdata.PackageHeader;
 import au.smarttrace.eel.rawdata.PackageHeader.PackageIdentifier;
+import au.smarttrace.gsm.GsmLocationResolvingRequest;
+import au.smarttrace.gsm.StationSignal;
+import au.smarttrace.json.ObjectMapperFactory;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -46,6 +51,10 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
     private final List<DeviceMessage> messages = new LinkedList<>();
     private final List<String> alerts = new LinkedList<>();
     private final Set<String> locks = new HashSet<>();
+    private List<UnwiredLabsRequest> locationRequests = new LinkedList<>();
+    private Set<String> trackers = new HashSet<>();
+    private final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
+
     @Before
     public void setUp() {
         this.beacon = createBeaconDevice("1289374698773");
@@ -131,24 +140,17 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
         assertEquals(longitude, loc.getLongitude(), 0.01);
     }
     @Test
-    public void testProcessWithStationSignals() {
+    public void testProcessWithStationSignals() throws IOException {
         final Date time = new Date(System.currentTimeMillis() - 10000000l);
 
         final EelMessage msg = new EelMessage();
         msg.setImei(beacon.getImei());
 
-        final EelPackage p = new EelPackage();
+        final EelPackage p = createLocationPackage();
         msg.getPackages().add(p);
 
-        final PackageHeader h = new PackageHeader();
-        h.setPid(PackageIdentifier.Location);
-        p.setHeader(h);
-
-        final LocationPackageBody body = new LocationPackageBody();
-        p.setBody(body);
-
         final DevicePosition pos = new DevicePosition();
-        body.setLocation(pos);
+        ((LocationPackageBody) p.getBody()).setLocation(pos);
         pos.setTime(toEpoch(time.getTime()));
 
         final GsmStationSignal sig = new GsmStationSignal();
@@ -190,9 +192,17 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
         handleMessage(msg);
 
         //test
-        assertEquals(2, messages.size());
+        assertEquals(0, messages.size());
+        assertEquals(1, this.locationRequests.size());
 
-        final DeviceMessage m = messages.get(0);
+        final UnwiredLabsRequest req = locationRequests.get(0);
+        assertEquals(SENDER, req.getSender());
+
+        final LocationDetectRequest ldr = json.readValue(req.getUserData(), LocationDetectRequest.class);
+        final List<DeviceMessage> msgs = ldr.getMessages();
+
+        assertEquals(2, msgs.size());
+        final DeviceMessage m = msgs.get(0);
         assertEquals(battery, Math.round(m.getBattery()));
         assertTrue(m.getImei().contains(address));
         assertEquals(temperature, m.getTemperature(), 0.001);
@@ -200,14 +210,130 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
 
         assertNull(m.getLocation());
 
-        assertEquals(2, m.getStationSignals().size());
-        final StationSignal ss = m.getStationSignals().get(0);
+        final GsmLocationResolvingRequest gsmReq = req.getRequest();
+        assertEquals(2, gsmReq.getStations().size());
+        final StationSignal ss = gsmReq.getStations().get(0);
 
         assertEquals(cid, ss.getCi());
         assertEquals(lac, ss.getLac());
         assertEquals(mcc, ss.getMcc());
         assertEquals(mnc, ss.getMnc());
         assertEquals(rxLevel, ss.getLevel());
+    }
+    @Test
+    public void testIncludeTracker() throws IOException {
+        final String imei = "123456677";
+        final EelMessage msg = crtateLocationMessage(imei, null, createGsmStationSignal());
+
+        handleMessage(msg);
+
+        //test
+        assertEquals(0, messages.size());
+
+        //test not registered device
+        assertEquals(0, this.locationRequests.size());
+
+        //register device
+        trackers.add(imei);
+        handleMessage(msg);
+
+        assertEquals(0, messages.size());
+        assertEquals(1, this.locationRequests.size());
+
+        final UnwiredLabsRequest req = locationRequests.get(0);
+        assertEquals(SENDER, req.getSender());
+
+        final LocationDetectRequest ldr = json.readValue(req.getUserData(), LocationDetectRequest.class);
+        final List<DeviceMessage> msgs = ldr.getMessages();
+
+        assertEquals(1, msgs.size());
+        final DeviceMessage m = msgs.get(0);
+        assertEquals(imei, m.getImei());
+    }
+
+    @Test
+    public void testIncludeTrackerResolvedLocation() throws IOException {
+        final String imei = "123456677";
+        final EelMessage msg = crtateLocationMessage(imei, new Location(), null);
+
+        handleMessage(msg);
+
+        //test
+        assertEquals(0, messages.size());
+
+        //register device
+        trackers.add(imei);
+        handleMessage(msg);
+
+        assertEquals(1, messages.size());
+        final DeviceMessage m = messages.get(0);
+        assertEquals(imei, m.getImei());
+    }
+
+    /**
+     * @param imei
+     * @param loc
+     * @param createGsmStationSignal
+     * @return
+     */
+    private EelMessage crtateLocationMessage(final String imei, final Location loc,
+            final GsmStationSignal sig) {
+        final Date time = new Date(System.currentTimeMillis() - 10000000l);
+
+        final EelMessage msg = new EelMessage();
+        msg.setImei(imei);
+
+        final EelPackage p = createLocationPackage();
+        msg.getPackages().add(p);
+
+        final DevicePosition pos = new DevicePosition();
+        ((LocationPackageBody) p.getBody()).setLocation(pos);
+        pos.setTime(toEpoch(time.getTime()));
+
+        if (loc != null) {
+            final GpsData gps = new GpsData();
+            gps.setLatitude((int) Math.round(loc.getLatitude() * COORDINATES_MASHTAB));
+            gps.setLongitude((int) Math.round(loc.getLongitude() * COORDINATES_MASHTAB));
+
+            pos.setGpsData(gps);
+        }
+        if(sig != null) {
+            pos.getTowerSignals().add(sig);
+        }
+
+        return msg;
+    }
+
+    /**
+     * @return
+     */
+    private GsmStationSignal createGsmStationSignal() {
+        final GsmStationSignal sig = new GsmStationSignal();
+        sig.setCid(1111);
+        sig.setLac(222);
+        sig.setMcc(333);
+        sig.setMnc(444);
+        sig.setRxLevel(55);
+
+        return sig;
+    }
+
+    /**
+     * @return
+     */
+    protected EelPackage createLocationPackage() {
+        final EelPackage p = new EelPackage();
+
+        //header
+        final PackageHeader h = new PackageHeader();
+        h.setPid(PackageIdentifier.Location);
+        p.setHeader(h);
+
+        //body
+        final LocationPackageBody body = new LocationPackageBody();
+        p.setBody(body);
+
+        return p;
     }
     /**
      * @param t
@@ -329,6 +455,25 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
     @Override
     protected Beacon getBeaconByImei(final String imei) {
         return beacons.get(imei);
+    }
+    /* (non-Javadoc)
+     * @see au.smarttrace.eel.service.EelMessageHandlerImpl#saveUnwiredLabsRequest(java.lang.String, java.lang.String, au.smarttrace.gsm.GsmLocationResolvingRequest)
+     */
+    @Override
+    protected void saveUnwiredLabsRequest(final String sender, final String userData, final GsmLocationResolvingRequest r) {
+        final UnwiredLabsRequest unwReq = new UnwiredLabsRequest();
+        unwReq.setSender(sender);
+        unwReq.setUserData(userData);
+        unwReq.setRequest(r);
+
+        locationRequests.add(unwReq);
+    }
+    /* (non-Javadoc)
+     * @see au.smarttrace.eel.service.EelMessageHandlerImpl#isTrackerRegistered(java.lang.String)
+     */
+    @Override
+    protected boolean isTrackerRegistered(final String imei) {
+        return trackers.contains(imei);
     }
     /**
      * BT04 message

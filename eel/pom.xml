@@ -103,6 +103,13 @@
 			<artifactId>clicksend</artifactId>
 			<version>0.0.1</version>
 		</dependency>
+		
+		<!-- Location resolving -->
+		<dependency>
+			<groupId>au.smarttrace</groupId>
+			<artifactId>geolocation</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
 		<!-- Tests -->
 		<dependency>

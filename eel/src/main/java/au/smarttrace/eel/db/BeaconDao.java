@@ -45,7 +45,7 @@ public class BeaconDao {
         sql = loadSql();
     }
 
-    public Beacon getById(final String imei) {
+    public Beacon getBeaconById(final String imei) {
         final String entityName = "d";
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(IMEI_FIELD, imei);
@@ -107,21 +107,6 @@ public class BeaconDao {
         return map ;
     }
     /**
-     * @param imei
-     * @return
-     */
-    public String getCompanyEmail(final String imei) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("imei", imei);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select email from companies"
-                + " join devices on devices.company = companies.id and devices.imei = :imei limit 1",
-                params);
-
-        return list.size() == 0 ? null : (String) list.get(0).get("email");
-    }
-    /**
      * @return
      */
     private String loadSql() {
@@ -145,5 +130,19 @@ public class BeaconDao {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * @param imei
+     * @return
+     */
+    public boolean isTrackerRegistered(final String imei) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("imei", imei);
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select imei from devices where imei = :imei and active", params);
+
+        return !list.isEmpty();
     }
 }

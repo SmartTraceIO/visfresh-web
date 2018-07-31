@@ -60,7 +60,7 @@ public class BeaconDaoTest {
         createBeacon(imei);
         createBeacon("imei-2");
 
-        final Beacon b = dao.getById(imei);
+        final Beacon b = dao.getBeaconById(imei);
         assertEquals(imei, b.getImei());
         assertEquals(company, b.getCompany());
         assertTrue(b.isActive());
@@ -80,7 +80,7 @@ public class BeaconDaoTest {
 
         saveGateway(beaconId, g);
 
-        final Beacon b = dao.getById(beaconId);
+        final Beacon b = dao.getBeaconById(beaconId);
         assertNotNull(b.getGateway());
 
         assertEquals(g.isActive(), b.getGateway().isActive());
@@ -103,7 +103,7 @@ public class BeaconDaoTest {
 
         saveGateway(beaconId, g);
 
-        final Beacon b = dao.getById(beaconId);
+        final Beacon b = dao.getBeaconById(beaconId);
         assertNotNull(b.getGateway());
         assertFalse(g.isActive());
     }
@@ -127,7 +127,7 @@ public class BeaconDaoTest {
         saveGateway(beaconId, g1);
         saveGateway(beaconId, g2);
 
-        final Beacon b = dao.getById(beaconId);
+        final Beacon b = dao.getBeaconById(beaconId);
         assertNotNull(b.getGateway());
         assertEquals(g1.getId(), b.getGateway().getId());
     }
