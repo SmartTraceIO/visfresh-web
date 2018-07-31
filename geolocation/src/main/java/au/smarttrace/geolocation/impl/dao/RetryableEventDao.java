@@ -209,6 +209,6 @@ public class RetryableEventDao {
     public void deleteRequest(final RetryableEvent e) {
         final Map<String, Object> params = new HashMap<>();
         params.put("id", e.getId());
-        jdbc.update("delete locationrequests where id = :id", params);
+        jdbc.update("delete from locationrequests where id = :id", params);
     }
 }
