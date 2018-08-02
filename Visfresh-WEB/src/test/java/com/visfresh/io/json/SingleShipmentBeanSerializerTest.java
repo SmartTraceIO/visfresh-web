@@ -1247,6 +1247,8 @@ public class SingleShipmentBeanSerializerTest {
         final SingleShipmentBean s = new SingleShipmentBean();
         //status is mandatory value
         s.setStatus(ShipmentStatus.Arrived);
+        s.setDevice("230948324098098");
+        s.setDeviceModel(DeviceModel.STF2);
         return s;
     }
 }

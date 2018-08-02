@@ -981,7 +981,7 @@ public class ShipmentReportBuilder {
      * @return
      */
     private String getShipmentNumber(final ShipmentReportBean bean) {
-        return Device.getSerialNumber(bean.getDevice())
+        return Device.getSerialNumber(bean.getDeviceModel(), bean.getDevice())
         + "(" + bean.getTripCount() + ")";
     }
     /**
