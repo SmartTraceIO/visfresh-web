@@ -12,6 +12,7 @@ select
     d.color as deviceColor,
     nd.imei as nearestDevice,
     nd.color as nearestDeviceColor,
+    nd.model as nearestDeviceModel,
     d.name as deviceName,
     d.model as deviceModel,
     s.nonotifsifnoalerts as excludeNotificationsIfNoAlerts,

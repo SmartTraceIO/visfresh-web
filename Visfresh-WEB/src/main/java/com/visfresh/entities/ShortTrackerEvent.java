@@ -45,6 +45,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
      * Humidity in percents 0-100%
      */
     private Integer humidity;
+    private DeviceModel deviceModel;
 
     /**
      * Default constructor.
@@ -61,6 +62,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
         this.setBattery(e.getBattery());
         this.setCreatedOn(e.getCreatedOn());
         this.setDeviceImei(e.getDevice().getImei());
+        this.setDeviceModel(e.getDevice().getModel());
         this.setId(e.getId());
         this.setLatitude(e.getLatitude());
         this.setLongitude(e.getLongitude());
@@ -79,6 +81,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
         this.setBattery(e.getBattery());
         this.setCreatedOn(e.getCreatedOn());
         this.setDeviceImei(e.getDeviceImei());
+        this.setDeviceModel(e.getDeviceModel());
         this.setId(e.getId());
         this.setLatitude(e.getLatitude());
         this.setLongitude(e.getLongitude());
@@ -223,6 +226,19 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
     public void setHumidity(final Integer humidity) {
         this.humidity = humidity;
     }
+    /**
+     * @return
+     */
+    public DeviceModel getDeviceModel() {
+        return deviceModel;
+    }
+    /**
+     * @param model the deviceModel to set
+     */
+    public void setDeviceModel(final DeviceModel model) {
+        this.deviceModel = model;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */

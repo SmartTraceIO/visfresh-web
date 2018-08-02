@@ -26,6 +26,7 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -42,6 +43,11 @@ import com.visfresh.utils.StringUtils;
 @Component
 public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent, Long>
     implements TrackerEventDao {
+
+    /**
+     *
+     */
+    private static final String DEVICE_MODEL = "deviceModel";
 
     /**
      * Table name.
@@ -417,7 +423,10 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
         for (final String imei : imeis) {
             final String key = "imei_" + index;
 
-            final String sql = "(select * from " + getTableName()
+            final String sql = "(select "
+                    + getTableName()+ ".*,"
+                    + " devices.model as deviceModel from " + getTableName()
+                    + " join devices on devices.imei = device"
                     + " where " + DEVICE_FIELD + "=:" + key
                     + " order by " + ID_FIELD + " desc limit 1"
                     + ")";
@@ -513,7 +522,9 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
             params.put("endDate", endDate);
         }
 
-        final StringBuilder sql = new StringBuilder("select * from " + getTableName());
+        final StringBuilder sql = new StringBuilder("select "
+                + getTableName() + ".*, devices.model as deviceModel from " + getTableName()
+                + " join devices on devices.imei = " + getTableName() + ".device");
         sql.append(" where " + DEVICE_FIELD + "=:device");
         if (startDate != null) {
             sql.append(" and " + TIME_FIELD + " >= :startDate");
@@ -602,6 +613,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
             ue.setShipmentId(shipmentField.longValue());
         }
         ue.setDeviceImei((String) row.get(DEVICE_FIELD));
+        ue.setDeviceModel(DeviceModel.valueOf((String) row.get(DEVICE_MODEL)));
         return ue;
     }
     /* (non-Javadoc)

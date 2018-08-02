@@ -57,18 +57,18 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * @return the sn
      */
     public String getSn() {
-        if (shouldUseFullImeiAsSn(model)) {
-            return getImei();
-        }
-        return getSerialNumber(getImei());
+        return getSerialNumber(model, getImei());
     }
     /**
      * @param imei device IMEI.
      * @return
      */
-    public static String getSerialNumber(final String imei) {
+    public static String getSerialNumber(final DeviceModel model, final String imei) {
         if (imei == null) {
             return null;
+        }
+        if (shouldUseFullImeiAsSn(model)) {
+            return imei;
         }
 
         //normalize device serial number

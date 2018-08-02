@@ -63,6 +63,25 @@ public class DeviceRestClient extends RestClient {
      */
     public List<ListDeviceItem> getDevices(final String sortColumn, final boolean sortOrder,
             final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
+        final JsonArray response = getDevicesJson(sortColumn, sortOrder, pageIndex, pageSize);
+
+        final List<ListDeviceItem> devices = new ArrayList<>(response.size());
+        for (int i = 0; i < response.size(); i++) {
+            devices.add(serializer.parseListDeviceItem(response.get(i).getAsJsonObject()));
+        }
+        return devices;
+    }
+    /**
+     * @param sortColumn
+     * @param sortOrder
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    public JsonArray getDevicesJson(final String sortColumn, final boolean sortOrder, final Integer pageIndex,
+            final Integer pageSize) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
             params.put("pageIndex", Integer.toString(pageIndex));
@@ -75,12 +94,7 @@ public class DeviceRestClient extends RestClient {
 
         final JsonArray response = sendGetRequest(getPathWithToken("getDevices"),
                 params).getAsJsonArray();
-
-        final List<ListDeviceItem> devices = new ArrayList<>(response.size());
-        for (int i = 0; i < response.size(); i++) {
-            devices.add(serializer.parseListDeviceItem(response.get(i).getAsJsonObject()));
-        }
-        return devices;
+        return response;
     }
     /**
      * @param device device.
@@ -189,7 +203,7 @@ public class DeviceRestClient extends RestClient {
      */
     public String getReadings(final Shipment s) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("sn", Device.getSerialNumber(s.getDevice().getImei()));
+        params.put("sn", Device.getSerialNumber(s.getDevice().getModel(), s.getDevice().getImei()));
         params.put("trip", Integer.toString(s.getTripCount()));
 
         return doSendGetRequest(getPathWithToken("getReadings"), params);

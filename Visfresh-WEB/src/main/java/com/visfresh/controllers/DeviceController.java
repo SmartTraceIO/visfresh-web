@@ -50,6 +50,7 @@ import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Role;
@@ -477,8 +478,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
                     + " should be presented in arguments");
         }
 
-        //create temporary file with report PDF content.
-
+        //create temporary file with report CSV content.
         try {
             final OutputStream out = new FileOutputStream(file);
             try {
@@ -668,7 +668,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
                     tripCounts.put(shipmentId, tripCount);
                 }
 
-                out.write(getShipmentNumber(e.getDeviceImei(), tripCount).getBytes());
+                out.write(getShipmentNumber(e.getDeviceImei(), e.getDeviceModel(), tripCount).getBytes());
             }
             out.write((byte) ',');
             //time
@@ -732,8 +732,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param tripCount
      * @return
      */
-    private String getShipmentNumber(final String deviceImei, final Integer tripCount) {
-        final StringBuilder sb = new StringBuilder(Device.getSerialNumber(deviceImei));
+    private String getShipmentNumber(final String deviceImei, final DeviceModel model, final Integer tripCount) {
+        final StringBuilder sb = new StringBuilder(Device.getSerialNumber(model, deviceImei));
         //add shipment trip count
         sb.append('(');
         sb.append(tripCount);

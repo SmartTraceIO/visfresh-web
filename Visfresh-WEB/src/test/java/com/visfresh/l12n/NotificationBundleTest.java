@@ -16,6 +16,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AppUserNotification;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationType;
@@ -49,6 +50,7 @@ public class NotificationBundleTest extends NotificationBundle {
         final Device device = new Device();
         device.setImei("90812730982372");
         device.setName("JUnit device");
+        device.setModel(DeviceModel.STB1);
 
         final LocationProfile shippedTo = createLocation("Target location", 11, 11);
         final LocationProfile shippedFrom = createLocation("Start location", 1, 1);
@@ -252,6 +254,7 @@ public class NotificationBundleTest extends NotificationBundle {
         final AppUserNotification n = new AppUserNotification();
         n.setIssueDate(new Date());
         n.setDevice(shipment.getDevice().getImei());
+        n.setDeviceModel(shipment.getDevice().getModel());
         n.setShipmentId(shipment.getId());
         n.setShipmentDescription(shipment.getShipmentDescription());
         n.setShipmentTripCount(shipment.getTripCount());

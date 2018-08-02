@@ -329,7 +329,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.add("nearestTracker", nt);
 
             nt.addProperty("device", dto.getNearestTracker());
-            nt.addProperty("sn", Device.getSerialNumber(dto.getNearestTracker()));
+            nt.addProperty("sn", Device.getSerialNumber(dto.getNearestTrackerModel(),
+                    dto.getNearestTracker()));
             nt.addProperty("color", dto.getNearestTrackerColor());
         }
 

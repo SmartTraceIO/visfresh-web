@@ -20,6 +20,7 @@ import com.visfresh.dao.impl.json.ShortenerAliasesBuilder;
 import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.CorrectiveAction;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEventType;
@@ -124,10 +125,12 @@ public class SingleShipmentBeanSerializerTest {
         final String shipmentType = "JUnit";
         final Integer shutDownAfterStartMinutes = 95;
         final Integer shutdownDeviceAfterMinutes = 67;
+        final DeviceModel nearestTrackerModel = DeviceModel.STB1;
         final Date shutdownTime = new Date(System.currentTimeMillis() - 192837987987l);
         final Date startTime = new Date(System.currentTimeMillis() - 98709870987l);
         final ShipmentStatus status = ShipmentStatus.Ended;
         final int tripCount = 19;
+        final DeviceModel model = DeviceModel.STB1;
 
         SingleShipmentBean s = createBean();
 
@@ -147,6 +150,7 @@ public class SingleShipmentBeanSerializerTest {
         s.setDeviceColor(c);
         s.setDeviceName(deviceName);
         s.setDevice(device);
+        s.setDeviceModel(model);
         s.setEta(etaPretty);
         s.setExcludeNotificationsIfNoAlerts(excludeNotificationsIfNoAlerts);
         s.setFirstReadingTime(firstReadingTime);
@@ -156,6 +160,7 @@ public class SingleShipmentBeanSerializerTest {
         s.setMinTemp(minTemp);
         s.setNearestTracker(nearestTracker);
         s.setNearestTrackerColor(nearestTrackerColor);
+        s.setNearestTrackerModel(nearestTrackerModel);
         s.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
         s.setNoAlertsAfterStartMinutes(noAlertsAfterStartMinutes);
         s.setPalletId(palletId);
@@ -192,6 +197,7 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(c, s.getDeviceColor());
         assertEquals(deviceName, s.getDeviceName());
         assertEquals(device, s.getDevice());
+        assertEquals(model, s.getDeviceModel());
         assertEqualDates(etaPretty, s.getEta());
         assertEquals(excludeNotificationsIfNoAlerts, s.isExcludeNotificationsIfNoAlerts());
         assertEqualDates(firstReadingTime, s.getFirstReadingTime());
@@ -201,6 +207,7 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(minTemp, s.getMinTemp(), 0.0001);
         assertEquals(nearestTracker, s.getNearestTracker());
         assertEquals(nearestTrackerColor, s.getNearestTrackerColor());
+        assertEquals(nearestTrackerModel, s.getNearestTrackerModel());
         assertEquals(noAlertsAfterArrivalMinutes, s.getNoAlertsAfterArrivalMinutes());
         assertEquals(noAlertsAfterStartMinutes, s.getNoAlertsAfterStartMinutes());
         assertEquals(palletId, s.getPalletId());

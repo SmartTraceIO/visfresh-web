@@ -10,6 +10,7 @@ notifications.hidden as hidden,
 al.date as issueDate,
 
 s.device as device,
+d.model as deviceModel,
 s.id as shipmentId,
 s.tripcount as shipmentTripCount,
 s.description as shipmentDescription,
@@ -34,6 +35,7 @@ join alerts al on notifications.user = :user and notifications.type = 'Alert'
    -- %insert-slert-criterias%
 left outer join temperaturerules rule on al.rule = rule.id
 join shipments s on s.id = al.shipment
+join devices d on s.device = d.imei
 left outer join trackerevents e on al.event = e.id
 -- %insert-criterias%
 )
@@ -52,6 +54,7 @@ notifications.hidden as hidden,
 arr.date as issueDate,
 
 s.device as device,
+d.model as deviceModel,
 s.id as shipmentId,
 s.tripcount as shipmentTripCount,
 s.description as shipmentDescription,
@@ -74,6 +77,7 @@ from notifications
 join arrivals arr on notifications.user = :user and notifications.type = 'Arrival'
    and notifications.issue = arr.id
 join shipments s on s.id = arr.shipment
+join devices d on s.device = d.imei
 left outer join trackerevents e on arr.event = e.id
 -- %insert-criterias%
 )

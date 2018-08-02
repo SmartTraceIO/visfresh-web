@@ -212,7 +212,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_IMEI, item.getImei());
         obj.addProperty(DeviceConstants.PROPERTY_MODEL, item.getModel().name());
         obj.addProperty(DeviceConstants.PROPERTY_NAME, item.getName());
-        obj.addProperty(DeviceConstants.PROPERTY_SN, Device.getSerialNumber(item.getImei()));
+        obj.addProperty(DeviceConstants.PROPERTY_SN, Device.getSerialNumber(item.getModel(), item.getImei()));
         obj.addProperty(DeviceConstants.PROPERTY_COLOR,
                 item.getColor() == null ? null : item.getColor().name());
         obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, item.isActive());
@@ -231,7 +231,8 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_LONG, item.getLongitude());
         obj.addProperty(DeviceConstants.PROPERTY_SHIPMENT_NUMBER,
                 item.getShipmentId() == null ? null
-                        : (Device.getSerialNumber(item.getImei()) + "(" + item.getTripCount() + ")"));
+                        : (Device.getSerialNumber(item.getModel(), item.getImei())
+                                + "(" + item.getTripCount() + ")"));
         obj.addProperty(DeviceConstants.PROPERTY_SHIPMENT_STATUS,
                 item.getShipmentStatus() == null ? null: item.getShipmentStatus().name());
 

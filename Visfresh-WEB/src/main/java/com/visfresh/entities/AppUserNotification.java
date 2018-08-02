@@ -60,6 +60,7 @@ public class AppUserNotification {
     private int numberOfMettersOfArrival;
     private boolean alertCumulative;
     private Double readingTemperature;
+    private DeviceModel deviceModel;
 
 
     /**
@@ -308,5 +309,17 @@ public class AppUserNotification {
      */
     public void setReadingTemperature(final Double readingTemperature) {
         this.readingTemperature = readingTemperature;
+    }
+    /**
+     * @return device model.
+     */
+    public DeviceModel getDeviceModel() {
+        return deviceModel;
+    }
+    /**
+     * @param model the deviceModel to set
+     */
+    public void setDeviceModel(final DeviceModel model) {
+        this.deviceModel = model;
     }
 }

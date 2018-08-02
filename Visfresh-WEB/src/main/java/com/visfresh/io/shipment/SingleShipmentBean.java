@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.lists.ListNotificationScheduleItem;
@@ -79,6 +80,8 @@ public class SingleShipmentBean {
     private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
     private final List<AlertBean> sentAlerts = new LinkedList<>();
     private AlertProfileBean alertProfile;
+    private DeviceModel nearestTrackerModel;
+    private DeviceModel deviceModel;
 
     /**
      * Default constructor.
@@ -147,6 +150,19 @@ public class SingleShipmentBean {
     public String getDeviceColor() {
         return deviceColor;
     }
+
+    /**
+     * @return device model
+     */
+    public DeviceModel getDeviceModel() {
+        return deviceModel;
+    }
+    /**
+     * @param modell the deviceModel to set
+     */
+    public void setDeviceModel(final DeviceModel modell) {
+        this.deviceModel = modell;
+    }
     /**
      * @return the nearestTracker
      */
@@ -160,17 +176,30 @@ public class SingleShipmentBean {
         return nearestTrackerColor;
     }
     /**
-     * @param nearestTracker the nearestTracker to set
+     * @param tracker the nearestTracker to set
      */
-    public void setNearestTracker(final String nearestTracker) {
-        this.nearestTracker = nearestTracker;
+    public void setNearestTracker(final String tracker) {
+        this.nearestTracker = tracker;
     }
     /**
-     * @param nearestTrackerColor the nearestTrackerColor to set
+     * @param color the nearestTrackerColor to set
      */
-    public void setNearestTrackerColor(final String nearestTrackerColor) {
-        this.nearestTrackerColor = nearestTrackerColor;
+    public void setNearestTrackerColor(final String color) {
+        this.nearestTrackerColor = color;
     }
+    /**
+     * @return
+     */
+    public DeviceModel getNearestTrackerModel() {
+        return nearestTrackerModel;
+    }
+    /**
+     * @param model the nearestTrackerModel to set
+     */
+    public void setNearestTrackerModel(final DeviceModel model) {
+        this.nearestTrackerModel = model;
+    }
+
     /**
      * @return the tripCount
      */

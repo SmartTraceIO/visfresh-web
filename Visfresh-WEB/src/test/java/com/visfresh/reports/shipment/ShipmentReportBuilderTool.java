@@ -273,6 +273,7 @@ public final class ShipmentReportBuilderTool {
     private static ShortTrackerEvent createEvent(final SingleShipmentBean s, final SingleShipmentLocationBean bean) {
         final ShortTrackerEvent e = new ShortTrackerEvent();
         e.setCreatedOn(bean.getTime());
+        e.setDeviceModel(s.getDeviceModel());
         e.setDeviceImei(s.getDevice());
         e.setId(bean.getId());
         e.setLatitude(bean.getLatitude());

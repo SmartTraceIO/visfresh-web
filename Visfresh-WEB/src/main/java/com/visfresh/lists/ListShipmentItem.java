@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.shipment.AlertBean;
@@ -63,6 +64,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private final List<AlertBean> sentAlerts = new LinkedList<>();
     private final List<TemperatureRuleBean> temperatureRules = new LinkedList<>();
     private boolean isBeacon;
+    private DeviceModel nearestTrackerModel;
 
     /**
      * Default constructor.
@@ -504,16 +506,28 @@ public class ListShipmentItem implements EntityWithId<Long> {
         return nearestTrackerColor;
     }
     /**
-     * @param nearestTracker the nearestTracker to set
+     * @param tracker the nearestTracker to set
      */
-    public void setNearestTracker(final String nearestTracker) {
-        this.nearestTracker = nearestTracker;
+    public void setNearestTracker(final String tracker) {
+        this.nearestTracker = tracker;
     }
     /**
-     * @param nearestTrackerColor the nearestTrackerColor to set
+     * @param colo the nearestTrackerColor to set
      */
-    public void setNearestTrackerColor(final String nearestTrackerColor) {
-        this.nearestTrackerColor = nearestTrackerColor;
+    public void setNearestTrackerColor(final String colo) {
+        this.nearestTrackerColor = colo;
+    }
+    /**
+     * @return
+     */
+    public DeviceModel getNearestTrackerModel() {
+        return nearestTrackerModel;
+    }
+    /**
+     * @param model the nearestTrackerModel to set
+     */
+    public void setNearestTrackerModel(final DeviceModel model) {
+        this.nearestTrackerModel = model;
     }
     /**
      * @param useGateway

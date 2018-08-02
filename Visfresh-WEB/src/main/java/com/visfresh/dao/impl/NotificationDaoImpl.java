@@ -26,6 +26,7 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AppUserNotification;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.User;
@@ -145,6 +146,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Notification,
         n.setIssueDate((Date) row.get("issueDate"));
 
         n.setDevice((String) row.get("device"));
+        n.setDeviceModel(DeviceModel.valueOf((String) row.get("deviceModel")));
         n.setShipmentId(dbLong(row.get("shipmentId")));
         n.setShipmentTripCount(dbInteger(row.get("shipmentTripCount")));
         n.setShipmentDescription((String) row.get("shipmentDescription"));

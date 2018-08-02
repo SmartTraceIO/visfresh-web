@@ -759,6 +759,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
             item.setNearestTracker((String) row.get("nearestTracker"));
             item.setNearestTrackerColor((String) row.get("nearestTrackerColor"));
+            final String nearestTrackerModel = (String) row.get("nearestTrackerModel");
+            if (nearestTrackerModel != null) {
+                item.setNearestTrackerModel(DeviceModel.valueOf(nearestTrackerModel));
+            }
 
             item.setShippedFrom((String) row.get("shippedFromLocationName"));
             item.setShippedTo((String) row.get("shippedToLocationName"));

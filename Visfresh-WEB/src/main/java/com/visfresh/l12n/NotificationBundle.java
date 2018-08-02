@@ -106,7 +106,7 @@ public class NotificationBundle extends NotificationIssueBundle {
         final String str = getBundle().getString("LinkToShipment");
         final Map<String, String> map = new HashMap<String, String>();
         map.put("shipmentId", n.getShipmentId().toString());
-        map.put("devicesn", normalizeSn(Device.getSerialNumber(n.getDevice())));
+        map.put("devicesn", normalizeSn(Device.getSerialNumber(n.getDeviceModel(), n.getDevice())));
         map.put("tripCount", Integer.toString(n.getShipmentTripCount()));
         return StringUtils.getMessage(str, map);
     }
@@ -191,7 +191,7 @@ public class NotificationBundle extends NotificationIssueBundle {
         //${device} device IMEI
         map.put("device", n.getDevice());
         //${devicesn} device serial number
-        map.put("devicesn", normalizeSn(Device.getSerialNumber(n.getDevice())));
+        map.put("devicesn", normalizeSn(Device.getSerialNumber(n.getDeviceModel(), n.getDevice())));
 
         //${tripCount} trip count for given device of shipment.
         map.put("tripCount", Integer.toString(n.getShipmentTripCount()));

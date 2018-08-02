@@ -4,6 +4,7 @@ select
   nd.imei as nearestTracker,
   d.model as deviceModel,
   nd.color as nearestTrackerColor,
+  nd.model as nearestTrackerModel,
   substring(nd.imei, -7, 6) as nearestTrackerSn,
   sfrom.name as shippedFromLocationName,
   sto.name as shippedToLocationName,

@@ -447,7 +447,7 @@ public class NotificationServiceImpl implements NotificationService {
         final String companyName = report.getCompanyName().replaceAll("[\\p{Punct}]", "");
 
         final String name = "-" + companyName + "-"
-                + Device.getSerialNumber(report.getDevice())
+                + Device.getSerialNumber(report.getDeviceModel(), report.getDevice())
                 + "(" + report.getTripCount() + ")"
                 + "-" + fmt.format(new Date()) + ".pdf";
 

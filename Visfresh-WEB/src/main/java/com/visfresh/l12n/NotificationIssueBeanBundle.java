@@ -74,7 +74,8 @@ public class NotificationIssueBeanBundle {
         //${device} device IMEI
         map.put("device", shipment.getDevice());
         //${devicesn} device serial number
-        map.put("devicesn", normalizeSn(Device.getSerialNumber(shipment.getDevice())));
+        map.put("devicesn", normalizeSn(Device.getSerialNumber(
+                shipment.getDeviceModel(), shipment.getDevice())));
 
         //${tripCount} trip count for given device of shipment.
         map.put("tripCount", Integer.toString(shipment.getTripCount()));

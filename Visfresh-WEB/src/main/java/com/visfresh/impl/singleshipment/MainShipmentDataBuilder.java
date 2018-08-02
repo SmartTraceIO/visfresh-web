@@ -197,10 +197,15 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         bean.setDevice((String) row.get("device"));
         bean.setDeviceColor((String) row.get("deviceColor"));
         bean.setDeviceName((String) row.get("deviceName"));
+        bean.setDeviceModel(DeviceModel.valueOf((String) row.get("deviceModel")));
 
         //nearest device
         bean.setNearestTracker((String) row.get("nearestDevice"));
         bean.setNearestTrackerColor((String) row.get("nearestDeviceColor"));
+        final String nearestDeviceModel = (String) row.get("nearestDeviceModel");
+        if (nearestDeviceModel != null) {
+            bean.setNearestTrackerModel(DeviceModel.valueOf(nearestDeviceModel));
+        }
 
         bean.setExcludeNotificationsIfNoAlerts(Boolean.TRUE.equals(row.get("excludeNotificationsIfNoAlerts")));
 

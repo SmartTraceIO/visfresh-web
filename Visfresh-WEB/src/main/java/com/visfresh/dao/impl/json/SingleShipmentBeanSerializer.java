@@ -27,6 +27,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
@@ -418,8 +419,11 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("companyId", s.getCompanyId());
         json.addProperty("device", s.getDevice());
         json.addProperty("deviceName", s.getDeviceName());
+        json.addProperty("deviceModel", s.getDeviceModel().name());
         json.addProperty("nearestTracker", s.getNearestTracker());
         json.addProperty("nearestTrackerColor", s.getNearestTrackerColor());
+        json.addProperty("nearestTrackerModel",
+                s.getNearestTrackerModel() == null ? null : s.getNearestTrackerModel().name());
         json.addProperty("tripCount", s.getTripCount());
         json.addProperty("shipmentDescription", s.getShipmentDescription());
         json.addProperty("palletId", s.getPalletId());
@@ -529,8 +533,13 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         s.setCompanyId(asLong(json.get("companyId")));
         s.setDevice(asString(json.get("device")));
         s.setDeviceName(asString(json.get("deviceName")));
+        s.setDeviceModel(DeviceModel.valueOf(asString(json.get("deviceModel"))));
         s.setNearestTracker(asString(json.get("nearestTracker")));
         s.setNearestTrackerColor(asString(json.get("nearestTrackerColor")));
+        final String nearestTrackerModel = asString(json.get("nearestTrackerModel"));
+        if (nearestTrackerModel != null) {
+            s.setNearestTrackerModel(DeviceModel.valueOf(nearestTrackerModel));
+        }
         s.setTripCount(asInt(json.get("tripCount")));
         s.setShipmentDescription(asString(json.get("shipmentDescription")));
         s.setPalletId(asString(json.get("palletId")));
@@ -1308,7 +1317,8 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
 
         json.addProperty("shipmentId", bean.getShipmentId()); /*+*/
-        json.addProperty(ShipmentConstants.DEVICE_SN, Device.getSerialNumber(bean.getDevice())); /*+*/
+        json.addProperty(ShipmentConstants.DEVICE_SN, Device.getSerialNumber(
+                bean.getNearestTrackerModel(), bean.getDevice())); /*+*/
         json.addProperty(ShipmentConstants.DEVICE_COLOR, bean.getDeviceColor());
         json.addProperty("isBeacon", bean.isBeacon());
         json.addProperty("tripCount", bean.getTripCount()); /*+*/
@@ -1353,7 +1363,8 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
             json.add("nearestTracker", nt);
 
             nt.addProperty("device", bean.getNearestTracker());
-            nt.addProperty("sn", Device.getSerialNumber(bean.getNearestTracker()));
+            nt.addProperty("sn", Device.getSerialNumber(
+                    bean.getNearestTrackerModel(), bean.getNearestTracker()));
             nt.addProperty("color", bean.getNearestTrackerColor());
         }
 
@@ -1569,7 +1580,8 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty(NoteConstants.NOTE_TEXT, dto.getNoteText());
         json.addProperty(NoteConstants.SHIPMENT_ID, bean.getShipmentId());
         json.addProperty(NoteConstants.NOTE_TYPE, dto.getNoteType());
-        json.addProperty(NoteConstants.SN, Device.getSerialNumber(bean.getDevice()));
+        json.addProperty(NoteConstants.SN, Device.getSerialNumber(
+                bean.getNearestTrackerModel(), bean.getDevice()));
         json.addProperty(NoteConstants.TRIP, bean.getTripCount());
         json.addProperty(NoteConstants.TIME_ON_CHART, formatIso(dto.getTimeOnChart()));
         json.addProperty("timeOnChartTimestamp", toTimestamp(dto.getTimeOnChart()));

@@ -4,6 +4,7 @@ select
   -- nearest tracker
   nd.imei as nearestTracker,
   nd.color as nearestTrackerColor,
+  nd.model as nearestTrackerModel,
   substring(nd.imei, -7, 6) as nearestTrackerSn,
   -- shipped from
   sfrom.name as shippedFromLocationName,

@@ -40,6 +40,7 @@ import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
@@ -148,6 +149,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         final Date eta = new Date(System.currentTimeMillis() - 1000000l);
         final String nearestTracker = "32498703948798";
         final Color nearestTrackerColor = Color.BlueViolet;
+        final DeviceModel nearestTrackerModel = DeviceModel.STB1;
 
         //set fields to shipment
         final Shipment s = createDefaultNotSavedShipment(device);
@@ -175,6 +177,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         //nearest device
         final Device nearest = createDevice(nearestTracker);
         nearest.setColor(nearestTrackerColor);
+        nearest.setModel(nearestTrackerModel);
+
         context.getBean(DeviceDao.class).save(nearest);
 
         shipmentDao.setNearestTracker(s, nearest);
@@ -207,6 +211,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertEquals(device.getImei(), bean.getDevice());
         assertEquals(device.getColor().name(), bean.getDeviceColor());
         assertEquals(device.getName(), bean.getDeviceName());
+        assertEquals(device.getModel(), bean.getDeviceModel());
         assertEquals(excludeNotificationsIfNoAlerts, bean.isExcludeNotificationsIfNoAlerts());
         assertEquals(status, bean.getStatus());
         assertEquals(s.getTripCount(), bean.getTripCount());
@@ -225,7 +230,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertTrue(Math.abs(eta.getTime() - bean.getEta().getTime()) < 1000l);
         assertEquals(100, bean.getPercentageComplete());
         assertEquals(nearestTracker, bean.getNearestTracker());
-        assertEquals(nearestTrackerColor, nearestTrackerColor);
+        assertEquals(nearestTrackerColor.name(), bean.getNearestTrackerColor());
+        assertEquals(nearestTrackerModel, bean.getNearestTrackerModel());
     }
     @Test
     public void testInterimStops() {

@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.BeansException;
 
+import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.controllers.restclient.DeviceRestClient;
 import com.visfresh.dao.AlertDao;
@@ -200,6 +201,23 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(23.46, item.getTemperature(), 0.1);
         assertNotNull(item.getLastReadingTime());
         assertEquals(e1.getShipment().getId(), item.getShipmentId());
+    }
+    @Test
+    public void testGetDevicesSerialNumber() throws RestServiceException, IOException {
+        final String imei = "3333333333333";
+        final Device d = createDevice(imei, true);
+        createShipment(d, true);
+
+        JsonObject device = client.getDevicesJson(null, true, null, null).get(0).getAsJsonObject();
+        assertEquals("333333", device.get("sn").getAsString());
+        assertEquals("333333(1)", device.get("shipmentNumber").getAsString());
+
+        d.setModel(DeviceModel.STB1);
+        dao.save(d);
+
+        device = client.getDevicesJson(null, true, null, null).get(0).getAsJsonObject();
+        assertEquals(imei, device.get("sn").getAsString());
+        assertEquals(imei + "(1)", device.get("shipmentNumber").getAsString());
     }
     @Test
     public void testGetDevicesSortByImei() throws RestServiceException, IOException {
@@ -501,6 +519,34 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertTrue(getDiferenceMs(e.getCreatedOn(), str[9]) <  61000);
         //type
         assertEquals("SwitchedOn", str[10]);
+    }
+    @Test
+    public void testGetReadingsDeviceSn() throws IOException, RestServiceException {
+        final Device d1 = createDevice("1234987039487", true);
+
+        final long dt = 60 * 60 * 1000l; //one hour
+        final long t0 = System.currentTimeMillis() - 5 * dt;
+
+        final Shipment s = createShipment(d1, true);
+        final TrackerEvent e = createTrackerEvent(d1, new Date(t0 + 3 * dt));
+        e.setShipment(s);
+        context.getBean(TrackerEventDao.class).save(e);
+
+        String data =  client.getReadings(d1, new Date(t0 + 2 * dt - 10000), new Date(t0 + 3 * dt + 10000));
+        String[] str = data.split("\n")[1].split(",");
+
+        //shipment
+        assertEquals("703948(1)", str[1]);
+
+        //change device model
+        d1.setModel(DeviceModel.STB1);
+        dao.save(d1);
+
+        data =  client.getReadings(d1, new Date(t0 + 2 * dt - 10000), new Date(t0 + 3 * dt + 10000));
+        str = data.split("\n")[1].split(",");
+
+        //shipment
+        assertEquals("1234987039487(1)", str[1]);
     }
     @Test
     public void testGetReadingsByShipmentId() throws IOException, RestServiceException {

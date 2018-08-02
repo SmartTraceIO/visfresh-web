@@ -386,7 +386,8 @@ public class ReportsController extends AbstractController {
      * @return
      */
     private String createFileName(final Shipment s, final String extension) {
-        final StringBuilder sb = new StringBuilder(Device.getSerialNumber(s.getDevice().getImei()));
+        final StringBuilder sb = new StringBuilder(Device.getSerialNumber(
+                s.getDevice().getModel(), s.getDevice().getImei()));
         //add shipment trip count
         sb.append('(');
         sb.append(s.getTripCount());

@@ -348,6 +348,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         //check any fields of second event
         assertEquals(e2.getId(), ute2.getId());
         assertEquals(e2.getDevice().getImei(), ute2.getDeviceImei());
+        assertEquals(e2.getDevice().getModel(), ute2.getDeviceModel());
         assertNull(ute2.getShipmentId());
 
         //fully check fields of first tracker event.

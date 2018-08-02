@@ -400,7 +400,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         dao.save(s);
 
         assertEquals(s.getId(), dao.getShipmentId(
-                Device.getSerialNumber(s.getDevice().getImei()), s.getTripCount()));
+                Device.getSerialNumber(s.getDevice().getModel(), s.getDevice().getImei()), s.getTripCount()));
     }
     @Test
     public void testFindNextShipmentFor() {

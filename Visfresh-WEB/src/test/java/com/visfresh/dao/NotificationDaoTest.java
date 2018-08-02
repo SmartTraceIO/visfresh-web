@@ -240,6 +240,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertFalse(un.isAlertCumulative());
         assertEquals(hidden, un.isHidden());
         assertEquals(read, un.isRead());
+        assertEquals(s.getDevice().getModel(), un.getDeviceModel());
     }
     @Test
     public void testTemperatureAlertFieldsOfFindForUser() {
