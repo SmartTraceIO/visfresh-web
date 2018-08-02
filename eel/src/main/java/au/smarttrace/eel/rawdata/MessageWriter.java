@@ -67,7 +67,7 @@ public class MessageWriter {
      * @param imei
      * @return
      */
-    private byte[] imeiToBytes(final String imei) {
+    public byte[] imeiToBytes(final String imei) {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         new WriteBuffer(out).writeImei(imei);
         return out.toByteArray();
