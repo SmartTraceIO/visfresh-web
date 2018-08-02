@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -20,6 +21,7 @@ public class ObjectMapperFactory {
         final ObjectMapper m = new ObjectMapper();
         m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
         m.setLocale(Locale.US);
+        m.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         return m;
     }
 }
