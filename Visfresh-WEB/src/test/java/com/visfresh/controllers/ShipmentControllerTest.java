@@ -509,6 +509,21 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(0, shipmentClient.getShipments(3, 10000).size());
     }
     @Test
+    public void testGetShipmentsStb1() throws RestServiceException, IOException {
+        final String imei = "abcd1234ef1234";
+        final Device device = createDevice(imei, true);
+        device.setModel(DeviceModel.STB1);
+        context.getBean(DeviceDao.class).save(device);
+
+        createShipment(device, true);
+        final JsonArray shipments = shipmentClient.getShipments(null, null);
+        assertEquals(1, shipments.size());
+
+        //check serial number
+        final JsonObject json = shipments.get(0).getAsJsonObject();
+        assertEquals(imei, json.get("deviceSN").getAsString());
+    }
+    @Test
     public void testGetShipmentsBeaconId() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         s.getShippedTo().setAddress("Coles Perth DC");
@@ -1446,7 +1461,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createTemperatureAlert(s, AlertType.Hot);
         createArrival(s);
 
-        final JsonObject sd = shipmentClient.getSingleShipment(
+        JsonObject sd = shipmentClient.getSingleShipment(
                 "11", s.getTripCount()).getAsJsonObject();
         assertNotNull(sd);
 
@@ -1457,6 +1472,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         } catch (final Exception e) {
             //ok
         }
+
+        //test full imei as SN
+        sd = shipmentClient.getSingleShipment(
+                device.getImei(), s.getTripCount()).getAsJsonObject();
+        assertNotNull(sd);
     }
     @Test
     public void testGetSingleShipmentByDeviceGroups() throws RestServiceException, IOException {

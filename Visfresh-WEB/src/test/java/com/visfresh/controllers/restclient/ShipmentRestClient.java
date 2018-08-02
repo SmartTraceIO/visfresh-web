@@ -17,7 +17,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.controllers.ShipmentController;
-import com.visfresh.controllers.ShipmentControllerOld;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
@@ -32,10 +31,6 @@ import com.visfresh.io.json.fastxml.JsonSerializerFactory;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
-import com.visfresh.utils.DiffFilter;
-import com.visfresh.utils.SerializerUtils;
-
-import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -44,7 +39,6 @@ import junit.framework.AssertionFailedError;
 public class ShipmentRestClient extends RestClient {
     private ShipmentSerializer serializer;
     private GetShipmentsRequestParser reqParser;
-    private final DiffFilter diffFilter;
 
     /**
      *
@@ -54,32 +48,16 @@ public class ShipmentRestClient extends RestClient {
         this.serializer = new ShipmentSerializer(user.getLanguage(), user.getTimeZone(),
                 user.getTemperatureUnits());
         this.reqParser = new GetShipmentsRequestParser(user.getTimeZone());
-        diffFilter = new DiffFilter() {
-            @Override
-            public boolean accept(final String key) {
-                return !key.endsWith("Timestamp");
-            }
-        };
     }
     public JsonElement getSingleShipment(final Shipment shipment)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("shipmentId", shipment.getId().toString());
 
-        long startTime = System.currentTimeMillis();
-        final JsonElement oldVersionResult = sendGetRequest(getPathWithToken(ShipmentControllerOld.GET_SINGLE_SHIPMENT_OLD), params);
-        final long oldTime = System.currentTimeMillis() - startTime;
-
-        startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         final JsonElement newVersionResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
         final long newTime = System.currentTimeMillis() - startTime;
-        System.out.println("Old execution time: " + oldTime + ", new execution time: " + newTime);
-
-        final JsonObject diff = SerializerUtils.diff(oldVersionResult, newVersionResult, diffFilter);
-        if (diff != null) {
-            throw new AssertionFailedError("Old and new version are not equals: " + diff);
-        }
-
+        System.out.println("Execution time: " + newTime);
         return newVersionResult;
     }
     public JsonElement getSingleShipment(final String sn, final int trip)
@@ -90,19 +68,10 @@ public class ShipmentRestClient extends RestClient {
             params.put("trip", Integer.toString(trip));
         }
 
-        long startTime = System.currentTimeMillis();
-        final JsonElement oldResult = sendGetRequest(getPathWithToken(ShipmentControllerOld.GET_SINGLE_SHIPMENT_OLD), params);
-        final long oldTime = System.currentTimeMillis() - startTime;
-
-        startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         final JsonElement newResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
         final long newTime = System.currentTimeMillis() - startTime;
-        System.out.println("Old execution time: " + oldTime + ", new execution time: " + newTime);
-
-        final JsonObject diff = SerializerUtils.diff(oldResult, newResult, diffFilter);
-        if (diff != null) {
-            throw new AssertionFailedError("Old and new version are not equals: " + diff);
-        }
+        System.out.println("Execution time: " + newTime);
 
         return newResult;
     }

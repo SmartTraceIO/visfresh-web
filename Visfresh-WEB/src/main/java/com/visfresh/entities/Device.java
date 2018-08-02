@@ -57,6 +57,9 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * @return the sn
      */
     public String getSn() {
+        if (shouldUseFullImeiAsSn(model)) {
+            return getImei();
+        }
         return getSerialNumber(getImei());
     }
     /**
@@ -267,5 +270,13 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
     @Override
     public String toString() {
         return getImei() + " (" + getDescription() + ")";
+    }
+
+    /**
+     * @param deviceModel
+     * @return
+     */
+    public static boolean shouldUseFullImeiAsSn(final DeviceModel deviceModel) {
+        return deviceModel == DeviceModel.STB1;
     }
 }

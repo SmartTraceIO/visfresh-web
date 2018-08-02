@@ -251,7 +251,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         map.put("trip", tripCount);
 
         final List<Map<String, Object>> list = jdbc.queryForList("select s.id as id from shipments s "
-                + "where s.device like concat('%', :sn, '_') and s.tripcount = :trip", map);
+                + "where (s.device like concat('%', :sn, '_') or s.device = :sn) and s.tripcount = :trip", map);
         if (list.size() > 0) {
             return ((Number) list.get(0).get("id")).longValue();
         }
@@ -653,8 +653,9 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
             query.append("s.id = :s");
             params.put("s", shipmentId);
         } else {
-            query.append("s.tripcount = :trip and s.device like :sn");
+            query.append("s.tripcount = :trip and (s.device like :sn or s.device = :originSn)");
             params.put("sn", createSerialNumberLikeCause(sn));
+            params.put("originSn", sn);
             params.put("trip", tripCount);
         }
 
@@ -746,9 +747,15 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
             item.setAlertProfileId(dbLong(row.get("alertProfileId")));
             item.setAlertProfileName((String) row.get("alertProfileName"));
             item.setDeviceName((String) row.get("deviceName"));
-            item.setDeviceSN((String) row.get("deviceSn"));
             item.setDevice((String) row.get("device"));
-            item.setBeacon(DeviceModel.valueOf((String) row.get("deviceModel")).isUseGateway());
+
+            final DeviceModel deviceModel = DeviceModel.valueOf((String) row.get("deviceModel"));
+            item.setBeacon(deviceModel.isUseGateway());
+            if (Device.shouldUseFullImeiAsSn(deviceModel)) {
+                item.setDeviceSN(item.getDevice());
+            } else {
+                item.setDeviceSN((String) row.get("deviceSn"));
+            }
 
             item.setNearestTracker((String) row.get("nearestTracker"));
             item.setNearestTrackerColor((String) row.get("nearestTrackerColor"));
