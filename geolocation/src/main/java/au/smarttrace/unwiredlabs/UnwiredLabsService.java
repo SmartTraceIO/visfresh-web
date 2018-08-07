@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -333,12 +332,5 @@ public class UnwiredLabsService implements GeoLocationService {
      */
     public String getToken() {
         return token;
-    }
-    /**
-     * @param jdbc JDBC template.
-     * @return UnwiredLabs helper.
-     */
-    public static UnwiredLabsHelper createHelper(final NamedParameterJdbcTemplate jdbc) {
-        return new UnwiredLabsHelper(jdbc);
     }
 }

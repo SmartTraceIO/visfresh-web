@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
-import au.smarttrace.geolocation.impl.dao.GeoLocationRequestDaoImpl;
+import au.smarttrace.geolocation.impl.dao.RetryableEventDao;
 import au.smarttrace.geolocation.init.JdbcConfig;
 
 /**
@@ -18,7 +18,7 @@ import au.smarttrace.geolocation.init.JdbcConfig;
 @Configuration
 @Import(JdbcConfig.class)
 @ComponentScan(basePackageClasses = {
-    GeoLocationRequestDaoImpl.class
+    RetryableEventDao.class
 })
 @PropertySource("classpath:/junit.app.properties")
 public class DaoTestRunnerConfig {

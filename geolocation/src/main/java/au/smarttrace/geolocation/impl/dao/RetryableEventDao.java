@@ -148,13 +148,35 @@ public class RetryableEventDao {
     }
     /**
      * @param requestor geo location resolving requestor.
+     * @param limit events limit.
+     * @param types service types.
      * @return list of processed events with success or error status.
      */
-    public List<RetryableEvent> getProcessedRequests(final String requestor) {
+    public List<RetryableEvent> getProcessedRequests(final String requestor, final int limit, final ServiceType... types) {
+        if (types.length == 0) {
+            return new LinkedList<>();
+        }
+
         final Map<String, Object> params = new HashMap<>();
         params.put("sender", requestor);
+        params.put("limit", limit);
+
+        final StringBuilder whereServiceTypes = new StringBuilder("(");
+        for (int i = 0; i < types.length; i++) {
+            final String key = "t_" + i;
+            if (i > 0) {
+                whereServiceTypes.append(',');
+            }
+            whereServiceTypes.append(':').append(key);
+            params.put(key, types[i].name());
+        }
+        whereServiceTypes.append(')');
+
+        final String sql = "select * from locationrequests "
+            + "where sender = :sender and not status is NULL and type in " + whereServiceTypes + " "
+            + "order by id limit :limit";
         final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from locationrequests where sender = :sender and not status is NULL", params);
+                sql, params);
         return createEvents(rows);
     }
     /**

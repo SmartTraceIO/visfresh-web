@@ -8,5 +8,6 @@ package au.smarttrace.geolocation;
  *
  */
 public enum ServiceType {
-    UnwiredLabs
+    UnwiredLabs,
+    TestType //for unit tests. Please remove where second real type will added.
 }

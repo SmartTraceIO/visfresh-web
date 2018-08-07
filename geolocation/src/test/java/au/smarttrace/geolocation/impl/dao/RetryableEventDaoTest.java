@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import au.smarttrace.geolocation.GeoLocationRequest;
-import au.smarttrace.geolocation.GeoLocationRequestDao;
 import au.smarttrace.geolocation.RequestStatus;
 import au.smarttrace.geolocation.ServiceType;
 import au.smarttrace.geolocation.impl.RetryableEvent;
@@ -243,11 +242,7 @@ public class RetryableEventDaoTest {
     public void testGetProcessedRequests() {
         final String requestor = "req12345estor";
 
-        //event with success status should be ignored
-        final RetryableEvent e1 = createEvent();
-        e1.getRequest().setStatus(RequestStatus.success);
-        e1.getRequest().setSender(requestor);
-        dao.save(e1);
+        final RetryableEvent e1 = createSuccessEvent(requestor);
 
         //event with error status should be ignored.
         final RetryableEvent e2 = createEvent();
@@ -265,16 +260,48 @@ public class RetryableEventDaoTest {
         e4.getRequest().setSender("abcdef");
         dao.save(e4);
 
-        final List<RetryableEvent> events = dao.getProcessedRequests(requestor);
+        final List<RetryableEvent> events = dao.getProcessedRequests(requestor, 1000, ServiceType.UnwiredLabs);
         assertEquals(2, events.size());
 
         final Set<Long> ids = getIds(events);
         assertTrue(ids.contains(e1.getId()));
         assertTrue(ids.contains(e2.getId()));
+    }
+    @Test
+    public void testGetProcessedRequestsFilterByType() {
+        final String requestor = "req12345estor";
 
-        //get by exported DAO
-        assertEquals(2, GeoLocationRequestDao.Factory.create(
-                support.getJdbc()).getProcessedRequests(requestor).size());
+        //event with success status should be ignored
+        final RetryableEvent e1 = createEvent();
+        e1.getRequest().setStatus(RequestStatus.success);
+        e1.getRequest().setType(ServiceType.UnwiredLabs);
+        e1.getRequest().setSender(requestor);
+        dao.save(e1);
+
+        assertEquals(1, dao.getProcessedRequests(requestor, 1000, ServiceType.UnwiredLabs).size());
+        assertEquals(0, dao.getProcessedRequests(requestor, 1000, ServiceType.TestType).size());
+    }
+    @Test
+    public void testGetProcessedRequestsLimit() {
+        final String requestor = "req12345estor";
+
+        //event with success status should be ignored
+        createSuccessEvent(requestor);
+        createSuccessEvent(requestor);
+
+        assertEquals(2, dao.getProcessedRequests(requestor, 1000, ServiceType.UnwiredLabs).size());
+        assertEquals(1, dao.getProcessedRequests(requestor, 1, ServiceType.UnwiredLabs).size());
+    }
+
+    /**
+     * @param requestor
+     */
+    private RetryableEvent createSuccessEvent(final String requestor) {
+        final RetryableEvent e = createEvent();
+        e.getRequest().setStatus(RequestStatus.success);
+        e.getRequest().setSender(requestor);
+        dao.save(e);
+        return e;
     }
 
     /**

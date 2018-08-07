@@ -138,7 +138,6 @@ public class GeoLocationDispatcherTest extends GeoLocationDispatcherImpl {
         e = support.getEvent(e.getId());
         assertEquals(RequestStatus.error, e.getRequest().getStatus());
     }
-
     /* (non-Javadoc)
      * @see au.smarttrace.geolocation.impl.GeoLocationDispatcherImpl#startDispatcherThread()
      */

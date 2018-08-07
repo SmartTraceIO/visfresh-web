@@ -37,15 +37,14 @@ import au.smarttrace.eel.rawdata.EelMessage;
 import au.smarttrace.eel.rawdata.EelPackage;
 import au.smarttrace.eel.rawdata.GsmStationSignal;
 import au.smarttrace.eel.rawdata.LocationPackageBody;
-import au.smarttrace.geolocation.GeoLocationRequest;
+import au.smarttrace.geolocation.GeoLocationHelper;
+import au.smarttrace.geolocation.GeoLocationResponse;
 import au.smarttrace.geolocation.Location;
 import au.smarttrace.geolocation.RequestStatus;
-import au.smarttrace.geolocation.impl.RetryableEvent;
+import au.smarttrace.geolocation.ServiceType;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
 import au.smarttrace.json.ObjectMapperFactory;
-import au.smarttrace.unwiredlabs.UnwiredLabsHelper;
-import au.smarttrace.unwiredlabs.UnwiredLabsService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -67,8 +66,7 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
     private BeaconChannelLockService lockService;
     @Autowired
     private NamedParameterJdbcTemplate jdbc;
-    private UnwiredLabsHelper unwiredLabsHelper;
-    private final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
+    private GeoLocationHelper unwiredLabsHelper;
     /**
      * Default constructor.
      */
@@ -78,20 +76,24 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
 
     @PostConstruct
     public void initialize() {
-        unwiredLabsHelper = UnwiredLabsService.createHelper(jdbc);
+        unwiredLabsHelper = GeoLocationHelper.createHelper(jdbc, ServiceType.UnwiredLabs);
     }
 
     @Scheduled(fixedDelay = 10000l)
     public void handleResolvedLocations() {
-        final List<RetryableEvent> requests = getProcessedRequests(SENDER);
-        for (final RetryableEvent e : requests) {
-            final GeoLocationRequest req = e.getRequest();
-            try {
-                if (req.getStatus() == RequestStatus.success) {
+        final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
+
+        for (int i = 0; i < 10; i++) {
+            final List<GeoLocationResponse> responses = getAndRemoveProcessedResponses(SENDER, 20);
+            if (responses.isEmpty()) {
+                break;
+            }
+            for (final GeoLocationResponse resp : responses) {
+                if (resp.getStatus() == RequestStatus.success) {
                     try {
                         final LocationDetectRequest r = json.readValue(
-                                req.getUserData(), LocationDetectRequest.class);
-                        final Location loc = json.readValue(req.getBuffer(), Location.class);
+                                resp.getUserData(), LocationDetectRequest.class);
+                        final Location loc = resp.getLocation();
 
                         //set location to messages
                         for (final DeviceMessage m : r.getMessages()) {
@@ -103,17 +105,8 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
                         log.error("Failed to send resolved message to system", exc);
                     }
                 }
-            } finally {
-                deleteEvent(e);
             }
         }
-    }
-    /**
-     * @param e
-     */
-    private void deleteEvent(final RetryableEvent e) {
-        unwiredLabsHelper.deleteRequest(e);
-
     }
 
     /* (non-Javadoc)
@@ -220,8 +213,10 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
             return;
         }
 
+        final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
         final GsmLocationResolvingRequest r = req.getReq();
         req.setReq(null);
+
         try {
             final String userData = json.writeValueAsString(req);
             saveUnwiredLabsRequest(SENDER, userData, r);
@@ -363,8 +358,8 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
      * @param sender
      * @return
      */
-    protected List<RetryableEvent> getProcessedRequests(final String sender) {
-        return unwiredLabsHelper.getProcessedRequests(sender);
+    protected List<GeoLocationResponse> getAndRemoveProcessedResponses(final String sender, final int limit) {
+        return unwiredLabsHelper.getAndRemoveProcessedResponses(sender, limit);
     }
     /**
      * @param sender
