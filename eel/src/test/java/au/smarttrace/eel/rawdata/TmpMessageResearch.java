@@ -4,7 +4,6 @@
 package au.smarttrace.eel.rawdata;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.DecoderException;
@@ -37,32 +36,43 @@ public final class TmpMessageResearch {
     private static void researchMessage() throws DecoderException, IOException {
         final byte[][] manyMessages = getData();
         for (final byte[] bytes : manyMessages) {
-            System.out.println("----------------------------------------------------------");
+            int numIncorrect = 0;
 
             final MessageParser parser = new MessageParser();
             final EelMessage msg = parser.parseMessage(bytes);
-            System.out.println("IMEI: " + msg.getImei());
             for (final EelPackage p : msg.getPackages()) {
                 final PackageIdentifier pid = p.getHeader().getPid();
-                System.out.println("Pid: " + p);
+                System.out.println(pid);
+
                 if (pid == PackageIdentifier.Location) {
+                    boolean hasIncorrect = false;
                     final LocationPackageBody body = (LocationPackageBody) p.getBody();
                     final DevicePosition pos = body.getLocation();
-                    System.out.println("Date: " + new Date(pos.getTime() * 1000l));
 
                     if (pos.getGpsData() != null) {
-                        final GpsData gps = pos.getGpsData();
-                        System.out.println("GPS data: " + gps);
+//                        final GpsData gps = pos.getGpsData();
+//                        System.out.println("GPS data: " + gps);
                     } else if (!pos.getTowerSignals().isEmpty()) {
-                        final int size = pos.getTowerSignals().size();
-                        System.out.println("Tower Signals ("
-                                + size
-                                + "):" + (size > 1 ? " *********************" : ""));
                         for (final GsmStationSignal gsm : pos.getTowerSignals()) {
-                            System.out.println(gsm);
+                            if (gsm.getCid() == 0 && gsm.getLac() == 0) {
+                                hasIncorrect = true;
+                            }
                         }
                     }
+
+                    if (hasIncorrect) {
+                        numIncorrect++;
+                    }
                 }
+            }
+
+            if (numIncorrect > 0) {
+                System.out.println("--------------------------");
+                System.out.println("Message from " + msg.getImei() + " has " + numIncorrect
+                    + " packages with incorrect tower signal:");
+                System.out.println(Hex.encodeHexString(bytes));
+            } else {
+                System.out.println("**** Is fully ok");
             }
         }
     }

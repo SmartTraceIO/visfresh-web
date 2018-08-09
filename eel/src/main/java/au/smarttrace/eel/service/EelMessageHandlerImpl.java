@@ -38,6 +38,7 @@ import au.smarttrace.eel.rawdata.EelPackage;
 import au.smarttrace.eel.rawdata.GsmStationSignal;
 import au.smarttrace.eel.rawdata.LocationPackageBody;
 import au.smarttrace.geolocation.GeoLocationHelper;
+import au.smarttrace.geolocation.GeoLocationRequest;
 import au.smarttrace.geolocation.GeoLocationResponse;
 import au.smarttrace.geolocation.Location;
 import au.smarttrace.geolocation.RequestStatus;
@@ -366,8 +367,10 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
      * @param userData
      * @param r
      */
-    protected void saveUnwiredLabsRequest(final String sender, final String userData, final GsmLocationResolvingRequest r) {
-        unwiredLabsHelper.saveRequest(sender, userData, r);
+    protected void saveUnwiredLabsRequest(final String sender,
+            final String userData, final GsmLocationResolvingRequest r) {
+        final GeoLocationRequest req = unwiredLabsHelper.createRequest(sender, userData, r);
+        unwiredLabsHelper.saveRequest(req);
     }
     /**
      * @param beacons set of beacon IMEI.
