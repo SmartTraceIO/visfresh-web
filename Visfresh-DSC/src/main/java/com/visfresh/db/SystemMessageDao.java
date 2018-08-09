@@ -19,8 +19,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
 import com.visfresh.DeviceMessage;
-import com.visfresh.Location;
 import com.visfresh.SystemMessage;
+
+import au.smarttrace.geolocation.Location;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -98,7 +99,9 @@ public class SystemMessageDao {
         return msg;
     }
 
-    public SystemMessage sendSystemMessageFor(final DeviceMessage e, final Location loc) {
+    public SystemMessage sendSystemMessageFor(final DeviceMessage e) {
+        final Location loc = e.getLocation();
+
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         sdf.setTimeZone(UTC);
 
@@ -112,7 +115,6 @@ public class SystemMessageDao {
             obj.addProperty("longitude", loc.getLongitude());
         }
         obj.addProperty("imei", e.getImei());
-        obj.addProperty("gateway", e.getGateway());
 
         final SystemMessage sm = new SystemMessage();
         sm.setMessageInfo(obj.toString());

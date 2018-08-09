@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.visfresh.dispatcher.DeviceMessageDispatcher;
 import com.visfresh.spring.prod.Config;
 
 /**
@@ -41,9 +40,6 @@ public class ApplicationInitializer implements ServletContextListener {
         ctx.refresh();
         sce.getServletContext().setAttribute(BEAN_FACTORY_PROPERTY, ctx);
 
-        //initialize dispatcher
-        ctx.getBean(DeviceMessageDispatcher.class).start();
-
         log.debug("Application has initialized.");
     }
 
@@ -54,8 +50,6 @@ public class ApplicationInitializer implements ServletContextListener {
     public void contextDestroyed(final ServletContextEvent sce) {
         final ServletContext servletContext = sce.getServletContext();
         final ConfigurableApplicationContext ctx = getBeanContext(servletContext);
-
-        ctx.getBean(DeviceMessageDispatcher.class).stop();
 
         //destroy spring context
         servletContext.removeAttribute(BEAN_FACTORY_PROPERTY);

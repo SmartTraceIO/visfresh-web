@@ -51,7 +51,6 @@ public class MessageSnapshootDaoTest extends MessageSnapshootDao {
     private DeviceMessage createMessage() {
         final DeviceMessage msg = new DeviceMessage();
         msg.setBattery(12);
-        msg.setId(777l);
         msg.setImei("123455789");
         msg.setMessage("message");
         msg.setTemperature(15.);

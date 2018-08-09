@@ -19,10 +19,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
-import com.visfresh.Location;
 import com.visfresh.SystemMessage;
 import com.visfresh.spring.mock.JUnitConfig;
 
+import au.smarttrace.geolocation.Location;
 import junit.framework.TestCase;
 
 /**
@@ -65,23 +65,17 @@ public class SystemMessageDaoTest extends TestCase {
         final Location location = new Location();
         location.setLatitude(100.500);
         location.setLongitude(100.500);
-        final int numberOfRetry = 4;
-        final Date retryOn = new Date(System.currentTimeMillis() + 10000000l);
         final double temperature = 36.6;
-        final String gateway = "1234567890";
 
         //create device command
         final DeviceMessage m = new DeviceMessage();
         m.setBattery(battery);
         m.setImei(imei);
-        m.setNumberOfRetry(numberOfRetry);
-        m.setRetryOn(retryOn);
         m.setTemperature(temperature);
         m.setTime(new Date());
         m.setType(DeviceMessageType.AUT);
-        m.setGateway(gateway);
 
-        SystemMessage sm = dao.sendSystemMessageFor(m, location);
+        SystemMessage sm = dao.sendSystemMessageFor(m);
         sm = dao.findOne(sm.getId());
 
         assertEquals(m.getImei(), sm.getGroup());
@@ -96,26 +90,21 @@ public class SystemMessageDaoTest extends TestCase {
         assertTrue(Math.abs(m.getTime().getTime()
                 - sdf.parse(json.get("time").getAsString()).getTime()) < 1000l);
         assertEquals(DeviceMessageType.AUT.name(), json.get("type").getAsString());
-        assertEquals(gateway, json.get("gateway").getAsString());
     }
     public void testSupportsNullLocations() {
         final int battery = 90;
         final String imei = "09098098";
-        final int numberOfRetry = 4;
-        final Date retryOn = new Date(System.currentTimeMillis() + 10000000l);
         final double temperature = 36.6;
 
         //create device command
         final DeviceMessage m = new DeviceMessage();
         m.setBattery(battery);
         m.setImei(imei);
-        m.setNumberOfRetry(numberOfRetry);
-        m.setRetryOn(retryOn);
         m.setTemperature(temperature);
         m.setTime(new Date());
         m.setType(DeviceMessageType.AUT);
 
-        SystemMessage sm = dao.sendSystemMessageFor(m, null);
+        SystemMessage sm = dao.sendSystemMessageFor(m);
         sm = dao.findOne(sm.getId());
 
         final Reader in = new StringReader(sm.getMessageInfo());

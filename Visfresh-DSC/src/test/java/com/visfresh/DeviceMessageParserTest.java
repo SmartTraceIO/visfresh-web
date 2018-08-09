@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
+import au.smarttrace.gsm.StationSignal;
 import junit.framework.TestCase;
 
 /**
@@ -52,11 +53,11 @@ public class DeviceMessageParserTest extends TestCase {
      * @throws IOException
      */
     public void testParse() throws IOException {
-        final List<DeviceMessage> msgs;
+        final IncommingRequest req;
         final Reader r = new InputStreamReader(DeviceMessageParserTest.class.getClassLoader()
                 .getResourceAsStream("msg.txt"));
         try {
-            msgs = parser.parse(r);
+            req = parser.parse(r);
         } finally {
             r.close();
         }
@@ -71,6 +72,7 @@ public class DeviceMessageParserTest extends TestCase {
         //460|1|9533|16113|23|
         //460|1|9533|16142|21|
         //460|1|9533|16526|18|
+        final List<DeviceMessage> msgs = req.getMessages();
         assertEquals(6, msgs.size());
 
         final DeviceMessage msg = msgs.get(2);
@@ -81,10 +83,15 @@ public class DeviceMessageParserTest extends TestCase {
         assertEquals("-10.24", Double.toString(msg.getTemperature()));
 
         //test station signals
-        assertEquals(6, msg.getStations().size());
+        assertNotNull(req.getSignals(msgs.get(0)));
+        assertNotNull(req.getSignals(msgs.get(1)));
+        assertNotNull(req.getSignals(msgs.get(2)));
+        assertNotNull(req.getSignals(msgs.get(3)));
+        assertNotNull(req.getSignals(msgs.get(4)));
+        assertNotNull(req.getSignals(msgs.get(5)));
 
         //test one station fully
-        final StationSignal station = msg.getStations().get(3);
+        final StationSignal station = req.getSignals(msg).get(3);
         // 460 |  1  | 9533|16113|  23   |
         //<MCC>|<MNC>|<LAC>|<CI> |<RXLEV>|
         assertEquals(460, station.getMcc());

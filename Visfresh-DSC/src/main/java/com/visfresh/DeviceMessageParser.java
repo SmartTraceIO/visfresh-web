@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import au.smarttrace.gsm.StationSignal;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -32,14 +34,19 @@ public class DeviceMessageParser {
      * @param msgData message data.
      * @return parsed device message.
      */
-    public List<DeviceMessage> parse(final String msgData) {
-        final List<DeviceMessage> messages = new LinkedList<>();
+    public IncommingRequest parse(final String msgData) {
+        final IncommingRequest messages = new IncommingRequest();
+        messages.setRawData(msgData);
+
         final List<List<String>> splitted = splitToMessages(msgData.trim().split("\n"));
 
         for (final List<String> list : splitted) {
             final String[] lines = list.toArray(new String[list.size()]);
 
             final DeviceMessage msg = new DeviceMessage();
+            final List<StationSignal> signals = new LinkedList<>();
+            messages.addMessage(msg, signals);
+
             //first line
             //<IMEI>|<DATA_TYPE>|<TIME>|
             String[] line = lines[0].split(Pattern.quote("|"));
@@ -61,11 +68,9 @@ public class DeviceMessageParser {
                 for (int i = 2; i < lines.length; i++) {
                     //parse station
                     final StationSignal station = parseStationSignal(lines[i]);
-                    msg.getStations().add(station);
+                    signals.add(station);
                 }
             }
-
-            messages.add(msg);
         }
 
         return messages;
@@ -146,7 +151,7 @@ public class DeviceMessageParser {
      * @return parsed device message.
      * @throws IOException
      */
-    public List<DeviceMessage> parse(final Reader reader) throws IOException {
+    public IncommingRequest parse(final Reader reader) throws IOException {
         final String msgData = MessageParserUtils.getContent(reader);
         return parse(msgData);
     }

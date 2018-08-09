@@ -47,7 +47,7 @@ public class MessageSnapshootDao {
         }
 
         final String signature = createSignature(messages);
-        return doSaveReceived(messages.get(0).getImei(), signature);
+        return doSaveReceived(messages.iterator().next().getImei(), signature);
     }
 
     /**
@@ -70,7 +70,7 @@ public class MessageSnapshootDao {
      * @return
      */
     public static String createSignature(final List<DeviceMessage> messages) {
-        final DeviceMessage first = messages.get(0);
+        final DeviceMessage first = messages.iterator().next();
         final String imei = first.getImei();
         final Date time = first.getTime();
 

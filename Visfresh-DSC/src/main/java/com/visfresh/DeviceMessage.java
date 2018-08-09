@@ -4,23 +4,14 @@
 package com.visfresh;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+
+import au.smarttrace.geolocation.Location;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class DeviceMessage {
-    /**
-     * List of station signals.
-     */
-    private final List<StationSignal> stations = new LinkedList<StationSignal>();
-
-    /**
-     * The message ID.
-     */
-    private long id = -1;
     /**
      * Device IMEI code.
      */
@@ -41,19 +32,11 @@ public class DeviceMessage {
      * Temperature
      */
     private double temperature;
-    /**
-     * The number of retry.
-     */
-    private int numberOfRetry;
-    /**
-     * The ready on date.
-     */
-    private Date retryOn = new Date();
     private String message;
     private String typeString;
     private Integer humidity;
-    private RadioType radio;
-    private String gateway;
+
+    private Location location;
 
     /**
      * Default constructor.
@@ -62,12 +45,6 @@ public class DeviceMessage {
         super();
     }
 
-    /**
-     * @return the stations
-     */
-    public List<StationSignal> getStations() {
-        return stations;
-    }
     /**
      * @return the imei
      */
@@ -141,43 +118,6 @@ public class DeviceMessage {
     public void setTemperature(final double temperature) {
         this.temperature = temperature;
     }
-    /**
-     * @return the numberOfRetry
-     */
-    public int getNumberOfRetry() {
-        return numberOfRetry;
-    }
-    /**
-     * @param numberOfRetry the numberOfRetry to set
-     */
-    public void setNumberOfRetry(final int numberOfRetry) {
-        this.numberOfRetry = numberOfRetry;
-    }
-    /**
-     * @return the readyOn
-     */
-    public Date getRetryOn() {
-        return retryOn;
-    }
-    /**
-     * @param retryOn the readyOn to set
-     */
-    public void setRetryOn(final Date retryOn) {
-        this.retryOn = retryOn;
-    }
-    /**
-     * @return the id
-     */
-    public long getId() {
-        return id;
-    }
-    /**
-     * @param id the id to set
-     */
-    public void setId(final long id) {
-        this.id = id;
-    }
-
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
@@ -196,9 +136,6 @@ public class DeviceMessage {
         sb.append(getTemperature()).append('|');
         sb.append('\n');
 
-        for (final StationSignal station : getStations()) {
-            sb.append(station).append('\n');
-        }
         return sb.toString();
     }
 
@@ -227,37 +164,15 @@ public class DeviceMessage {
         return humidity;
     }
     /**
-     * @return the radio
+     * @return the location
      */
-    public RadioType getRadio() {
-        return radio;
+    public Location getLocation() {
+        return location;
     }
     /**
-     * @param radio the radio to set
+     * @param location the location to set
      */
-    public void setRadio(final RadioType radio) {
-        this.radio = radio;
-    }
-    /**
-     * @param radio
-     */
-    public void setRadio(final String radio) {
-        if (radio == null) {
-            this.radio = null;
-        } else {
-            setRadio(RadioType.valueOf(radio));
-        }
-    }
-    /**
-     * @return the gateway
-     */
-    public String getGateway() {
-        return gateway;
-    }
-    /**
-     * @param gateway the gateway to set
-     */
-    public void setGateway(final String gateway) {
-        this.gateway = gateway;
+    public void setLocation(final Location location) {
+        this.location = location;
     }
 }

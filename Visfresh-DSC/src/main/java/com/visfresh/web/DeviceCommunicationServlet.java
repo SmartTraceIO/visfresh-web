@@ -5,7 +5,6 @@ package com.visfresh.web;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import com.visfresh.DeviceCommand;
-import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageParser;
+import com.visfresh.IncommingRequest;
 import com.visfresh.MessageParserUtils;
 import com.visfresh.service.DeviceMessageService;
 
@@ -66,7 +65,7 @@ public class DeviceCommunicationServlet extends HttpServlet {
         final String rawData = MessageParserUtils.getContent(new InputStreamReader(req.getInputStream()));
         log.debug("device message has received: " + rawData);
 
-        List<DeviceMessage> msgs;
+        IncommingRequest msgs;
         try {
             msgs = getParser().parse(rawData);
         } catch (final Exception e) {
@@ -80,7 +79,8 @@ public class DeviceCommunicationServlet extends HttpServlet {
 
         if (cmd != null) {
             final String command = cmd.getCommand();
-            log.debug("Sending command " + command + " to device " + msgs.get(0).getImei());
+            log.debug("Sending command " + command + " to device "
+                    + msgs.getMessages().get(0).getImei());
             resp.getOutputStream().write(command.getBytes());
         }
 
