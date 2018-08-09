@@ -24,6 +24,7 @@ import au.smarttrace.json.ObjectMapperFactory;
  */
 public class GeoLocationHelper {
     private static final Logger log = LoggerFactory.getLogger(GeoLocationHelper.class);
+    private static final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
 
     private RetryableEventDao dao;
     private final ServiceType type;
@@ -33,35 +34,56 @@ public class GeoLocationHelper {
         dao = new RetryableEventDao(jdbc);
         this.type = type;
     }
-
-    public void saveRequest(final String sender, final String userData, final GsmLocationResolvingRequest gsm) {
-        final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
-
+    /**
+     * @param req
+     */
+    public void saveRequest(final GeoLocationRequest req) {
+        dao.saveNewRequest(req);
+    }
+    /**
+     * @param sender
+     * @param userData
+     * @param gsm
+     * @return
+     */
+    public GeoLocationRequest createRequest(final String sender, final String userData,
+            final GsmLocationResolvingRequest gsm) {
+        return createRequest(sender, userData, gsm, type);
+    }
+    /**
+     * @param sender
+     * @param userData
+     * @param gsm
+     * @param type
+     * @return
+     */
+    public static GeoLocationRequest createRequest(
+            final String sender, final String userData, final GsmLocationResolvingRequest gsm,
+            final ServiceType type) {
         //create request
         final GeoLocationRequest req = new GeoLocationRequest();
         try {
             req.setBuffer(json.writeValueAsString(gsm));
+            req.setSender(sender);
+            req.setType(type);
+            req.setUserData(userData);
         } catch (final JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        req.setSender(sender);
-        req.setType(type);
-        req.setUserData(userData);
-
-        dao.saveNewRequest(req);
+        return req;
     }
     /**
      * @param sender request sender.
      * @param limit max number of fetch events.
      * @return list of GEO location responses.
      */
-    public List<GeoLocationResponse> getAndRemoveProcessedResponses(final String sender, final int limit) {
+    public List<GeoLocationResponse> getAndRemoveProcessedResponses(
+            final String sender, final int limit) {
         final List<RetryableEvent> events = dao.getProcessedRequests(sender, limit, type);
 
         //create responses.
         final List<GeoLocationResponse> responses = new LinkedList<>();
         final List<RetryableEvent> toDelete = new LinkedList<>();
-        final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
 
         for (final RetryableEvent e : events) {
             final GeoLocationRequest req = e.getRequest();

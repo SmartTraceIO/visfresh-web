@@ -58,7 +58,7 @@ public class GeoLocationHelperTest {
     @Test
     public void testSendRequest() throws IOException {
         final String sender = "sender";
-        final String userData = "userData";
+        final String userData = "UserData";
         final String imei = "12093847987234";
         final String radio = "lte";
 
@@ -81,7 +81,7 @@ public class GeoLocationHelperTest {
         gsm.getStations().add(sig);
         gsm.getStations().add(sig);
 
-        helper.saveRequest(sender, userData, gsm);
+        helper.saveRequest(helper.createRequest(sender, userData, gsm));
 
         final List<RetryableEvent> events = support.getAllEvents();
         assertEquals(1, events.size());
