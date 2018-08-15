@@ -24,7 +24,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
@@ -106,13 +105,6 @@ public class UnwiredLabsService implements GeoLocationService {
             throws IOException, JsonParseException, JsonMappingException {
         return objectMapper.readValue(
                 request, GsmLocationResolvingRequest.class);
-    }
-    public static String crateGeoLocationRequest(final GsmLocationResolvingRequest r) {
-        try {
-            return objectMapper.writeValueAsString(r);
-        } catch (final JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.dispatcher.LocationService#getLocation(java.util.List)

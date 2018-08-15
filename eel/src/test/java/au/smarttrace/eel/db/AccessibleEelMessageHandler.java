@@ -3,9 +3,9 @@
  */
 package au.smarttrace.eel.db;
 
-import au.smarttrace.eel.DeviceMessage;
 import au.smarttrace.eel.rawdata.BeaconData;
 import au.smarttrace.eel.service.EelMessageHandlerImpl;
+import au.smarttrace.geolocation.DeviceMessage;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

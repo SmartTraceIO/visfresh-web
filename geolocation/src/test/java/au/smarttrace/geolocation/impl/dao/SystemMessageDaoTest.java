@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.db;
+package au.smarttrace.geolocation.impl.dao;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -11,25 +11,33 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import au.smarttrace.DeviceMessage;
-import au.smarttrace.Location;
-import au.smarttrace.SystemMessage;
+import au.smarttrace.geolocation.DeviceMessage;
+import au.smarttrace.geolocation.Location;
+import au.smarttrace.geolocation.SystemMessage;
+import au.smarttrace.geolocation.junit.DaoTest;
+import au.smarttrace.geolocation.junit.db.DaoTestRunner;
 import junit.framework.TestCase;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@RunWith(DaoTestRunner.class)
+@Category(DaoTest.class)
 public class SystemMessageDaoTest extends TestCase {
-    private AnnotationConfigApplicationContext spring;
+    @Autowired
     private SystemMessageDao dao;
+    @Autowired
     private NamedParameterJdbcTemplate jdbc;
 
     /**
@@ -38,23 +46,8 @@ public class SystemMessageDaoTest extends TestCase {
     public SystemMessageDaoTest() {
         super();
     }
-    /**
-     * @param name test case name.
-     */
-    public SystemMessageDaoTest(final String name) {
-        super(name);
-    }
 
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-        spring = JUnitDbConfig.createContext();
-        dao = spring.getBean(SystemMessageDao.class);
-        jdbc = spring.getBean(NamedParameterJdbcTemplate.class);
-    }
-
+    @Test
     public void testSendSystemMessage() {
         final int battery = 90;
         final String imei = "09098098";
@@ -101,6 +94,7 @@ public class SystemMessageDaoTest extends TestCase {
             throw new RuntimeException(e);
         }
     }
+    @Test
     public void testSupportsNullLocations() {
         final int battery = 90;
         final String imei = "09098098";
@@ -128,6 +122,5 @@ public class SystemMessageDaoTest extends TestCase {
     protected void tearDown() throws Exception {
         //clean up data base
         jdbc.update("delete from " + SystemMessageDao.TABLE, new HashMap<String, Object>());
-        spring.close();
     }
 }

@@ -18,8 +18,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import au.smarttrace.Beacon;
-import au.smarttrace.DeviceMessage;
 import au.smarttrace.GatewayBinding;
+import au.smarttrace.geolocation.DeviceMessage;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -28,7 +28,6 @@ import au.smarttrace.GatewayBinding;
 public class Bt04ServiceTest extends Bt04Service {
     private Beacon beacon;
     private Map<String, Beacon> beacons = new HashMap<>();
-    private long lastId;
     private final List<DeviceMessage> messages = new LinkedList<>();
     private final List<String> alerts = new LinkedList<>();
     private final Set<String> locks = new HashSet<>();
@@ -209,7 +208,6 @@ public class Bt04ServiceTest extends Bt04Service {
      */
     @Override
     protected void sendMessage(final DeviceMessage msg) {
-        msg.setId(lastId++);
         messages.add(msg);
     }
     /* (non-Javadoc)

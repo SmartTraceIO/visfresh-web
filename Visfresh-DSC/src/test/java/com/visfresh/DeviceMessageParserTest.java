@@ -10,6 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
+import au.smarttrace.geolocation.DataWithGsmInfo;
+import au.smarttrace.geolocation.DeviceMessage;
+import au.smarttrace.geolocation.DeviceMessageType;
 import au.smarttrace.gsm.StationSignal;
 import junit.framework.TestCase;
 
@@ -53,7 +56,7 @@ public class DeviceMessageParserTest extends TestCase {
      * @throws IOException
      */
     public void testParse() throws IOException {
-        final IncommingRequest req;
+        final List<DataWithGsmInfo<DeviceMessage>> req;
         final Reader r = new InputStreamReader(DeviceMessageParserTest.class.getClassLoader()
                 .getResourceAsStream("msg.txt"));
         try {
@@ -72,10 +75,9 @@ public class DeviceMessageParserTest extends TestCase {
         //460|1|9533|16113|23|
         //460|1|9533|16142|21|
         //460|1|9533|16526|18|
-        final List<DeviceMessage> msgs = req.getMessages();
-        assertEquals(6, msgs.size());
+        assertEquals(6, req.size());
 
-        final DeviceMessage msg = msgs.get(2);
+        final DeviceMessage msg = req.get(2).getUserData();
         assertEquals("358688000000158", msg.getImei());
         assertEquals(DeviceMessageType.AUT, msg.getType());
         assertEquals("2013/10/18 13:28:29", utcFormat.format(msg.getTime()));
@@ -83,15 +85,15 @@ public class DeviceMessageParserTest extends TestCase {
         assertEquals("-10.24", Double.toString(msg.getTemperature()));
 
         //test station signals
-        assertNotNull(req.getSignals(msgs.get(0)));
-        assertNotNull(req.getSignals(msgs.get(1)));
-        assertNotNull(req.getSignals(msgs.get(2)));
-        assertNotNull(req.getSignals(msgs.get(3)));
-        assertNotNull(req.getSignals(msgs.get(4)));
-        assertNotNull(req.getSignals(msgs.get(5)));
+        assertEquals(5, req.get(0).getGsmInfo().getStations().size());
+        assertEquals(5, req.get(1).getGsmInfo().getStations().size());
+        assertEquals(6, req.get(2).getGsmInfo().getStations().size());
+        assertEquals(5, req.get(3).getGsmInfo().getStations().size());
+        assertEquals(5, req.get(4).getGsmInfo().getStations().size());
+        assertEquals(0, req.get(5).getGsmInfo().getStations().size());
 
         //test one station fully
-        final StationSignal station = req.getSignals(msg).get(3);
+        final StationSignal station = req.get(2).getGsmInfo().getStations().get(3);
         // 460 |  1  | 9533|16113|  23   |
         //<MCC>|<MNC>|<LAC>|<CI> |<RXLEV>|
         assertEquals(460, station.getMcc());

@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.visfresh.DeviceMessage;
-import com.visfresh.DeviceMessageType;
+import au.smarttrace.geolocation.DeviceMessage;
+import au.smarttrace.geolocation.DeviceMessageType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -56,7 +56,6 @@ public class MessageSnapshootDaoTest extends MessageSnapshootDao {
         msg.setTemperature(15.);
         msg.setType(DeviceMessageType.BRT);
         msg.setTime(new Date());
-        msg.setTypeString("BRT");
         return msg;
     }
 }

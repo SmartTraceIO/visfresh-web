@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import au.smarttrace.geolocation.DataWithGsmInfo;
+import au.smarttrace.geolocation.DeviceMessage;
+import au.smarttrace.geolocation.DeviceMessageType;
+import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
 
 /**
@@ -34,9 +38,8 @@ public class DeviceMessageParser {
      * @param msgData message data.
      * @return parsed device message.
      */
-    public IncommingRequest parse(final String msgData) {
-        final IncommingRequest messages = new IncommingRequest();
-        messages.setRawData(msgData);
+    public List<DataWithGsmInfo<DeviceMessage>> parse(final String msgData) {
+        final List<DataWithGsmInfo<DeviceMessage>> messages = new LinkedList<>();
 
         final List<List<String>> splitted = splitToMessages(msgData.trim().split("\n"));
 
@@ -44,17 +47,23 @@ public class DeviceMessageParser {
             final String[] lines = list.toArray(new String[list.size()]);
 
             final DeviceMessage msg = new DeviceMessage();
-            final List<StationSignal> signals = new LinkedList<>();
-            messages.addMessage(msg, signals);
 
             //first line
             //<IMEI>|<DATA_TYPE>|<TIME>|
             String[] line = lines[0].split(Pattern.quote("|"));
             msg.setImei(line[0]);
-            msg.setTypeString(line[1]);
             msg.setType(getType(line[1]));
             msg.setTime(parseDate(line[2]));
 
+            final DataWithGsmInfo<DeviceMessage> d = new DataWithGsmInfo<>();
+
+            final GsmLocationResolvingRequest gsm = new GsmLocationResolvingRequest();
+            gsm.setRadio("gsm");
+            gsm.setImei(msg.getImei());
+            d.setGsmInfo(gsm);
+            d.setUserData(msg);
+
+            messages.add(d);
             if (DeviceMessageType.RSP == msg.getType()) {
                 msg.setMessage(lines[1]);
             } else {
@@ -68,7 +77,7 @@ public class DeviceMessageParser {
                 for (int i = 2; i < lines.length; i++) {
                     //parse station
                     final StationSignal station = parseStationSignal(lines[i]);
-                    signals.add(station);
+                    gsm.getStations().add(station);
                 }
             }
         }
@@ -151,7 +160,7 @@ public class DeviceMessageParser {
      * @return parsed device message.
      * @throws IOException
      */
-    public IncommingRequest parse(final Reader reader) throws IOException {
+    public List<DataWithGsmInfo<DeviceMessage>> parse(final Reader reader) throws IOException {
         final String msgData = MessageParserUtils.getContent(reader);
         return parse(msgData);
     }

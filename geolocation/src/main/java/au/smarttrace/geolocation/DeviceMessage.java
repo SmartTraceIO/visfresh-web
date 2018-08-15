@@ -1,11 +1,9 @@
 /**
  *
  */
-package com.visfresh;
+package au.smarttrace.geolocation;
 
 import java.util.Date;
-
-import au.smarttrace.geolocation.Location;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -16,10 +14,6 @@ public class DeviceMessage {
      * Device IMEI code.
      */
     private String imei;
-    /**
-     * Message type.
-     */
-    private DeviceMessageType type;
     /**
      * Time of creation.
      */
@@ -32,11 +26,20 @@ public class DeviceMessage {
      * Temperature
      */
     private double temperature;
-    private String message;
-    private String typeString;
+    /**
+     * The IMEI of gateway phone.
+     */
+    private String gateway;
+    /**
+     * The IMEI of gateway phone.
+     */
     private Integer humidity;
 
+    private String message;
+
     private Location location;
+
+    private DeviceMessageType type = DeviceMessageType.AUT;
 
     /**
      * Default constructor.
@@ -56,30 +59,6 @@ public class DeviceMessage {
      */
     public void setImei(final String imei) {
         this.imei = imei;
-    }
-    /**
-     * @return the type
-     */
-    public DeviceMessageType getType() {
-        return type;
-    }
-    /**
-     * @param type the type to set
-     */
-    public void setType(final DeviceMessageType type) {
-        this.type = type;
-    }
-    /**
-     * @param typeString the typeString to set
-     */
-    public void setTypeString(final String typeString) {
-        this.typeString = typeString;
-    }
-    /**
-     * @return the typeString
-     */
-    public String getTypeString() {
-        return typeString;
     }
 
     /**
@@ -118,25 +97,17 @@ public class DeviceMessage {
     public void setTemperature(final double temperature) {
         this.temperature = temperature;
     }
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
+    /**
+     * @return the gateway
      */
-    @Override
-    public String toString() {
-        //358688000000158|AUT|2013/10/18 13:28:29|<LF> <IMEI>|<DATA_TYPE>|<TIME>|
-        //4023|-10.24|<LF> <BATTERY>|<TEMPERATURE>|
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getImei()).append('|');
-        sb.append(getType()).append('|');
-        sb.append(getTime()).append('|');
-
-        sb.append('\n');
-
-        sb.append(getBattery()).append('|');
-        sb.append(getTemperature()).append('|');
-        sb.append('\n');
-
-        return sb.toString();
+    public String getGateway() {
+        return gateway;
+    }
+    /**
+     * @param gateway the gateway to set
+     */
+    public void setGateway(final String gateway) {
+        this.gateway = gateway;
     }
 
     /**
@@ -152,18 +123,6 @@ public class DeviceMessage {
         return message;
     }
     /**
-     * @param humidity
-     */
-    public void setHumidity(final Integer humidity) {
-        this.humidity = humidity;
-    }
-    /**
-     * @return the humidity
-     */
-    public Integer getHumidity() {
-        return humidity;
-    }
-    /**
      * @return the location
      */
     public Location getLocation() {
@@ -174,5 +133,29 @@ public class DeviceMessage {
      */
     public void setLocation(final Location location) {
         this.location = location;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
+    }
+    /**
+     * @param humidity the humidity to set
+     */
+    public void setHumidity(final Integer humidity) {
+        this.humidity = humidity;
+    }
+    /**
+     * @return the type
+     */
+    public DeviceMessageType getType() {
+        return type;
+    }
+    /**
+     * @param type the type to set
+     */
+    public void setType(final DeviceMessageType type) {
+        this.type = type;
     }
 }

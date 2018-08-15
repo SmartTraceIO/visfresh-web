@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 import au.smarttrace.eel.cfg.JdbcConfig;
-import au.smarttrace.eel.db.SystemMessageDao;
+import au.smarttrace.eel.db.BeaconDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -18,7 +18,7 @@ import au.smarttrace.eel.db.SystemMessageDao;
 @Configuration
 @Import(JdbcConfig.class)
 @ComponentScan(basePackageClasses = {
-    SystemMessageDao.class
+    BeaconDao.class
 })
 @PropertySource("classpath:/junit.app.properties")
 public class DaoTestRunnerConfig {

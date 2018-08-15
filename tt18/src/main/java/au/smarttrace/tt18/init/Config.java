@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import au.smarttrace.tt18.server.Tt18Server;
 import au.smarttrace.tt18.st.MessageDao;
@@ -19,6 +20,7 @@ import au.smarttrace.tt18.st.MessageDao;
 @Import(JdbcConfig.class)
 @ComponentScan(basePackageClasses = {Tt18Server.class, MessageDao.class})
 @PropertySource("classpath:/app.properties")
+@EnableScheduling
 public class Config {
     /**
      *

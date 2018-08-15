@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.visfresh.db.SystemMessageDao;
+import com.visfresh.db.DeviceCommandDao;
 
 /**
  * Base JPA configuration for test and production environment.
@@ -18,7 +18,7 @@ import com.visfresh.db.SystemMessageDao;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = {
-        SystemMessageDao.class})
+        DeviceCommandDao.class})
 public class JdbcConfig {
     /**
      * Default constructor.

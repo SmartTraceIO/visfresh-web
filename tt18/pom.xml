@@ -103,6 +103,13 @@
 			<version>0.0.1</version>
 		</dependency>
 
+		<!-- Geo Location -->
+		<dependency>
+			<groupId>au.smarttrace</groupId>
+			<artifactId>geolocation</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+
 		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>

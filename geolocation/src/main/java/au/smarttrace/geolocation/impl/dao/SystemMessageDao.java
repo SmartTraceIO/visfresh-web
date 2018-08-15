@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.eel.db;
+package au.smarttrace.geolocation.impl.dao;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
 
-import au.smarttrace.eel.DeviceMessage;
-import au.smarttrace.eel.SystemMessage;
+import au.smarttrace.geolocation.DeviceMessage;
 import au.smarttrace.geolocation.Location;
+import au.smarttrace.geolocation.SystemMessage;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -45,13 +45,12 @@ public class SystemMessageDao {
     /**
      * JDBC template.
      */
+    protected final NamedParameterJdbcTemplate jdbc;
+
     @Autowired
-    protected NamedParameterJdbcTemplate jdbc;
-    /**
-     * Default constructor.
-     */
-    public SystemMessageDao() {
+    public SystemMessageDao(final NamedParameterJdbcTemplate jdbc) {
         super();
+        this.jdbc = jdbc;
     }
 
     /* (non-Javadoc)
@@ -107,7 +106,7 @@ public class SystemMessageDao {
         obj.addProperty("battery", e.getBattery());
         obj.addProperty("temperature", e.getTemperature());
         obj.addProperty("time", sdf.format(e.getTime()));
-        obj.addProperty("type", "AUT");
+        obj.addProperty("type", e.getType().name());
 
         final Location loc = e.getLocation();
         if (loc != null) {

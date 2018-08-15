@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.db;
+package au.smarttrace.geolocation.impl.dao;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,14 +20,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BeaconChannelLockDao {
-    @Autowired
-    private NamedParameterJdbcTemplate jdbc;
+    private final NamedParameterJdbcTemplate jdbc;
 
     /**
      * Default constructor.
      */
-    public BeaconChannelLockDao() {
+    @Autowired
+    public BeaconChannelLockDao(final NamedParameterJdbcTemplate jdbc) {
         super();
+        this.jdbc = jdbc;
     }
 
     /**

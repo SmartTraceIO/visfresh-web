@@ -5,6 +5,7 @@ package com.visfresh.web;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,9 +18,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import com.visfresh.DeviceCommand;
 import com.visfresh.DeviceMessageParser;
-import com.visfresh.IncommingRequest;
 import com.visfresh.MessageParserUtils;
 import com.visfresh.service.DeviceMessageService;
+
+import au.smarttrace.geolocation.DataWithGsmInfo;
+import au.smarttrace.geolocation.DeviceMessage;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -65,7 +68,7 @@ public class DeviceCommunicationServlet extends HttpServlet {
         final String rawData = MessageParserUtils.getContent(new InputStreamReader(req.getInputStream()));
         log.debug("device message has received: " + rawData);
 
-        IncommingRequest msgs;
+        List<DataWithGsmInfo<DeviceMessage>> msgs;
         try {
             msgs = getParser().parse(rawData);
         } catch (final Exception e) {
@@ -74,13 +77,13 @@ public class DeviceCommunicationServlet extends HttpServlet {
             return;
         }
 
-        final DeviceCommand cmd = service.process(msgs);
+        final DeviceCommand cmd = service.process(msgs, rawData);
         resp.setStatus(HttpServletResponse.SC_OK);
 
         if (cmd != null) {
             final String command = cmd.getCommand();
             log.debug("Sending command " + command + " to device "
-                    + msgs.getMessages().get(0).getImei());
+                    + msgs.get(0).getUserData().getImei());
             resp.getOutputStream().write(command.getBytes());
         }
 

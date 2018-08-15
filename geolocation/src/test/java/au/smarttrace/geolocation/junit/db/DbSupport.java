@@ -65,6 +65,12 @@ public class DbSupport {
         jdbc.update("delete from locationrequests", new HashMap<>());
     }
     /**
+     *
+     */
+    public void clearSystemMessages() {
+        jdbc.update("delete from systemmessages", new HashMap<>());
+    }
+    /**
      * @param id event ID.
      * @return
      */
@@ -87,6 +93,14 @@ public class DbSupport {
         }
         return events;
     }
+    /**
+     *
+     */
+    public void clearBeaconLocks() {
+        final HashMap<String, Object> params = new HashMap<>();
+        jdbc.update("delete from beaconchannels", params);
+    }
+
     /**
      * @return the jdbc
      */

@@ -4,7 +4,6 @@
 package au.smarttrace.tt18.st;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -14,6 +13,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import au.smarttrace.geolocation.DataWithGsmInfo;
+import au.smarttrace.geolocation.DeviceMessage;
+import au.smarttrace.geolocation.DeviceMessageType;
 import au.smarttrace.tt18.MessageParser;
 import au.smarttrace.tt18.MessageParserTest;
 import au.smarttrace.tt18.RawMessage;
@@ -44,17 +46,17 @@ public class SmartTraceRawMessageHandlerTest {
     public void testConvert() throws IOException {
         final RawMessage rawMessage = readTestMessage();
 
-        final DeviceMessage stMessage = handler.convert(rawMessage);
-        assertNotNull(stMessage);
+        final DataWithGsmInfo<DeviceMessage> info = handler.convert(rawMessage);
+        assertNotNull(info);
+
+        final DeviceMessage stMessage = info.getUserData();
 
         assertEquals(rawMessage.getBattery(), stMessage.getBattery());
         assertEquals(rawMessage.getImei(), stMessage.getImei());
-        assertEquals(1, stMessage.getStations().size());
+        assertEquals(1, info.getGsmInfo().getStations().size());
         assertEquals(rawMessage.getTemperature().doubleValue(), stMessage.getTemperature(), 0.001);
         assertEqualsDates(rawMessage.getTime(), stMessage.getTime());
-        assertFalse(stMessage.getRetryOn().after(new Date()));
         assertEquals(DeviceMessageType.AUT, stMessage.getType());
-        assertEquals("AUT", stMessage.getTypeString());
     }
 
     /**

@@ -3,6 +3,8 @@
  */
 package au.smarttrace.tt18.st;
 
+import au.smarttrace.geolocation.DataWithGsmInfo;
+import au.smarttrace.geolocation.DeviceMessage;
 import au.smarttrace.tt18.RawMessage;
 
 /**
@@ -21,7 +23,7 @@ public class AccessibleSmartTraceRawMessageHandler extends SmartTraceRawMessageH
      * @see au.smarttrace.tt18.st.SmartTraceRawMessageHandler#convert(au.smarttrace.tt18.RawMessage)
      */
     @Override
-    public DeviceMessage convert(final RawMessage msg) {
-        return super.convert(msg);
+    public DataWithGsmInfo<DeviceMessage> convert(final RawMessage raw) {
+        return super.convert(raw);
     }
 }

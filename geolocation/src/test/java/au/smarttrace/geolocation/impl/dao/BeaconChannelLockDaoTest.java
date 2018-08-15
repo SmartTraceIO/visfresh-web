@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.db;
+package au.smarttrace.geolocation.impl.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,20 +15,25 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import au.smarttrace.geolocation.junit.DaoTest;
+import au.smarttrace.geolocation.junit.db.DaoTestRunner;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@RunWith(DaoTestRunner.class)
+@Category(DaoTest.class)
 public class BeaconChannelLockDaoTest {
-    private static AnnotationConfigApplicationContext spring;
+    @Autowired
     private NamedParameterJdbcTemplate jdbc;
+    @Autowired
     private BeaconChannelLockDao dao;
 
     /**
@@ -36,19 +41,6 @@ public class BeaconChannelLockDaoTest {
      */
     public BeaconChannelLockDaoTest() {
         super();
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        spring = JUnitDbConfig.createContext();
-    }
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Before
-    public void setUp() throws Exception {
-        jdbc = spring.getBean(NamedParameterJdbcTemplate.class);
-        dao = spring.getBean(BeaconChannelLockDao.class);
     }
 
     @Test
@@ -166,12 +158,5 @@ public class BeaconChannelLockDaoTest {
     public void tearDown() throws Exception {
         //clean up data base
         jdbc.update("delete from beaconchannels", new HashMap<String, Object>());
-    }
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#tearDown()
-     */
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        spring.close();
     }
 }

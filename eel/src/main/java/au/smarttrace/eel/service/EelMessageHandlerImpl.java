@@ -3,14 +3,11 @@
  */
 package au.smarttrace.eel.service;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -23,29 +20,26 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import au.smarttrace.eel.Beacon;
-import au.smarttrace.eel.DeviceMessage;
 import au.smarttrace.eel.GatewayBinding;
 import au.smarttrace.eel.db.BeaconDao;
-import au.smarttrace.eel.db.SystemMessageDao;
 import au.smarttrace.eel.rawdata.BeaconData;
 import au.smarttrace.eel.rawdata.DevicePosition;
 import au.smarttrace.eel.rawdata.EelMessage;
 import au.smarttrace.eel.rawdata.EelPackage;
 import au.smarttrace.eel.rawdata.GsmStationSignal;
 import au.smarttrace.eel.rawdata.LocationPackageBody;
-import au.smarttrace.geolocation.GeoLocationHelper;
+import au.smarttrace.geolocation.DataWithGsmInfo;
+import au.smarttrace.geolocation.DeviceMessage;
 import au.smarttrace.geolocation.GeoLocationRequest;
 import au.smarttrace.geolocation.GeoLocationResponse;
 import au.smarttrace.geolocation.Location;
+import au.smarttrace.geolocation.MultiBeaconGeoLocationFacade;
+import au.smarttrace.geolocation.MultiBeaconMessage;
 import au.smarttrace.geolocation.RequestStatus;
 import au.smarttrace.geolocation.ServiceType;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
-import au.smarttrace.json.ObjectMapperFactory;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -58,16 +52,12 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
     private static final Logger log = LoggerFactory.getLogger(EelMessageHandlerImpl.class);
 
     @Autowired
-    private SystemMessageDao messageDao;
-    @Autowired
     private BeaconDao deviceDao;
     @Autowired
     private InactiveDeviceAlertSender alerter;
     @Autowired
-    private BeaconChannelLockService lockService;
-    @Autowired
     private NamedParameterJdbcTemplate jdbc;
-    private GeoLocationHelper unwiredLabsHelper;
+    private MultiBeaconGeoLocationFacade facade;
     /**
      * Default constructor.
      */
@@ -77,37 +67,12 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
 
     @PostConstruct
     public void initialize() {
-        unwiredLabsHelper = GeoLocationHelper.createHelper(jdbc, ServiceType.UnwiredLabs);
+        facade = MultiBeaconGeoLocationFacade.createFacade(jdbc, ServiceType.UnwiredLabs, SENDER);
     }
 
     @Scheduled(fixedDelay = 10000l)
     public void handleResolvedLocations() {
-        final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
-
-        for (int i = 0; i < 10; i++) {
-            final List<GeoLocationResponse> responses = getAndRemoveProcessedResponses(SENDER, 20);
-            if (responses.isEmpty()) {
-                break;
-            }
-            for (final GeoLocationResponse resp : responses) {
-                if (resp.getStatus() == RequestStatus.success) {
-                    try {
-                        final LocationDetectRequest r = json.readValue(
-                                resp.getUserData(), LocationDetectRequest.class);
-                        final Location loc = resp.getLocation();
-
-                        //set location to messages
-                        for (final DeviceMessage m : r.getMessages()) {
-                            m.setLocation(loc);
-                        }
-
-                        sendResolvedMessages(r.getImei(), r.getMessages());
-                    } catch (final IOException exc) {
-                        log.error("Failed to send resolved message to system", exc);
-                    }
-                }
-            }
-        }
+        facade.processResolvedLocations();
     }
 
     /* (non-Javadoc)
@@ -120,8 +85,8 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
         log.debug("Raw data:\n" + encodeHexString(eelMessage.getRawData()));
 
         final Map<String, Boolean> beaconCache = new HashMap<>();
-        final List<DeviceMessage> toHandle = new LinkedList<>();
-        final List<LocationDetectRequest> toLoctionDetect = new LinkedList<>();
+        final List<DataWithGsmInfo<MultiBeaconMessage>> toHandle = new LinkedList<>();
+        final List<DataWithGsmInfo<MultiBeaconMessage>> toLoctionDetect = new LinkedList<>();
         final boolean isGatewayRegistered = isTrackerRegistered(eelMessage.getImei());
 
         for (final EelPackage pck : eelMessage.getPackages()) {
@@ -134,22 +99,22 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
                     continue;
                 }
 
-                final Date time = fromEpoch(location.getTime());
                 Location loc = null;
-                List<DeviceMessage> msgs;
+                final Date time = fromEpoch(location.getTime());
+
+                final DataWithGsmInfo<MultiBeaconMessage> ldr = new DataWithGsmInfo<>();
+                ldr.setUserData(new MultiBeaconMessage());
+                ldr.getUserData().setGateway(eelMessage.getImei());
+
                 if (location.getGpsData() != null) { //create location.
                     loc = new Location(
                         location.getGpsData().getLatitude() / COORDINATES_MASHTAB,
                         location.getGpsData().getLongitude() / COORDINATES_MASHTAB);
-                    msgs = toHandle;
+                    toHandle.add(ldr);
                 } else { //if not location, create location detection request
                     //and collect messages to supply by given request.
-                    final LocationDetectRequest req = new LocationDetectRequest();
-                    req.setImei(eelMessage.getImei());
-                    req.setReq(createRequest(eelMessage.getImei(), location));
-                    toLoctionDetect.add(req);
-
-                    msgs = req.getMessages();
+                    ldr.setGsmInfo(createRequest(eelMessage.getImei(), location));
+                    toLoctionDetect.add(ldr);
                 }
 
                 if (isGatewayRegistered) {
@@ -157,7 +122,7 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
                     msg.setLocation(loc);
                     msg.setTime(time);
 
-                    msgs.add(msg);
+                    ldr.getUserData().setGatewayMessage(msg);
                 }
 
                 for (final BeaconData bs : locBody.getBeacons()) {
@@ -171,7 +136,7 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
                         msg.setTime(time);
                         msg.setLocation(loc);
 
-                        msgs.add(msg);
+                        ldr.getUserData().getBeacons().add(msg);
                     } else {
                         log.warn("Not found registered device " + beaconImei
                                 + " for beacon " + bs.getAddress() + " message will ignored");
@@ -180,14 +145,25 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
             }
         }
 
+        //process resolved messages.
         if (!toHandle.isEmpty()) {
-            sendResolvedMessages(eelMessage.getImei(), toHandle);
+            for (final DataWithGsmInfo<MultiBeaconMessage> req : toHandle) {
+                processResolvedMessage(req.getUserData());
+            }
         }
+        //send location detect requests.
         if (!toLoctionDetect.isEmpty()) {
-            for (final LocationDetectRequest req : toLoctionDetect) {
+            for (final DataWithGsmInfo<MultiBeaconMessage> req : toLoctionDetect) {
                 sendLocationResolvingRequest(req);
             }
         }
+    }
+
+    /**
+     * @param req
+     */
+    protected void processResolvedMessage(final MultiBeaconMessage req) {
+        facade.processResolvedMessage(req, RequestStatus.success);
     }
 
     /**
@@ -204,26 +180,17 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
         msg.setTemperature(locBody.getTemperature() / 256.);
         return msg;
     }
-
     /**
      * @param req
      */
-    private void sendLocationResolvingRequest(final LocationDetectRequest req) {
-        if (req.getMessages().size() == 0) {
+    protected void sendLocationResolvingRequest(final DataWithGsmInfo<MultiBeaconMessage> req) {
+        if (req.getUserData().getGatewayMessage() == null && req.getUserData().getBeacons().size() == 0) {
             //ignore request without messages.
             return;
         }
 
-        final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
-        final GsmLocationResolvingRequest r = req.getReq();
-        req.setReq(null);
-
-        try {
-            final String userData = json.writeValueAsString(req);
-            saveUnwiredLabsRequest(SENDER, userData, r);
-        } catch (final JsonProcessingException e) {
-            log.error("Failed to send location resolving request for " + req.getReq().getImei(), e);
-        }
+        final GeoLocationRequest r = facade.createRequest(req);
+        facade.saveRequest(r);
     }
     /**
      * @param imei
@@ -242,22 +209,6 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
         }
         return req;
     }
-
-    /**
-     * @param gateway
-     * @param toHandle
-     */
-    public void sendResolvedMessages(final String gateway, final List<DeviceMessage> toHandle) {
-        final Set<String> beacons = lockBeaconChannels(getOnlyBeaconImeis(toHandle), gateway);
-        for (final DeviceMessage m : toHandle) {
-            if (m.getGateway() == null || beacons.contains(m.getImei())) {
-                sendMessage(m);
-            } else {
-                log.debug("Beacon " + m.getImei() + " channel has locked by another gateway");
-            }
-        }
-    }
-
     /**
      * @param beaconImei
      * @param eelMessage
@@ -360,41 +311,8 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
      * @return
      */
     protected List<GeoLocationResponse> getAndRemoveProcessedResponses(final String sender, final int limit) {
-        return unwiredLabsHelper.getAndRemoveProcessedResponses(sender, limit);
+        return facade.getAndRemoveProcessedResponses(limit);
     }
-    /**
-     * @param sender
-     * @param userData
-     * @param r
-     */
-    protected void saveUnwiredLabsRequest(final String sender,
-            final String userData, final GsmLocationResolvingRequest r) {
-        final GeoLocationRequest req = unwiredLabsHelper.createRequest(sender, userData, r);
-        unwiredLabsHelper.saveRequest(req);
-    }
-    /**
-     * @param beacons set of beacon IMEI.
-     * @param gateway TODO
-     * @return successfully locked channels.
-     */
-    protected Set<String> lockBeaconChannels(final Set<String> beacons, final String gateway) {
-        return lockService.lockChannels(beacons, gateway);
-    }
-
-    /**
-     * @param msgs messages.
-     * @return set of IMEI.
-     */
-    private Set<String> getOnlyBeaconImeis(final List<DeviceMessage> msgs) {
-        final Set<String> imeis = new HashSet<>();
-        for (final DeviceMessage m : msgs) {
-            if (m.getGateway() != null) {
-                imeis.add(m.getImei());
-            }
-        }
-        return imeis;
-    }
-
     /**
      * @param imei
      * @param beacon
@@ -424,13 +342,6 @@ public class EelMessageHandlerImpl implements EelMessageHandler {
      */
     private Date fromEpoch(final long t) {
         return new Date(t * 1000l - TimeZone.getDefault().getOffset(t));
-    }
-    /**
-     * @param msg device message.
-     */
-    protected void sendMessage(final DeviceMessage msg) {
-        log.debug("Message for " + msg.getImei() + " have resolved location");
-        messageDao.sendSystemMessageFor(msg);
     }
     /**
      * @param subject

@@ -18,11 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import au.smarttrace.Beacon;
-import au.smarttrace.DeviceMessage;
 import au.smarttrace.GatewayBinding;
-import au.smarttrace.Location;
 import au.smarttrace.db.BeaconDao;
-import au.smarttrace.db.SystemMessageDao;
+import au.smarttrace.geolocation.DeviceMessage;
+import au.smarttrace.geolocation.Location;
+import au.smarttrace.geolocation.impl.dao.SystemMessageDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.eel;
+package au.smarttrace.geolocation;
 
 import java.util.Date;
 

@@ -7,7 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import au.smarttrace.db.SystemMessageDao;
+import au.smarttrace.db.BeaconDao;
+import au.smarttrace.geolocation.impl.dao.SystemMessageDao;
 
 /**
  * Base JPA configuration for test and production environment.
@@ -18,7 +19,7 @@ import au.smarttrace.db.SystemMessageDao;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = {
-        SystemMessageDao.class})
+        BeaconDao.class, SystemMessageDao.class})
 public class JdbcConfig {
 
     /**

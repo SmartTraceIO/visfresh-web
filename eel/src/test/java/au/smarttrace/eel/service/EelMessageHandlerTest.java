@@ -22,11 +22,7 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import au.smarttrace.eel.Beacon;
-import au.smarttrace.eel.DeviceMessage;
 import au.smarttrace.eel.GatewayBinding;
 import au.smarttrace.eel.rawdata.BeaconData;
 import au.smarttrace.eel.rawdata.DevicePosition;
@@ -37,13 +33,13 @@ import au.smarttrace.eel.rawdata.GsmStationSignal;
 import au.smarttrace.eel.rawdata.LocationPackageBody;
 import au.smarttrace.eel.rawdata.PackageHeader;
 import au.smarttrace.eel.rawdata.PackageHeader.PackageIdentifier;
+import au.smarttrace.geolocation.DataWithGsmInfo;
+import au.smarttrace.geolocation.DeviceMessage;
 import au.smarttrace.geolocation.GeoLocationResponse;
 import au.smarttrace.geolocation.Location;
-import au.smarttrace.geolocation.RequestStatus;
-import au.smarttrace.geolocation.ServiceType;
+import au.smarttrace.geolocation.MultiBeaconMessage;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
-import au.smarttrace.json.ObjectMapperFactory;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -52,13 +48,10 @@ import au.smarttrace.json.ObjectMapperFactory;
 public class EelMessageHandlerTest extends EelMessageHandlerImpl {
     private Beacon beacon;
     private Map<String, Beacon> beacons = new HashMap<>();
-    private long lastId;
     private final List<DeviceMessage> messages = new LinkedList<>();
     private final List<String> alerts = new LinkedList<>();
-    private final Set<String> locks = new HashSet<>();
-    private List<UnwiredLabsRequest> locationRequests = new LinkedList<>();
+    private List<DataWithGsmInfo<MultiBeaconMessage>> locationRequests = new LinkedList<>();
     private Set<String> trackers = new HashSet<>();
-    private final ObjectMapper json = ObjectMapperFactory.craeteObjectMapper();
     private final List<GeoLocationResponse> responses = new LinkedList<>();
 
 
@@ -202,14 +195,11 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
         assertEquals(0, messages.size());
         assertEquals(1, this.locationRequests.size());
 
-        final UnwiredLabsRequest req = locationRequests.get(0);
-        assertEquals(SENDER, req.getSender());
+        final DataWithGsmInfo<MultiBeaconMessage> req = locationRequests.get(0);
+        final MultiBeaconMessage msgs = req.getUserData();
 
-        final LocationDetectRequest ldr = json.readValue(req.getUserData(), LocationDetectRequest.class);
-        final List<DeviceMessage> msgs = ldr.getMessages();
-
-        assertEquals(2, msgs.size());
-        final DeviceMessage m = msgs.get(0);
+        assertEquals(2, msgs.getBeacons().size());
+        final DeviceMessage m = msgs.getBeacons().get(0);
         assertEquals(battery, Math.round(m.getBattery()));
         assertTrue(m.getImei().contains(address));
         assertEquals(temperature, m.getTemperature(), 0.001);
@@ -217,7 +207,7 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
 
         assertNull(m.getLocation());
 
-        final GsmLocationResolvingRequest gsmReq = req.getRequest();
+        final GsmLocationResolvingRequest gsmReq = req.getGsmInfo();
         assertEquals(2, gsmReq.getStations().size());
         final StationSignal ss = gsmReq.getStations().get(0);
 
@@ -231,6 +221,11 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
     public void testIncludeTracker() throws IOException {
         final String imei = "123456677";
         final EelMessage msg = crtateLocationMessage(imei, null, createGsmStationSignal());
+        //add one beacon
+        final LocationPackageBody lp = getLocationPackage(msg, 0);
+
+        final BeaconData beaconData = createBeaconData("9038749879");
+        lp.getBeacons().add(beaconData);
 
         handleMessage(msg);
 
@@ -241,23 +236,19 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
         assertEquals(0, this.locationRequests.size());
 
         //register device
-        trackers.add(imei);
+        createBeaconDevice(beaconData.getAddress());
         handleMessage(msg);
 
         assertEquals(0, messages.size());
         assertEquals(1, this.locationRequests.size());
 
-        final UnwiredLabsRequest req = locationRequests.get(0);
-        assertEquals(SENDER, req.getSender());
+        final DataWithGsmInfo<MultiBeaconMessage> req = locationRequests.get(0);
+        final MultiBeaconMessage msgs = req.getUserData();
 
-        final LocationDetectRequest ldr = json.readValue(req.getUserData(), LocationDetectRequest.class);
-        final List<DeviceMessage> msgs = ldr.getMessages();
-
-        assertEquals(1, msgs.size());
-        final DeviceMessage m = msgs.get(0);
-        assertEquals(imei, m.getImei());
+        assertEquals(1, msgs.getBeacons().size());
+        final DeviceMessage m = msgs.getBeacons().get(0);
+        assertEquals(beaconData.getAddress(), m.getImei());
     }
-
     @Test
     public void testIncludeTrackerResolvedLocation() throws IOException {
         final String imei = "123456677";
@@ -316,23 +307,6 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
         assertEquals(1, alerts.size());
     }
     @Test
-    public void testNotSuccessToLockChannel() {
-        final EelMessage msg = createMessage(beacon.getImei());
-
-        final GatewayBinding g = new GatewayBinding();
-        g.setActive(true);
-        g.setCompany(beacon.getCompany());
-        g.setId(77l);
-        g.setGateway(msg.getImei());
-        beacon.setGateway(g);
-
-        locks.add(beacon.getImei());
-        handleMessage(msg);
-
-        assertEquals(0, messages.size());
-        assertEquals(0, alerts.size());
-    }
-    @Test
     public void testNotSendIfDeviceNotGateway() {
         final EelMessage msg = createMessage(beacon.getImei());
 
@@ -359,61 +333,25 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
         assertEquals(0, messages.size());
         assertEquals(1, alerts.size());
     }
-    @Test
-    public void testHandleResolvedLocationsSuccess() {
-        final DeviceMessage msg = createDeviceMessage("32490870987978");
-
-        addResponse(RequestStatus.success, new Location(1.0, 2.0), msg);
-        addResponse(RequestStatus.success, new Location(1.0, 2.0), msg);
-
-        handleResolvedLocations();
-
-        assertEquals(2, messages.size());
-
-        //test location set
-        assertNotNull(messages.get(0).getLocation());
-        assertNotNull(messages.get(1).getLocation());
-    }
-    @Test
-    public void testHandleResolvedLocationsError() {
-        final DeviceMessage msg = createDeviceMessage("32490870987978");
-
-        addResponse(RequestStatus.error, new Location(1.0, 2.0), msg);
-        addResponse(RequestStatus.error, new Location(1.0, 2.0), msg);
-
-        handleResolvedLocations();
-
-        assertEquals(0, messages.size());
+    /* (non-Javadoc)
+     * @see au.smarttrace.eel.service.EelMessageHandlerImpl#processResolvedMessage(au.smarttrace.geolocation.MultiBeaconMessage)
+     */
+    @Override
+    protected void processResolvedMessage(final MultiBeaconMessage req) {
+        if (req.getGatewayMessage() != null) {
+            messages.add(req.getGatewayMessage());
+        }
+        messages.addAll(req.getBeacons());
     }
     /**
-     * @param imei
-     * @return
+     * @param req
      */
-    private DeviceMessage createDeviceMessage(final String imei) {
-        final DeviceMessage m = new DeviceMessage();
-        m.setImei(imei);
-        return m;
-    }
-    private GeoLocationResponse addResponse(final RequestStatus status,
-            final Location loc, final DeviceMessage... msgs) {
-        //create user data.
-        final LocationDetectRequest ldr = new LocationDetectRequest();
-        ldr.setImei("23049879087987");
-        for (final DeviceMessage msg : msgs) {
-            ldr.getMessages().add(msg);
+    @Override
+    protected void sendLocationResolvingRequest(final DataWithGsmInfo<MultiBeaconMessage> req) {
+        final MultiBeaconMessage userData = req.getUserData();
+        if (userData.getGatewayMessage() != null || userData.getBeacons().size() > 0) {
+            this.locationRequests.add(req);
         }
-
-        final GeoLocationResponse r = new GeoLocationResponse();
-        r.setLocation(loc);
-        r.setStatus(status);
-        r.setType(ServiceType.UnwiredLabs);
-        try {
-            r.setUserData(json.writeValueAsString(ldr));
-        } catch (final JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        responses.add(r);
-        return r;
     }
     /* (non-Javadoc)
      * @see au.smarttrace.eel.service.EelMessageHandlerImpl#getAndRemoveProcessedResponses(java.lang.String, int)
@@ -452,31 +390,11 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
         alerts.add(subject + ":" + message);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.bt04.Bt04Service#sendMessage(com.visfresh.DeviceMessage, com.visfresh.Location)
-     */
-    @Override
-    protected void sendMessage(final DeviceMessage msg) {
-        msg.setId(lastId++);
-        messages.add(msg);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.bt04.Bt04Service#getDeviceByImei(java.lang.String)
      */
     @Override
     protected Beacon getBeaconByImei(final String imei) {
         return beacons.get(imei);
-    }
-    /* (non-Javadoc)
-     * @see au.smarttrace.eel.service.EelMessageHandlerImpl#saveUnwiredLabsRequest(java.lang.String, java.lang.String, au.smarttrace.gsm.GsmLocationResolvingRequest)
-     */
-    @Override
-    protected void saveUnwiredLabsRequest(final String sender, final String userData, final GsmLocationResolvingRequest r) {
-        final UnwiredLabsRequest unwReq = new UnwiredLabsRequest();
-        unwReq.setSender(sender);
-        unwReq.setUserData(userData);
-        unwReq.setRequest(r);
-
-        locationRequests.add(unwReq);
     }
     /* (non-Javadoc)
      * @see au.smarttrace.eel.service.EelMessageHandlerImpl#isTrackerRegistered(java.lang.String)
@@ -606,17 +524,22 @@ public class EelMessageHandlerTest extends EelMessageHandlerImpl {
     private long toEpoch(final long t) {
         return (t + TimeZone.getDefault().getOffset(t)) / 1000;
     }
-    /* (non-Javadoc)
-     * @see au.smarttrace.bt04.Bt04Service#lockBeaconChannels(java.util.Set)
+
+    /**
+     * @param imei
+     * @return
      */
-    @Override
-    protected Set<String> lockBeaconChannels(final Set<String> beacons, final String gateway) {
-        final Set<String> result = new HashSet<>();
-        for (final String b : beacons) {
-            if (!locks.contains(b)) {
-                result.add(b);
-            }
-        }
-        return result;
+    private BeaconData createBeaconData(final String imei) {
+        final BeaconData bd = new BeaconData();
+        bd.setAddress(imei);
+        return bd;
+    }
+    /**
+     * @param msg
+     * @return
+     */
+    private LocationPackageBody getLocationPackage(final EelMessage msg, final int pos) {
+        final EelPackage pckg = msg.getPackages().get(pos);
+        return (LocationPackageBody) pckg.getBody();
     }
 }
