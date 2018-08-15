@@ -72,7 +72,8 @@ public class ShipmentStatisticsCollectorSerializer extends AbstractJsonSerialize
         final JsonObject json = el.getAsJsonObject();
         final AccessibleShipmentStatsCollector collector = new AccessibleShipmentStatsCollector();
 
-        collector.setTimeRanges(parseTimeRanges(json.get(TIME_RANGES)));
+        final TimeRanges tr = parseTimeRanges(json.get(TIME_RANGES));
+        collector.setTimeRanges(tr == null ? new TimeRanges() : tr);
         collector.setLastEvent(parseLastEvent(json.get(LAST_EVENT)));
 
         collector.setN(asInt(json.get(N)));
