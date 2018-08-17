@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
-import au.smarttrace.eel.cfg.JdbcConfig;
 import au.smarttrace.eel.db.BeaconDao;
+import au.smarttrace.spring.jdbc.SpringDbConfigJUnit;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
-@Import(JdbcConfig.class)
+@Import(SpringDbConfigJUnit.class)
 @ComponentScan(basePackageClasses = {
     BeaconDao.class
 })

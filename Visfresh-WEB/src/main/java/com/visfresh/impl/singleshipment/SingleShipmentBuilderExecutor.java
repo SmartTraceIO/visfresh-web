@@ -5,11 +5,11 @@ package com.visfresh.impl.singleshipment;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.visfresh.io.shipment.SingleShipmentData;
@@ -49,20 +49,20 @@ public class SingleShipmentBuilderExecutor {
         final ExecutorService pool = Executors.newFixedThreadPool(builders.size(), threadFactory);
 
         try {
+            final List<Callable<Void>> tasks = new LinkedList<>();
             for (final SingleShipmentPartBuilder builder : builders) {
-                pool.execute(new Runnable() {
+                tasks.add(new Callable<Void>() {
                     @Override
-                    public void run() {
+                    public Void call() throws Exception {
                         builder.fetchData();
+                        return null;
                     }
                 });
             }
+
+            pool.invokeAll(tasks, 3, TimeUnit.MINUTES);
         } finally {
             pool.shutdown();
-        }
-
-        if (!pool.awaitTermination(3, TimeUnit.MINUTES)) {
-            throw new TimeoutException("Build the single shipment data timed out");
         }
 
         for (final SingleShipmentPartBuilder b : builders) {

@@ -1,13 +1,10 @@
 /**
  *
  */
-package au.smarttrace.eel.db;
-
-import javax.sql.DataSource;
+package au.smarttrace.spring.jdbc.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -18,28 +15,25 @@ import com.zaxxer.hikari.HikariDataSource;
  *
  */
 @Component
-public class DataSourceTransactionManagerImpl extends DataSourceTransactionManager {
-    private static final long serialVersionUID = 8205030473604858685L;
-
+public class DataSourceImpl extends HikariDataSource {
     /**
      * Default constructor.
      */
     @Autowired
-    public DataSourceTransactionManagerImpl(final Environment env) {
-        super();
-        setDataSource(createDataSource(env));
+    public DataSourceImpl(final Environment env) {
+        super(createConfiguration(env));
     }
     /**
-     * @return JDBC data source.
+     * @param env
+     * @return
      */
-    private static DataSource createDataSource(final Environment env) {
-        //data source
+    private static HikariConfig createConfiguration(final Environment env) {
         final HikariConfig config = new HikariConfig();
         config.setDriverClassName(env.getProperty("dataSource.driverClassName"));
         config.setJdbcUrl(env.getProperty("dataSource.url"));
         config.setUsername(env.getProperty("dataSource.username"));
         config.setPassword(env.getProperty("dataSource.password"));
         config.setMaximumPoolSize(Integer.parseInt(env.getProperty("dataSource.numConnections", "3")));
-        return new HikariDataSource(config);
+        return config;
     }
 }

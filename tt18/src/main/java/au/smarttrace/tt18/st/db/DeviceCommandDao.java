@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.tt18.st;
+package au.smarttrace.tt18.st.db;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -11,6 +11,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import au.smarttrace.tt18.DeviceCommand;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

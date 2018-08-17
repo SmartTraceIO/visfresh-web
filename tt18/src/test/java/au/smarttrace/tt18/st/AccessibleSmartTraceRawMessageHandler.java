@@ -6,6 +6,7 @@ package au.smarttrace.tt18.st;
 import au.smarttrace.geolocation.DataWithGsmInfo;
 import au.smarttrace.geolocation.DeviceMessage;
 import au.smarttrace.tt18.RawMessage;
+import au.smarttrace.tt18.st.service.SmartTraceRawMessageHandler;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

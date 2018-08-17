@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.tt18.st;
+package au.smarttrace.tt18.st.service;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,8 +16,11 @@ import au.smarttrace.geolocation.DeviceMessage;
 import au.smarttrace.geolocation.DeviceMessageType;
 import au.smarttrace.gsm.GsmLocationResolvingRequest;
 import au.smarttrace.gsm.StationSignal;
+import au.smarttrace.tt18.DeviceCommand;
 import au.smarttrace.tt18.RawMessage;
 import au.smarttrace.tt18.RawMessageHandler;
+import au.smarttrace.tt18.st.db.DeviceCommandDao;
+import au.smarttrace.tt18.st.db.MessageDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -4,19 +4,21 @@
 package au.smarttrace.db;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 
-import au.smarttrace.cfg.JdbcConfig;
+import au.smarttrace.geolocation.impl.dao.SystemMessageDao;
+import au.smarttrace.spring.jdbc.SpringDbConfigJUnit;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
-@Import(JdbcConfig.class)
-@PropertySource("classpath:/application-junit.properties")
+@Import(SpringDbConfigJUnit.class)
+@ComponentScan(basePackageClasses = {
+        BeaconDao.class, SystemMessageDao.class})
 public class JUnitDbConfig {
     /**
      * Default constructor.

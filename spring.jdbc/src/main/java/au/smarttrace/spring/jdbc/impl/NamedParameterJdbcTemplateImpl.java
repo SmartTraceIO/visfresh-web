@@ -1,11 +1,12 @@
 /**
  *
  */
-package com.visfresh.init.jdbc;
+package au.smarttrace.spring.jdbc.impl;
+
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,11 +15,20 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class NamedParameterJdbcTemplateImpl extends NamedParameterJdbcTemplate {
+    private DataSourceImpl dataSource;
     /**
-     * @param dataSource
+     * @param ds data source.
      */
     @Autowired
-    public NamedParameterJdbcTemplateImpl(final DataSourceTransactionManager mgr) {
-        super(mgr.getDataSource());
+    public NamedParameterJdbcTemplateImpl(final DataSourceImpl ds) {
+        super(ds);
+        this.dataSource = ds;
+    }
+    /**
+     * Destroys data source.
+     */
+    @PreDestroy
+    public void destroy() {
+        dataSource.close();
     }
 }

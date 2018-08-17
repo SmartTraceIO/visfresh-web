@@ -17,9 +17,11 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import au.smarttrace.tt18.DeviceCommand;
 import au.smarttrace.tt18.junit.DaoTest;
 import au.smarttrace.tt18.junit.db.DaoTestRunner;
 import au.smarttrace.tt18.junit.db.DbSupport;
+import au.smarttrace.tt18.st.db.DeviceCommandDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

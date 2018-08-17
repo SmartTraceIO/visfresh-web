@@ -9,17 +9,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
+import com.visfresh.db.DeviceCommandDao;
 import com.visfresh.mail.mock.MockEmailSender;
 import com.visfresh.service.DeviceMessageService;
-import com.visfresh.spring.jdbc.JdbcConfig;
+
+import au.smarttrace.spring.jdbc.SpringDbConfigJUnit;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
-@Import(JdbcConfig.class)
+@Import(SpringDbConfigJUnit.class)
 @ComponentScan(basePackageClasses = {
+    DeviceCommandDao.class,
     MockEmailSender.class,
     DeviceMessageService.class})
 @PropertySource("classpath:/application-junit.properties")

@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.tt18.st;
+package au.smarttrace.tt18;
 
 
 

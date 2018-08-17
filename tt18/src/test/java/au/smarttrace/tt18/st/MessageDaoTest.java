@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import au.smarttrace.tt18.junit.DaoTest;
 import au.smarttrace.tt18.junit.db.DaoTestRunner;
 import au.smarttrace.tt18.junit.db.DbSupport;
+import au.smarttrace.tt18.st.db.MessageDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

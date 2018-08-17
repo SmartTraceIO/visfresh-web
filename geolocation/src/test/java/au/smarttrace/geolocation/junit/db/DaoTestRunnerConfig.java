@@ -9,14 +9,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 import au.smarttrace.geolocation.impl.dao.RetryableEventDao;
-import au.smarttrace.geolocation.init.JdbcConfig;
+import au.smarttrace.spring.jdbc.SpringDbConfigJUnit;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
-@Import(JdbcConfig.class)
+@Import(SpringDbConfigJUnit.class)
 @ComponentScan(basePackageClasses = {
     RetryableEventDao.class
 })

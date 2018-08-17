@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
-import au.smarttrace.tt18.init.JdbcConfig;
-import au.smarttrace.tt18.st.MessageDao;
+import au.smarttrace.spring.jdbc.SpringDbConfigJUnit;
+import au.smarttrace.tt18.st.db.MessageDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
-@Import(JdbcConfig.class)
+@Import(SpringDbConfigJUnit.class)
 @ComponentScan(basePackageClasses = {
     MessageDao.class
 })

@@ -11,15 +11,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.init.instance.InstanceConfig;
-import com.visfresh.init.jdbc.JdbcConfig;
 import com.visfresh.l12n.XmlResourceBundle;
 import com.visfresh.mock.MockRuleEngine;
+
+import au.smarttrace.spring.jdbc.SpringDbConfigJUnit;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Import({JdbcConfig.class, InstanceConfig.class})
+@Import({SpringDbConfigJUnit.class, InstanceConfig.class})
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = {
