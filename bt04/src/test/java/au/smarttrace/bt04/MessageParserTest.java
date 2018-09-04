@@ -33,7 +33,7 @@ public class MessageParserTest {
     public void testParse() {
         final String rawData = "356024089973101|1522093635378|21.0512713|105.7945854|0.0|20.0|0.0|\n"
                 + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|\n"
-                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|";
+                + "11160059|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093633809|3901|";
 
         final Bt04Message msg = parser.parse(rawData);
 
@@ -61,6 +61,19 @@ public class MessageParserTest {
         assertNotNull(b.getLastScannedTime());
         assertEquals("3901", b.getHardwareModel());
         assertEquals(79.68, b.getHumidity().doubleValue(), 0.001);
+    }
+    @Test
+    public void testUseBeaconOnlyByLatestSchanedTime() {
+        final String rawData = "356024089973101|1522093635378|21.0512713|105.7945854|0.0|20.0|0.0|\n"
+                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|98|1522093631000|3901|\n"
+                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|99|1522093633809|3901|\n"
+                + "11160058|RT_T|26.28|79.68|-82|0.16822005355867573|100|1522093630000|3901|";
+
+        final Bt04Message msg = parser.parse(rawData);
+
+        //beacon
+        assertEquals(1, msg.getBeacons().size());
+        assertEquals(99., msg.getBeacons().get(0).getBattery(), 0.01);
     }
     @Test
     public void testParseWithEmptyLocations() {

@@ -4,8 +4,10 @@
 package au.smarttrace.bt04;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -38,8 +40,22 @@ public class MessageParser {
         final String[] lines = splitByLines(rawData);
         parseHeader(lines[0].trim(), msg);
 
+        //TODO only beacon with latest scan time
+        final Set<String> parsedBeacons = new HashSet<>();
         for (int i = 1; i < lines.length; i++) {
-            msg.getBeacons().add(parseBeacon(lines[i].trim()));
+            final BeaconSignal b = parseBeacon(lines[i].trim());
+            if (!parsedBeacons.contains(b.getSn())) {
+                parsedBeacons.add(b.getSn());
+                msg.getBeacons().add(b);
+            } else {
+                msg.getBeacons().replaceAll(t -> {
+                    if (t.getSn().equals(b.getSn())
+                            && t.getLastScannedTime().before(b.getLastScannedTime())) {
+                        return b;
+                    }
+                    return t;
+                });
+            }
         }
 
         return msg;
